@@ -4,7 +4,8 @@
 // @author      Antiviblyadok
 // @version     0.0.3
 // @namespace   https://livacha.com/
-// @match       https://livacha.com/*
+// @match       https://livacha.com/chat/*
+// @match       https://livacha.com/post/*
 // @connect     livacha.com
 // @require     https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js
 // @grant       GM_xmlhttpRequest
@@ -75,7 +76,7 @@ var JS = create("script",{type: "text/javascript"},MsgClickFunc.toString());
 
 document.getElementsByTagName('head')[0].appendChild(JS);
 
-var ignorelist = new Array();
+var ignorelist = new Array(); // '','',0,0,0
 
 window.addEventListener('beforeunload', (event) => {
                     // [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time
@@ -111,7 +112,7 @@ window.addEventListener('beforeunload', (event) => {
 //                        if (ignorelist_loaded[i][0] == ignorelist[c][0] || ignorelist_loaded[i][2] == 3 || ignorelist[c][1] == '') {
 //                if (ticks - ignorelist_loaded[i][2] < 86400000) { ignorelist_temp.push(ignorelist[i]); }
 
-      if(typeof(localStorage) != 'undefined' && ignorelist_temp.length >= 1) { localStorage.setItem('ignorelist', JSON.stringify(ignorelist_temp)) }
+      if((typeof(localStorage) != 'undefined') && (ignorelist_temp.length > 0)) { localStorage.setItem('ignorelist', JSON.stringify(ignorelist_temp)) }
       //event.preventDefault();
       //event.returnValue = true;
 });
@@ -119,6 +120,17 @@ window.addEventListener('beforeunload', (event) => {
 (function () {
     'use strict';
 
+    var w = window.unsafeWindow || window;
+
+    if (w.self != w.top) {
+        return;
+    }
+/*
+    if (/http:\/\/userscripts.org/.test(w.location.href)) {
+        //Ниже идёт непосредственно код скрипта
+        alert("Userscripts приветствует вас навязчивым окном.");
+    }
+*/
     function getHostName(url) {
         var match = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
         if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0) {
@@ -177,11 +189,13 @@ $(document).ready(function () {
             m = m.replace(/^.*<img.*182113.*/, "🐖");
             m = m.replace(/^.*<img.*126716.*/, "🐖");
             m = m.replace(/^.*<img.*195552.*/, "🐖");
-            m = m.replace(/🇺🇦/, "🐖");
-            m = m.replace(/.+(і|ї).+/, "🐖");
+
+            // не учитываем сиволы в никах:
+            let no_span_tag = m.replace(/<span[^<>]+>[^<>]+<\/span>/i,''); let tm;
+            tm = no_span_tag.replace(/^.*🇺🇦.*/, "🐖"); if (tm != no_span_tag) { m = tm }
+            tm = no_span_tag.replace(/.*(і|ї).*/, "🐖"); if (tm != no_span_tag) { m = tm }
 
 
-//            console.log(m);
 //🐷🐖🐔🐓🐗🪓🔪
 //:210718:
 
@@ -213,9 +227,9 @@ $(document).ready(function () {
                 '.*рузьке.*': '🐷',
                 '.*сдохни р(а|о)с{1,2}ия.*': '🐷',
                 '.*раися.*': '🐷',
-                '.*раси..*': '🐷',
+                '.*расия.*': '🐷',
                 '.*( |^)на рас{1,2}(и|е){1,2}.*': '🐷',
-                '.*[c]?дохните рус[с]?к.*': '🐷',
+                '.*[c]?дохни\W{1,3} рус[с]?к.*': '🐷',
                 '.*рашист.*': '🐷',
                 '.*путло.*': '🐷',
                 '.*пидорашк.*': '🐷',
@@ -229,6 +243,7 @@ $(document).ready(function () {
                 '.*росс?(и|е)янц.*': '🐷',
                 '.*р(у|ю)с?(с|з)к\\S{1,5} алкаш.*': '🐷',
                 '.*это мусарской сайт.*': '🐷',
+                '.*путинизм.*': '🐷',
 /*=================================================================*/
                 '.*(с|по)дохн.*': '😭',
                 '.*умри.*': '😭',
@@ -236,7 +251,7 @@ $(document).ready(function () {
                  '.*б(о|а)?мж.*': '🤮',
                  '.*теплотрас.*': '🤮',
                  '.*мил(о|а)стын.*': '🤮',
-                 '.*на зон(у|а|ы|е).*': '🐓',
+                 '.*( |^)зон(у|а|ы|е).*': '🐓',
                  '.*пр(а|о)коп.*': '🤡'
 
             };
@@ -256,8 +271,8 @@ $(document).ready(function () {
                 for (var key in dict) { // Проверка на список нехороших слов
                     var reg = new RegExp(key,'i');
                     if (m.search(key) != -1) { // тег для показа скрытого сообщения
-                        m = '<div class="text service-tag" style="display: auto" ondblclick=MsgClick(this);>' + dict[key] + '</div>' +
-                            '<div class="text text-body" style="display: none">' + m + '</div>';
+                        m = '<div class="text service-tag" style="display: auto" ondblclick=MsgClick(this);>'
+                            + dict[key] + '</div>' + '<div class="text text-body" style="display: none">' + m + '</div>';
                         break;
                     }
                 };
@@ -379,8 +394,9 @@ $(document).ready(function () {
             'Nikita HUEEVICH LOH','Donald','osa22','boss2003',
             '` dont panic&amp;amp; ..','sofia28','kilovatw','ЯНА ВОЛЬКОВА','прямо_к****',
             'ines96','bond666','✔️Чпок','deep777','Pepe','ДжейКей','Джей Кей','Strong78',
-            'Бесперспективняк','Поменяйтe ник','болек','Propaganda','tata666'];
-            //'⚡Эстонец⚡️','❣ Zlobnyi element ❣☕'
+            'Бесперспективняк','Поменяйтe ник','tata666','болек',
+            '❣ Zlobnyi element ❣☕','Propaganda','МАСОЛ'];
+            //'⚡Эстонец⚡️'
 
         var userlist = new Map();
 
@@ -487,9 +503,10 @@ $(document).ready(function () {
 
                 if(n.toLowerCase() != nickname.toLowerCase()) {
                     if (typeof userdata === 'object') { is_spam = antiSpam(userdata[0],t) }
+                    t = antiCapsMat(t); // не обрабатывать сообщения от себя
                 }
 
-                t = antiCapsMat(t);
+                //t = antiCapsMat(t); // обрабатывать сообщения от себя
 
                 $($mms).html(t);
 
@@ -515,19 +532,27 @@ $(document).ready(function () {
                 var ticks = now.getTime();
                 var date_diff = 0;
 
+                const ignore_nick_100d = 0;
+                const ignore_login_100d = 1;
+                const ignore_both_100d = 2;
+                const ignore_nick_temp_1d = 3;
+                const ignore_both_1d = 4;
+
                 for(let i = 0; i < ignorelist.length; i++){
 //                  console.log(ignorelist[i]);
                     // [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time
                     // [2] instruction: 0: блокировать по нику; 1: блокировать по логину; 2: блокировать по логину и нику;
                     // [2] instruction: 3: - бан на день нику для временных ников;
                     // [2] instruction: 4: - бан на день по логину и нику;
-
+                if (ignorelist[i] !== undefined) {
                     date_diff = ticks - new Date(ignorelist[i][3]).getTime();
 
-                    if(is_temp == false && (
-                       ((ignorelist[i][2] == 0 || ignorelist[i][2] == 2) && ignorelist[i][0].toLowerCase() == n.toLowerCase()) ||
-                       ((ignorelist[i][2] == 1 || ignorelist[i][2] == 2) && ignorelist[i][1].toLowerCase() == l.toLowerCase()) ))
-                    {
+                       if(is_temp == false && (
+                          ((ignorelist[i][2] == ignore_nick_100d || ignorelist[i][2] == ignore_both_100d) &&
+                           ignorelist[i][0].toLowerCase() == n.toLowerCase()) ||
+                          ((ignorelist[i][2] == ignore_login_100d || ignorelist[i][2] == ignore_both_100d) &&
+                           ignorelist[i][1].toLowerCase() == l.toLowerCase()) ))
+                          {
                               if (date_diff >= 8640000000 ) // удаление через 100 дней
                               {
                                   ignorelist.splice(i, 1);
@@ -535,17 +560,20 @@ $(document).ready(function () {
                               } else {
                                   is_in_ignorelist = true;
                               }
-                    } else if (ignorelist[i][2] == 3 && ignorelist[i][0].toLowerCase() == n.toLowerCase()) {
+
+                         } else if (is_temp == true && (ignorelist[i][2] == ignore_nick_temp_1d &&
+                                                        ignorelist[i][0].toLowerCase() == n.toLowerCase())) {
                               is_in_ignorelist = true;
-                    } else if (ignorelist[i][2] == 4 && ignorelist[i][0].toLowerCase() == n.toLowerCase()) {
+                         } else if (ignorelist[i][2] == ignore_both_1d && ignorelist[i][0].toLowerCase() == n.toLowerCase()) {
                               if (date_diff >= 86400000 ) // удаление через 1 день
                               {
-                                  ignorelist.splice(i, 1);
+                                  ignorelist.splice(i, 1); // подумать над delete
                                   is_in_ignorelist = false;
                               } else { is_in_ignorelist = true; }
+                         }
                     }
                 }
-
+//console.log(ignorelist.length);
                 var nick_to_tags = t.match(/<span[^<>]+>[^<>]+<\/span>/g);
                 var nick_to_tag_data = new Array();
                 var nick_to_tag_data_broken = new Array();
@@ -557,7 +585,6 @@ $(document).ready(function () {
                         nick_to_tag_data = nick_to_tags[c].match(/<span[^<>]+data-client-id="([^<>"]+)">([^<>]+)<\/span>/);
                         //console.log(nick_to_tag_data);
                         //console.log(nick_to_tag_data_broken);
-                        //<span class="nick-not-found">` dont panic&amp;amp; ..</span>
                         if (nick_to_tag_data != null) { message_to.push([nick_to_tag_data[1],nick_to_tag_data[2]]) }
                         else {
                             nick_to_tag_data_broken = nick_to_tags[c].match(/<span[^<>]+(nick-not-found)[^<>]+>([^<>]+)<\/span>/);
@@ -595,18 +622,6 @@ $(document).ready(function () {
                     }
                 }
 
-/*
-                if(((is_ukropitek == true && is_me == false) && is_author == false)){
-                    let data = new Array("","",0);
-                    if (typeof userdata === 'object') {
-                    data[0] = nickname;
-                    data[1] = userdata[1];
-                    ignorelist_nick.push(data);
-                    added_to_ignore = true;
-                    }
-                }
-*/
-
                 if(is_in_ignorelist == true || message_to_ignored_nick == true || (is_temp == true && hide_temp_profile == true) ||
                    (is_ukropitek == true && hide_ukropitek == true)){
                     if(is_me == false && is_author == false) {
@@ -642,7 +657,8 @@ $(document).ready(function () {
                         color = "blue";
                     }
 
-                    console.log("%cchat: " + userdata[0] + ":" + userdata[1] + ":" + userdata[2] + ":" + userlist.size + ":" +
+                    console.log("%cchat: " + userdata[0] + ":" + userdata[1] + ":" + userdata[2] + ":" + 'ul' + "=" +
+                                userlist.size + ":" + 'il' + "=" + ignorelist.length + ":" +
                                 (is_temp ? 'is_temp' : '') + ":" + (is_author ? 'is_author' : '') + ":" +
                                 (userdata[3] ? 'is_me' : '') + ":" + (for_me ? 'for_me' : '') + ":" +
                                 (is_spam ? 'is_spam' : '') + ":" + (is_amoral ? 'is_amoral' : '') + ":" +
