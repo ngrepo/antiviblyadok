@@ -120,7 +120,6 @@ livacha.com##div[data-url*="/chat/esstonec"]
 livacha.com##div[data-url*="/chat/Delicious777"]
 livacha.com##div[data-url*="/chat/yyyyyyyy"]
 livacha.com##div[data-url*="/chat/iampganda"]
-livacha.com##div[data-url*="/chat/kris_top"]
 livacha.com##div[data-url*="chat/kadesia"]
 livacha.com##div[data-url*="/chat/vse_putem"]
 livacha.com##div[data-url*="/chat/Los_Vladus"]
@@ -146,6 +145,9 @@ livacha.com##div[data-url*="/chat/hopheilalalei"]
 livacha.com##div[data-url*="/chat/vasvasvas"]
 livacha.com##div[data-url*="/chat/stepdaddy"]
 livacha.com##div[data-url*="/chat/gfgf300"]
+livacha.com##div[data-url*="/chat/agrippa_perturbaciya"]
+livacha.com##div[data-url*="/chat/NeZaBuDo4kA1900"]
+livacha.com##div[data-url*="/chat/gfgf300"]
 livacha.com##div[data-url*="mudila"]
 livacha.com##div[data-url*="summma"]
 livacha.com##div[data-url*="umka"]
@@ -166,7 +168,6 @@ livacha.com##div[data-url*="/chat/gucci_kapitan"]
 livacha.com##div[data-url*="/chat/Djdnfjdj"]
 livacha.com##div[data-url*="/chat/Avershina"]
 livacha.com##div[data-url*="/chat/pic"]
-livacha.com##div[data-url*="/chat/lunapolina"]
 livacha.com##div[data-url*="/chat/bagrovushka"]
 livacha.com##div[data-url*="/chat/dostup_k_zakryt"]
 livacha.com##div[data-url*="/chat/t856"]
@@ -185,6 +186,10 @@ livacha.com##div[data-url*="/chat/pacan_pacanskii"]
 livacha.com##div[data-url*="/chat/Kalgan_fyfuk"]
 livacha.com##div[data-url*="/chat/zeeko"]
 livacha.com##div[data-url*="/chat/radioxoi"]
+livacha.com##div[data-url*="/chat/elena_zaharova"]
+livacha.com##div[data-url*="/chat/metallica666"]
+livacha.com##div[data-url*="/chat/galoperidol"]
+livacha.com##div[data-url*="/chat/metallica888"]
 
 #livacha.com##div: > a > div > div:has-text(/loading_stream.jpg/):nth-ancestor(1)
 #livacha.com##div:has( > div > div:has-text(loading_stream.jpg))::nth-child(1)
@@ -194,8 +199,12 @@ livacha.com##div[data-url*="/chat/radioxoi"]
 livacha.com##.doska-wrap
 livacha.com##DIV#promo_home
 
+
 livacha.com##div[data-url*="/user/inkmoto"]
+
+
 livacha.com##div[data-url*="/chat/rima"]
 
 livacha.com##div[data-url*="/chat/Blondie__"]
 livacha.com##div[data-url*="/chat/Nana1610"]
+
