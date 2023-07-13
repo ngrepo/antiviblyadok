@@ -472,7 +472,8 @@ textArea.addEventListener('input', () => {
                 const autocorrect_enabled = true; if (autocorrect_enabled == false) { return }
 
                 s = s.replace(/наврен/gi,'наверн',);
-                s = s.replace(/чтоли/gi,'что-ли',);
+                s = s.replace(/чтоли/gi,'что ли',);
+                s = s.replace(/врядли/gi,'вряд ли',);
 
                 var arrayOfStrings = s.split(/(#[^#:]+:|:[^:]+:|\. |\!|\?|\)|\()/); // Делим на предложения, ники, смайлы
                 //console.log(arrayOfStrings);
@@ -746,6 +747,9 @@ textArea.addEventListener('input', () => {
             m = m.replace(/^.*<img.*126173.*/, "🐖"); // бриташка
             m = m.replace(/^.*<img.*126401.*/, "🐖"); // бриташка
             m = m.replace(/^.*<img.*126171.*/, "🐖"); // пиндошка
+
+            m = m.replace(/^.*<img.*Ei_aaBHZgb9tueQMUzemVxdDvDh38zvhtt5OsW2US4l.*/, "🤮"); // мерзость
+            m = m.replace(/^.*<img.*HQrqpmNxtC6HsUorlq5TaeUC2l8N8HoMcuZiJOu9.*/, "🤮"); // мерзость
 
             // не учитываем символы в никах:
             let no_span_tag = m.replace(/<span[^<>]+>[^<>]+<\/span>/i,''); let tm;
@@ -1066,7 +1070,7 @@ textArea.addEventListener('input', () => {
             var is_in_ignorelist = false;
             var message_to_ignored_nick = false;
 
-            const hide_temp_profile = false;
+            const hide_temp_profile = true;
             const hide_in_message = true;
             const hide_ukropitek = true;
             const hide_amoral = false;
@@ -1162,7 +1166,7 @@ textArea.addEventListener('input', () => {
                                   is_in_ignorelist = true;
                                   comment = ignorelist[i][6];
                                   if (ignorelist[i][0] == n) { ignorelist_match = 'nick' }
-                                  ignorelist_match += ((ignorelist_match.length > 0) ? "+" : "");
+                                  ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "");
                                   if (ignorelist[i][1] == login) { ignorelist_match += 'login' }
                                   //if (typeof comment == 'string' && comment !== null) { comment = ignorelist[i][6]; console.log (1); console.log(typeof comment )}
                               }
@@ -1188,7 +1192,7 @@ textArea.addEventListener('input', () => {
                                   is_in_ignorelist = true;
                                   comment = ignorelist[i][6];
                                   if (ignorelist[i][0] == n) { ignorelist_match = 'nick' }
-                                  ignorelist_match += ((ignorelist_match.length > 0) ? "+" : "");
+                                  ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "");
                                   if (ignorelist[i][1] == login) { ignorelist_match += 'login' }
                                   //if (typeof comment == 'string' && comment !== null) { comment = ignorelist[i][6]; console.log (3); console.log(typeof comment )}
                               }
@@ -1209,7 +1213,7 @@ textArea.addEventListener('input', () => {
                     }
                 }
                 }
-
+//console.log(levenshtein('Hello', 'HelA_1'));
 //console.log(ignorelist);
 
                 var nick_to_tags = t.match(/<span[^<>]+>[^<>]+<\/span>/g);
