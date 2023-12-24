@@ -1,0 +1,10 @@
+<div class="row no-gutters mess-row" data-id="fv1cih0gnd5u00d0zs39" data-mid="ft7b765b9l6uy7789yio">
+
+	<div class="col">
+		<a href="#" class="avatar"><img src="/i/blank.png" class="user-popover app-popova" data-id="fv1cih0gnd5u00d0zs39" data-original-title="" title="" data-popova-group="user-popover"></a>
+		<i title="Автор трансляции" class="crown em em-crown"></i>
+		<i data-title="Сообщение заблокировано (стоп лист, видно только автору)" class="stoplist-notify text-danger fa fa-exclamation-circle" aria-hidden="true" data-original-title="" title=""></i>
+		<div class="nick"><span class="nick-to">Здрасти</span> </div>
+		<div class="text chat-text-content"><div class="row attach images no-gutters"><div class="col image"><a href="/upload/chat_room/chat_image/08/4b/chat_room_esuZT_CORYIkvAVFk8NopSJcCrCBmIMJjZLn4iHsIKpwlJ.jpeg" data-fancybox=""><img src="/upload/chat_room/chat_image/f9/d7/chat_room_medium_hmxcZ_6g5Knf0xEdIca5WhKANtxgYbpw71izMX5p1ilkBi.jpeg" width="400" height="400"></a></div></div></div>
+	</div>
+<div class="mess-actions"><button class="btn btn-sm btn-secondary" data-title="Выпилить" onclick="AddToIgnoreList(this);" data-original-title="" title=""><i class="fa fa-remove btn-saw-out"></i></button></div></div>
