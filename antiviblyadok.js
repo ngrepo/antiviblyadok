@@ -322,6 +322,8 @@ function MsgClick(e) {
 
 //var AddToIgnoreListFunc = function AddToIgnoreList(e) {
 function AddToIgnoreList(e) {
+    if (AntiviblyadokEnabled == false) { return }
+
     var element = e.parentElement.parentElement;
     var id = element.getAttribute('data-id');                          // id
     var nn = $(element).find("div.nick").find("span.nick-to").html();  // nick from tag
@@ -404,18 +406,22 @@ function OnOffFilter()
 var date = new Date();
 var BtnOnOff = document.getElementById('BtnOnOff');
 var color;
-if (BtnOnOff.value =='Выкл'){
+if (BtnOnOff.value == 'Выкл'){
 	AntiviblyadokEnabled = true;
 	BtnOnOff.value = 'Вкл';
-    color = 'Green'
+    color = window.getComputedStyle(BtnOnOff.parentNode, null).getPropertyValue("background-color");
+    BtnOnOff.style.background = color;
 }else{
 	AntiviblyadokEnabled = false;
 	BtnOnOff.value = 'Выкл';
-    color = 'Red'
+    color = 'Red';
+    BtnOnOff.style.background = color;
 }
-    console.log("%cchat(" + date.getHours() + ":" + date.getMinutes() + "): " +
+    console.log("%cchat(" + (date.getHours() < 10 ? '0' : '') + date.getHours() + ":" +
+                (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + "): " +
                 (AntiviblyadokEnabled ? 'Antiviblyandok: enabled' : 'Antiviblyandok: disabled')
-               , 'background: LemonChiffon;' + 'color: ' + color) ;
+                ,'background: LemonChiffon;color: ' +
+                 (AntiviblyadokEnabled ? color = 'Green' : color = 'Red')) ;
 }
 
 exportFunction(AddToIgnoreList, unsafeWindow, { defineAs: "AddToIgnoreList" });
@@ -523,7 +529,8 @@ $(document).ready(function () {
 
 			if (!document.getElementById("ChatFilterBase")) {
 				elements[0].appendChild(create("input", {id:'BtnOnOff', type:'button',
-                onclick: "OnOffFilter(); return false;", value:'Вкл'}));
+                onclick: "OnOffFilter(); return false;", value:'Вкл', style: 'background: ' +
+                window.getComputedStyle(elements[0], null).getPropertyValue("background-color") + '; border: 0;'}));
 			}
         }
 
@@ -1397,7 +1404,9 @@ textArea.addEventListener('input', () => {
                         color = "blue";
                     }
 
-                    console.log("%cchat(" + date.getHours() + ":" + date.getMinutes() + "): " + userdata[0] + ":" + userdata[1] + ":" + userdata[2] + ":" + 'ul' + "=" +
+                    console.log("%cchat(" + (date.getHours() < 10 ? '0' : '') + date.getHours() + ":" +
+                                (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() +
+                                "): " + userdata[0] + ":" + userdata[1] + ":" + userdata[2] + ":" + 'ul' + "=" +
                                 userlist.size + ":" + 'il' + "=" + ignorelist.length + ":" + "sa=" + SpamArray.length + ":" +
                                 (is_temp ? 'is_temp' : '') + ":" + (is_author ? 'is_author' : '') + ":" +
                                 (userdata[3] ? 'is_me' : '') + ":" + (for_me ? 'for_me' : '') + ":" +
