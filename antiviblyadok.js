@@ -130,11 +130,23 @@ const css_block =`
 .btn-secondary-pre:not(:disabled):not(.disabled).active:focus,.btn-secondary-pre:not(:disabled):not(.disabled):active:focus,.show>.btn-secondary-pre.dropdown-toggle:focus {
     box-shadow: 0 0 0 .2rem rgba(108,117,125,.5)
 }
+
+<!-- ============================================================================================ -->
 `;
 
 var DocStile = create( "style",{type: "text/css"},css_block);
 
-document.getElementsByTagName('head')[0].appendChild(DocStile);
+    document.getElementsByTagName('head')[0].appendChild(DocStile);
+
+/*const ScrptContent = `
+<div class="test" z-index:99999999;  >test</div>
+
+`
+;
+
+var Scrpt = create("div",ScrptContent);
+	document.getElementById('content').appendChild(Scrpt); */
+        var AntiviblyadokEnabled = true;
 
         var userlist = new Map();
 
@@ -387,8 +399,28 @@ function AddToIgnoreList(e) {
     }
 }
 
+function OnOffFilter()
+{
+var date = new Date();
+var BtnOnOff = document.getElementById('BtnOnOff');
+var color;
+if (BtnOnOff.value =='Выкл'){
+	AntiviblyadokEnabled = true;
+	BtnOnOff.value = 'Вкл';
+    color = 'Green'
+}else{
+	AntiviblyadokEnabled = false;
+	BtnOnOff.value = 'Выкл';
+    color = 'Red'
+}
+    console.log("%cchat(" + date.getHours() + ":" + date.getMinutes() + "): " +
+                (AntiviblyadokEnabled ? 'Antiviblyandok: enabled' : 'Antiviblyandok: disabled')
+               , 'background: LemonChiffon;' + 'color: ' + color) ;
+}
+
 exportFunction(AddToIgnoreList, unsafeWindow, { defineAs: "AddToIgnoreList" });
 exportFunction(MsgClick, unsafeWindow, { defineAs: "MsgClick" });
+exportFunction(OnOffFilter, unsafeWindow, { defineAs: "OnOffFilter" });
 
 //let JS = create("script",{type: "text/javascript"},MsgClickFunc.toString());
 //let JS1 = create("script",{type: "text/javascript"},AddToIgnoreListFunc.toString());
@@ -481,6 +513,20 @@ $(document).ready(function () {
     };
 
     Antiviblyadok.prototype.chat = function () {
+
+
+
+		var elements = document.getElementsByClassName("textarea-wrapper");
+			//alert(elements.length);
+
+		if (typeof elements[0] != "undefined") { // страница трансляции
+
+			if (!document.getElementById("ChatFilterBase")) {
+				elements[0].appendChild(create("input", {id:'BtnOnOff', type:'button',
+                onclick: "OnOffFilter(); return false;", value:'Вкл'}));
+			}
+        }
+
         function repl(str, f, r) {
             var regex = new RegExp(f, "g");
             var l = str.replace(regex, r);
@@ -603,6 +649,7 @@ textArea.addEventListener('input', () => {
                             console.log(typeof nickname);
 
                     $("div.app-comments-out").bind('DOMNodeInserted', function (e) {
+                        if (AntiviblyadokEnabled == false) { return }
                         var waitPanel1 = setInterval(function () {
 
                         if ($("ul.pagination").length) {
@@ -642,8 +689,10 @@ textArea.addEventListener('input', () => {
 
         if ( url.indexOf('https://livacha.com/chat/') != -1 ) {
 
+
             document.querySelector("div.textarea-wrapper textarea").addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
+                    if (AntiviblyadokEnabled == false) { return }
                     var element = e.target;
                     element.value = autocorrect(element.value,true,false);
                     return
@@ -652,6 +701,7 @@ textArea.addEventListener('input', () => {
             })
 
             document.querySelector("div.justify-content-between .submit").addEventListener('click', (e) => {
+                if (AntiviblyadokEnabled == false) { return }
                 var element = document.querySelector("div.textarea-wrapper textarea");
                 element.value = autocorrect(element.value,true,true);
                 return
@@ -694,66 +744,8 @@ textArea.addEventListener('input', () => {
             //console.log(arrayOfStrings);
         });
 */
-/*
-        var ignorelist_nick = ['АМанда Иоановна','ВЛАДиМИР Иллюминатов',
-            'Sjawa','White_Zombie','Дрочер №1',
-            'ЛеНиН ЖиВ','Збройнi Сили Украiни','ДИРИЖАБЛЬ','WESTRUST',
-            'Linux','Absolut','Klarissa','` don&amp;#039;t panic..',
-            'чепухан','Побочки','&amp;amp;ГосподинСвободныхМыслей',
-            'Войнючий Капутин','Тэ...','☜верблюжья лапка',
-            'Даздраперма Алоизовна Хёек','Слава Украине','Vit','☼ SerJ ☼',
-            'Пушок','Очкастый мачо','antol777','indigosan','fifa4732',
-            'antura','Рипа','Владимир','Lucky person','polten',
-            'gerrrd944','naganxad','mirevid','ivanovna1985','ஜЛИДИЯஜ',
-            'Фриц','ganger','Балумба','Стебан Бендера','вася пряник',
-            'fleur','КОНДРАТ','Prisma','Sir','Українська захисниця (93 ОМБР)',
-            'фашистская расия алкашей','Кристина','FREEDOM&amp;amp;PEACE','Лапти',
-            'Julia','† КАЗЬЁЛЬ †','МЭРЗОСТЬ','tor','Игрок',
-            'Черная вагина по-зарински','Ошейник вассала','ТэмП','Антикацапка',
-            'Zlobnyi element ❣','Комаров','ОТПЕРДОЛЕННАЯ ПАКСОЙ ДАШКА','RTX',
-            'жопоскряб','эхо','Vip','Habit','синяя борода',
-            'fradysariel','Bolt','jkguy','FROZMAN','Черничная',
-            'Поменяйте ник','шебутной мальчуган','ЗАБАНЕННЫЙ У КАРПА,НА ПОЖИЗНЕННО...',
-            'Ярополк','grizli','бункерная вошь','КАЛЯСКА МАХАЧЬ',
-            'zoro ','Сергеич','Саша','Penis Ebmundovich','besgmo',
-            'covid2021','Collectors everywhere','wafhas','ТРАХНИ ТАФФИ',
-            'Смотрящий за путями','фрифе','Блестящий член','kira_556',
-            'Tankist228','Dark Reg','и запятая','ᗪIᗩᖇY Oᖴ ᒍᗩᑎE*',
-            'kittygalor','РУБИКОН','АНУС','Ouen','УРФИН ДЖЮС',
-            'Болт','ПЮЗДУН','Дарья Трепова',
-            'командир  x','Бандера','⚡☑ᗫoᏰᏒo✪⚡','⚡☑ᗫoᏰᏒo⚡',
-            'ВасилиЙ','Зритель','netzv','Двоешник','Поменяйте ник.',
-            'vova','veб66','Слепой Пью','Арчи','Lexus','Максим',
-            'цып цып цып','ыть','jghkh','Гаврош','Шамиль(чеченец )',
-            'ВЕЛИКАЯ АМЕРИКА','ADIDAS','ВСУ','Руткит',
-            'MAXWELL_777','PLATINUMMAX112','Полковник Мамура','Слепой Пью',
-            'Nikita HUEEVICH LOH','osa22','boss2003',
-            '` dont panic&amp;amp; ..','sofia28','kilovatw','ЯНА ВОЛЬКОВА','прямо_к****',
-            'ines96','bond666','✔️Чпок','deep777','Pepe','ДжейКей','Джей Кей','Strong78',
-            'Бесперспективняк','Поменяйтe ник','tata666','болек',
-            '❣ Zlobnyi element ❣☕','МАСОЛ','Дима Франк',
-            'чабан(дмитрий владимирович)','Слепой Пью','PITHECANTHROP','mrdefton',
-            'ozone92','Шеф','RadioXoi','СВЯТОЙ   ИОАН','Извинись Дурачок',
-            'Олег Бобков (от сына отказался)','AktivniyGomes',
-            'Уасилий Синеносов','CЛАВА УКРАИНЕ','stranger','ИКСОНОГ','Alex-England','ZLOVoinie',
-            'Иван','Рембо первая бровь','степанычь','Потапич','Белоснежка','Оближи меня',
-            'BYДУ','Беркут','Олечка','lenatits','А что если дедушка - законченный муд@к',
-            'Гансик','Феодулия','мудачок яйцашлёп клоун ливачи','gva777','Извинись Дурачок',
-            'Атрейдес','Овод','мудачок яйцашлёп','elementcrime','xxx5','зНенацька',
-            'Минздрав','Бонс','дима','Зарина Вагинова','в Твоём Доме','CS_GO','пан','ana ana',
-            'Хрюк','Fejut','ARRUTA','Примат','rokan nonaev','цыганёнок алёша','kylinar','ПУТИН_ХУЙЛО',
-            'godar','Nespi','Mariya Pazhitnova','Здрасьте','Kirzenbaum P.','Муди','Jeangrey','Nespi',
-            'Zалупочёс','Оближи себя','Шнурок','Архитектор','ученик 1 б класса',
-            'laopao','``HooLiGaN ``','немец','АДИСИТ БЕНЯ С ФТОРЧЕРМЕТА','zzvvzz','ivan jones',
-            'magik_cаn','ТРЕВОЖНО','Ватное болото','gfgf300','чаkи','Без ника','ЙыЙ',
-            'easy_peasy_lemon_squeezy','Кондратьев','протри монитор','Ммм ','УКРАИНА СИЛА',
-            'dfgfdgdfgdfg','пишу...','Гугол','Ммм','andrei','Ядерный муровей','Alоx-pEngland',
-            'gkblijhk'];
-            //'⚡Эстонец⚡️' 'Надежда Осипова' 'Harter'
-*/
         var ignorelist_nick = ['Поменяйте ник'];
-            //'⚡Эстонец⚡️'
-        //var ignorelist_login = ['morf1','Zdraste','pupkinzzzzz','116500','zgaz'];
+
 /*==================================================================================*/
         function antiCapsMat(m) {
             if (m === undefined) {
@@ -1041,6 +1033,7 @@ textArea.addEventListener('input', () => {
 
 /*==================================================================================*/
         $("div.users-list-wrapper").bind('DOMNodeInserted', function (e) {
+            if (AntiviblyadokEnabled == false) { return }
 
             var element = e.target;
             var id = $(element).data('id');                 // id
@@ -1067,6 +1060,7 @@ textArea.addEventListener('input', () => {
 /*==================================================================================*/
 
         $("div.users-list-wrapper").bind('DOMNodeRemoved', function (e) {
+            if (AntiviblyadokEnabled == false) { return }
             var element = e.target;
             var id = $(element).data('id');
             var t = $(element).find("span.txt").html();     // nick
@@ -1086,7 +1080,7 @@ textArea.addEventListener('input', () => {
         const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
         $("div.app-chat").bind('DOMNodeInserted', function (e) {
-
+            if (AntiviblyadokEnabled == false) { return }
             var element = e.target;
             var id = $(element).data('id');                          // id
             var $mms = $(element).find("div.chat-text-content");     // message body backup
