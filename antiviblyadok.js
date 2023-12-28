@@ -419,7 +419,7 @@ if (BtnOnOff.value == 'Выкл'){
 }
     console.log("%cchat(" + (date.getHours() < 10 ? '0' : '') + date.getHours() + ":" +
                 (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() + "): " +
-                (AntiviblyadokEnabled ? 'Antiviblyandok: enabled' : 'Antiviblyandok: disabled')
+                (AntiviblyadokEnabled ? 'Antiviblyadok: enabled' : 'Antiviblyadok: disabled')
                 ,'background: LemonChiffon;color: ' +
                  (AntiviblyadokEnabled ? color = 'Green' : color = 'Red')) ;
 }
