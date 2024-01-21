@@ -762,6 +762,7 @@ textArea.addEventListener('input', () => {
             var fm = new Array('',m.toLowerCase());
 
             m = m.replace(/^.*<img.*Li0qwg66tYTFsL.gif.*/, "🐖");
+            m = m.replace(/^.*<img.*y64LUsus7cciDd.gif.*/, "🐖");
             m = m.replace(/^.*<img.*126179.*/, "🐖"); // хохлы
             m = m.replace(/^.*<img.*182113.*/, "🐖"); // хохлы
             m = m.replace(/^.*<img.*126716.*/, "🐖"); // хохлы
@@ -929,9 +930,9 @@ textArea.addEventListener('input', () => {
 
 			var tickcount = new Date().getTime();
 
-            const flood_reset_time = 45000;
-            const flood_threshold = 3;
-            const hard_flood_threshold = 8;
+            const flood_reset_time = 60000;
+            const flood_threshold = 2;
+            const hard_flood_threshold = 4;
 
             var ResultArray = new Array();
             var result = new Array();
@@ -1113,7 +1114,7 @@ textArea.addEventListener('input', () => {
             var is_in_ignorelist = false;
             var message_to_ignored_nick = false;
 
-            const hide_temp_profile = true;
+            const hide_temp_profile = false;
             const hide_in_message = true;
             const hide_ukropitek = true;
             const hide_amoral = false;
