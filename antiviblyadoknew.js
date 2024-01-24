@@ -8,7 +8,6 @@
 // @match       https://livacha.com/post*
 // @connect     livacha.com
 // @run-at      document-start
-// @require     https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.min.js
 // @noframes
 // ==/UserScript==
 // @unwrap
@@ -175,13 +174,14 @@ var Scrpt = create("div",ScrptContent);
         var AntiviblyadokEnabled = true;
 
         var userlist = new Map();
+        var msglist = new Map();
 
         var ignorelist = new Array(); // '','',0,0,0
 //console.log(document.getElementsByClassName('d-inline-block app-text-overflow text-white')[0].getElementsByTagName("strong"));
-        var nickname = document.getElementsByClassName('d-inline-block app-text-overflow text-white')[0].getElementsByTagName("strong")[0].innerHTML;
+      //  var nickname = document.getElementsByClassName('d-inline-block app-text-overflow text-white')[0].getElementsByTagName("strong")[0].innerHTML;
 
-        console.log(nickname);
-        if (typeof nickname === 'undefined') { nickname = "" };
+     //   console.log(nickname);
+     //   if (typeof nickname === 'undefined') { nickname = "" };
 
         const ignore_nick_365d = 0;
         const ignore_login_365d = 1;
@@ -190,13 +190,13 @@ var Scrpt = create("div",ScrptContent);
         const ignore_both_1d = 4;
 
 //        let e_app_nickname = document.getElementsByClassName("app-nickanme")[0]; // old
-        let e_app_nickname = document.getElementsByClassName("nickname text-truncate")[0].getElementsByTagName("strong")[0].getElementsByTagName("a")[0];;
+      //  let e_app_nickname = document.getElementsByClassName("nickname text-truncate")[0].getElementsByTagName("strong")[0].getElementsByTagName("a")[0];;
         var author_id = '';                                              // id
 //        console.log(e_app_nickname);
-        var author_nick = e_app_nickname.innerHTML;                      // nick
-        console.log(author_nick);
-        var author_login = e_app_nickname.href.replace(/.*\/user\//,''); // login
-        console.log(author_login);
+      //  var author_nick = e_app_nickname.innerHTML;                      // nick
+      //  console.log(author_nick);
+      //  var author_login = e_app_nickname.href.replace(/.*\/user\//,''); // login
+      //  console.log(author_login);
 
         //console.log(author_nick + '|' + author_login + '|' + nickname); // на данной стадии не пишет в консоль !
 
@@ -483,34 +483,22 @@ function messageDispather(data) {
 
             switch(message.mess) {
                 case 'authorized': {
-                    Athorized(message);
+                    userAthorized(message);
                     break
                 }
                 case 'users': {
-                    AddToUserList(message);
+                    addToUserList(message);
                     break
                 }
                 case 'joined': {
-                    console.log('joined =============================');
-                    console.log('room:' + message.room);
-                    console.log('lastMessages:' + message.response.lastMessages);
-                    console.log('self:' + message.response.self);
+                    roomJoin(message);
                     break
                 }
                 case 'message': {
-                    console.log('joined =============================');
-                    console.log('room:' + message.room);
-                    console.log('attached:' + message.response.attached);
-                    console.log('mid:' + message.response.mid);
-                    console.log('owner:' + message.response.owner);
-                    console.log('owner_id:' + message.response.owner_id);
-                    console.log('text:' + message.response.text);
-                    console.log('textRaw:' + message.response.textRaw);
-                    console.log('textWithSmiles:' + message.response.textWithSmiles);
-                    console.log('time:' + message.response.time);
+                    chatMessage(message);
                     break
                 }
-                case 'messRemoved': {
+                case 'messRemoved': { // модерастом или владельцем трансляции
                     console.log('messRemoved =============================');
                     break
                 }
@@ -536,7 +524,7 @@ function messageDispather(data) {
     }
 }
 
-function Athorized (message) {
+function userAthorized (message) {
                     console.log('authorized =========================');
                     console.log('id:' + message.response.id);
                     console.log('nickname:' + message.response.client.info.nickname);
@@ -551,9 +539,27 @@ function Athorized (message) {
                     console.log('country:' + message.response.client.info.country);
                     console.log('country_iso:' + message.response.client.info.country_iso);
                     console.log('uid:' + message.response.client.info.uid);
+    var nickname = message.response.client.info.nickname;
 }
 
-function AddToUserList (message) {
+function roomJoin (message) {
+     console.log('joined =============================');
+
+     console.log(userlist);
+     message.response.lastMessages.forEach(function(item, i, arr) {
+         if (userlist.has(item.owner.id) == false) {
+             userlist.set(item.owner.id,item.owner);
+             console.log('added to userlist');
+         };
+
+         msglist.set(item.mid,item);
+         console.log('added to msglist');
+     });
+     console.log(userlist);
+     console.log(msglist);
+}
+
+function addToUserList (message) {
      console.log('users ==============================');
 
      message.response.list.forEach(function(item, i, arr) {
@@ -581,6 +587,21 @@ function updateUserList (message) {
             }
         }
     }
+}
+
+function chatMessage(message) {
+                    console.log('message =============================>>>');
+                    console.log('attached:' + message.response.attached);
+                    console.log('mid:' + message.response.mid);
+                    console.log('owner:' + message.response.owner);
+                    console.log('owner_id:' + message.response.owner_id);
+                    console.log('text:' + message.response.text);
+                    console.log('textRaw:' + message.response.textRaw);
+                    console.log('textWithSmiles:' + message.response.textWithSmiles);
+                    console.log('message =============================>>>');
+    msglist.set(message.response.mid,message.response);
+    console.log(msglist);
+    console.log('added to msglist');
 }
 
 window.addEventListener('beforeunload', function(event) {
@@ -630,36 +651,33 @@ window.addEventListener('beforeunload', function(event) {
         } else {
             return null;
         }
-
-
     }
 
-$(document).ready(function () {
-    function Antiviblyadok() {
-        this.version = localStorage.getItem('tr-ver') != undefined ? localStorage.getItem('tr-ver') : "0.0.3";
+document.addEventListener("DOMContentLoaded", function(event) {
+        function Antiviblyadok() {
+            this.version = localStorage.getItem('tr-ver') != undefined ? localStorage.getItem('tr-ver') : "0.0.3";
 
-        if(typeof(localStorage) != 'undefined' ) {
-            if(window.localStorage.getItem('ignorelist')){
-                ignorelist = JSON.parse(window.localStorage.getItem('ignorelist'));
-            }
-        }
-    }
-
-    Antiviblyadok.prototype.run = function () {
-
-        var waitPanel = setInterval(function () {
-            if ($(".stream-starter").length) {
-                if ($(".video-output-container").length) {
-                    clearInterval(waitPanel);
-                } else {
-                    return true;
+            if(typeof(localStorage) != 'undefined' ) {
+                if(window.localStorage.getItem('ignorelist')){
+                    ignorelist = JSON.parse(window.localStorage.getItem('ignorelist'));
                 }
             }
-            if ($("i.em-smiley").length) {
-                clearInterval(waitPanel);
+        }
+
+    document.querySelector("div.chat-messages").addEventListener('DOMNodeRemoved', function (e) {
+        var element = e.target;
+
+        if (typeof element === 'object' && element !== null && 'getAttribute' in element) {
+            var id = element.getAttribute('data-id');
+            if (id !== 'null' && id !== 'undefined' && id.length > 0 ) {
+                console.log("%celement removed from div.chat-messages mid: " + id,'background: LemonChiffon;color: red');
+                console.log(element);
+                msglist.delete(id);
+                console.log('removed from msglist');
+                console.log(msglist);
             }
-        }, 1000);
-    };
+        }
+    });
 
     Antiviblyadok.prototype.initialize = function () {
        // exportFunction(messageDispatcher, unsafeWindow, { defineAs: "messageDispatcher" });
@@ -695,11 +713,11 @@ textArea.addEventListener('input', () => {
     var textLn =  textArea.value.length;
     if(textLn >= 100) {
         textArea.style.fontSize = '10pt';
-    }
+    }.querySelector('span.text')
 })
 */
 
-        function autocorrect (s,anticaps,auto_dot) {
+        function TextCorrector (s,anticaps,auto_dot) {
             if (typeof s === 'string' && typeof anticaps === 'boolean' &&  typeof auto_dot === 'boolean' ) {
                 const autocorrect_enabled = true; if (autocorrect_enabled == false) { return }
 
@@ -841,7 +859,7 @@ textArea.addEventListener('input', () => {
 
         if ( url.indexOf('https://livacha.com/chat/') != -1 ) {
 /*
-            document.querySelector("div.textarea-wrapper textarea").addEventListener('keydown', (e) => {
+            document.querySelector("div.form-control").addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
                     if (AntiviblyadokEnabled == false) { return }
                     var element = e.target;
@@ -851,15 +869,15 @@ textArea.addEventListener('input', () => {
 
             })
 
-            document.querySelector("div.justify-content-between .submit").addEventListener('click', (e) => {
+            document.querySelector("div.form-control").addEventListener('click', (e) => {
                 if (AntiviblyadokEnabled == false) { return }
-                var element = document.querySelector("div.textarea-wrapper textarea");
+                var element = document.querySelector("div.form-control");
                 element.value = autocorrect(element.value,true,true);
                 return
             })
 */
-
         }
+
 /*
 
 //       $('.app-form-wrapper .submit').click(function(){
@@ -1188,20 +1206,24 @@ textArea.addEventListener('input', () => {
         const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
         $("div.chat-messages").bind('DOMNodeInserted', function (e) {
-            if (AntiviblyadokEnabled == false) { return }
+
+//            if (AntiviblyadokEnabled == false) { return }
             var element = e.target;
-            var id = $(element).data('id');                          // id
-            var $mms = $(element).find("span.text");     // message body backup
-            var t = $(element).find("span.text").html(); // message body
-            var n = $(element).find("strong.nick-to").html();          // nick
+            console.log(element);
+            var id = element.getAttribute('data-id');                         // id
+            var $mms = element.querySelector('span.text');     // message body backup
+            console.log($mms);
+            var t = $mms.innerHTML; // message body
+            var n = element.querySelector('strong.nick, strong.nick-to').innerHTML;          // nick
             var login = '';                                          // login
-//            console.log("=============================");
-//            console.log(id);
-//            console.log("n:" + n);
-//            console.log("t:" + t);
-//            console.log("=============================>");
+            console.log("chat =============================");
+            console.log(id);
+            console.log("n:" + n);
+            console.log(t.replace(/(<([^>]+)>)/gi, '')); // удаление всех тегов
+            console.log("t:" + t);
+            console.log("chat =============================>");
 //            console.log(element.outerHTML);
-            return;
+
             var s = false;
             var reg = new RegExp();
             var date = new Date();
@@ -1238,13 +1260,15 @@ textArea.addEventListener('input', () => {
                         t = repl(t, z, l);
                     });
                 }
-
+                console.log('repl:' + t);
+            return;
                 //$(element).find("app-popova").click();
-                $(element).append( "<div class=\"mess-actions-self\">" +
+/*                $(element).append( "<div class=\"mess-actions-self\">" +
                                   "<button class=\"btn btn-sm btn-secondary-pre\"" +
                                    "data-title=\"В игнор\" onclick=AddToIgnoreList(this);><i class=\"fa fa-remove btn-saw-out\">" +
                                    "</i></button>" +
                                    "</div>" );
+*/
                 if(n == nickname) { is_me = true }
 
                 var userdata = new Array("","","",false);
@@ -1536,7 +1560,6 @@ textArea.addEventListener('input', () => {
 
     var Antiviblyadok = new Antiviblyadok();
     Antiviblyadok.initialize();
-    Antiviblyadok.run();
     Antiviblyadok.chat();
 
 })
