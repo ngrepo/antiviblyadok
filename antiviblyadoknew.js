@@ -485,7 +485,7 @@ function messageDispather(data) {
         let message = JSON.parse(data);
         if (message.mess != 'money' && message.mess != 'ping' && message.mess != 'pong') {
 
-            console.log(message);
+            //console.log(message);
 
             switch(message.mess) {
                 case 'authorized': {
@@ -522,14 +522,22 @@ function messageDispather(data) {
                     //console.log('streamsUpdate =============================');
                     break
                 }
+
                 case 'streamsListUpdate': {
                     //console.log('streamsListUpdate =========================');
                     break
                 }
+
                 case 'likeMe': {
-                    //console.log('streamsListUpdate =========================');
+                    //console.log('likeMe =========================');
                     break
                 }
+
+                case 'subscribe': {
+                    //console.log('subscribe =========================');
+                    break
+                }
+
                 default:{
                     console.log('default unknown message: ' + message.mess + ' =====================');
                     break
@@ -629,6 +637,14 @@ function updateUserList (message) {
 
 function chatMessage(message) {
     msglist.set(message.response.mid,message.response);
+//    console.log(message);
+/*
+                    console.log('nickname:' + message.response.owner.info.nickname);
+                    console.log('profile:' + message.response.owner.info.profile);
+                    console.log('text:' + message.response.text);
+                    console.log('textRaw:' + message.response.textRaw);
+                    console.log('textWithSmiles:' + message.response.textWithSmiles);
+*/
     //console.log(msglist);
     //console.log('added to msglist');
 }
@@ -1289,16 +1305,26 @@ textArea.addEventListener('input', () => {
             var is_ukropitek = false;
             var is_amoral = false;
             var is_spam = false;
+            var is_restricted_country = false;
             var added_to_ignore = false;
 
             var is_in_ignorelist = false;
             var message_to_ignored_nick = false;
 
-            const hide_temp_profile = false;
             const hide_in_message = true;
             const hide_ukropitek = true;
             const hide_amoral = false;
             const hide_spam = true;
+            const hide_temp_profile = false;
+            const hide_countries = true;
+            const hide_temp_not_ru_country = true;
+
+            const restrictedCountries = Array ( // boolean true - скрывать так же у зарегеных
+            ['UA',false],['NL',true],['VN',true],['GB',true],['EE',false],['FR',true],['PL',false],['US',false],
+            ['MD',false],['DE',false],['GE',true]
+            //,['ES',true],['HU',true],['DZ',false],['DK',false]
+            );
+
             const autoban_ukropitek = true;
             const autoban_ukropitek_treshold_msg = 2;
             const autoremove_from_ignorlist = false;
@@ -1613,14 +1639,34 @@ textArea.addEventListener('input', () => {
                     }
                 }
 */
-                let removed = false;
+
+                for (let i = 0; i < restrictedCountries.length; i++) {
+                    if (hide_temp_not_ru_country == true && country_iso != 'RU') {
+                        is_restricted_country = true;
+                        break;
+                    }
+                    if (restrictedCountries[i][0] == country_iso) {
+                         if (restrictedCountries[i][1] == true) {
+                             is_restricted_country = true;
+                             break;
+                         } else {
+                             if (is_temp == true) {
+                                 is_restricted_country = true;
+                                 break;
+                             }
+                         }
+                    }
+                }
+
+                let red = false;
 
                 if(is_in_ignorelist == true || (message_to_ignored_nick == true && for_author == false) ||
                    (is_temp == true && hide_temp_profile == true) ||
+                   (is_restricted_country == true && hide_countries == true) ||
                    (is_ukropitek == true && hide_ukropitek == true)){
                     if(is_me == false && is_author == false) {
                       element.remove();
-                      removed = true;
+                      red = true;
                     }
                 }
 
@@ -1632,7 +1678,7 @@ textArea.addEventListener('input', () => {
 
                     let color;
 
-                    if (removed == true) {
+                    if (red == true) {
                         color = "red";
                     } else if (is_me == true) {
                         color = "green";
@@ -1666,7 +1712,7 @@ textArea.addEventListener('input', () => {
                                 (is_me ? 'is_me' : '') + ":" + (for_me ? 'for_me' : '') + ":" +
                                 (for_author ? 'for_author' : '') + ":" +
                                 (is_spam ? 'is_spam(' + antiSpamResult[0] + ')' : '') + ":" + (is_amoral ? 'is_amoral' : '') + ":" +
-                                (is_ukropitek ? 'is_ukropitek' : '') + ":" +
+                                (is_ukropitek ? 'is_ukropitek' : '') + ":" + (is_restricted_country ? 'country_bl' : '') + ":" +
                                 (is_in_ignorelist ? 'ignored(' + (Math.ceil(Math.abs((ticks - ignore_date.getTime())) / (1000 * 3600 * 24))) +
                                 " д. (" + comment + "))" : '') + ":" +
                                 ((ignorelist_match != '') ? ignorelist_match : '') + ":" +
