@@ -1641,9 +1641,8 @@ textArea.addEventListener('input', () => {
 */
 
                 for (let i = 0; i < restrictedCountries.length; i++) {
-                    if (hide_temp_not_ru_country == true && country_iso != 'RU') {
+                    if (hide_temp_not_ru_country == true && country_iso != 'RU' && is_temp == true) {
                         is_restricted_country = true;
-                        break;
                     }
                     if (restrictedCountries[i][0] == country_iso) {
                          if (restrictedCountries[i][1] == true) {
