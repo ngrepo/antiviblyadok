@@ -177,6 +177,12 @@ var Scrpt = create("div",ScrptContent);
         var msglist = new Map();
 
         var ignorelist = new Array(); // '','',0,0,0
+        var author_user_id;
+        var author_nickname;
+        var author_profile;
+        var nickname_self;
+        var profile_self;
+        var user_id_self;
 //console.log(document.getElementsByClassName('d-inline-block app-text-overflow text-white')[0].getElementsByTagName("strong"));
       //  var nickname = document.getElementsByClassName('d-inline-block app-text-overflow text-white')[0].getElementsByTagName("strong")[0].innerHTML;
 
@@ -191,7 +197,7 @@ var Scrpt = create("div",ScrptContent);
 
 //        let e_app_nickname = document.getElementsByClassName("app-nickanme")[0]; // old
       //  let e_app_nickname = document.getElementsByClassName("nickname text-truncate")[0].getElementsByTagName("strong")[0].getElementsByTagName("a")[0];;
-        var author_id = '';                                              // id
+      //  var author_id = '';                                              // id
 //        console.log(e_app_nickname);
       //  var author_nick = e_app_nickname.innerHTML;                      // nick
       //  console.log(author_nick);
@@ -502,17 +508,26 @@ function messageDispather(data) {
                     console.log('messRemoved =============================');
                     break
                 }
+                case 'baned': { // модерастом или владельцем трансляции
+                    console.log('baned =============================');
+                    break
+                }
+
                 case 'updateRoom': {
                     updateUserList(message);
                     break
                 }
 
                 case 'streamsUpdate': {
-                    console.log('streamsUpdate =============================');
+                    //console.log('streamsUpdate =============================');
                     break
                 }
                 case 'streamsListUpdate': {
-                    console.log('streamsListUpdate =========================');
+                    //console.log('streamsListUpdate =========================');
+                    break
+                }
+                case 'likeMe': {
+                    //console.log('streamsListUpdate =========================');
                     break
                 }
                 default:{
@@ -539,7 +554,13 @@ function userAthorized (message) {
                     console.log('country:' + message.response.client.info.country);
                     console.log('country_iso:' + message.response.client.info.country_iso);
                     console.log('uid:' + message.response.client.info.uid);
-    var nickname = message.response.client.info.nickname;
+    nickname_self = message.response.client.info.nickname;
+    profile_self = message.response.client.info.profile;
+    user_id_self = message.response.client.id;
+    console.log(nickname_self);
+    console.log(profile_self);
+    console.log(user_id_self);
+    //.replace(/\/user\//,'')
 }
 
 function roomJoin (message) {
@@ -560,48 +581,56 @@ function roomJoin (message) {
 }
 
 function addToUserList (message) {
-     console.log('users ==============================');
-
+//     console.log('users ==============================');
+//     console.log(message);
      message.response.list.forEach(function(item, i, arr) {
          userlist.set(item.id,item);
+         if (item.owner == true ) {
+             author_user_id = item.id;
+             author_nickname = item.info.nickname;
+             author_profile = item.info.profile;
+//             console.log(author_user_id);
+//             console.log(author_nickname);
+//             console.log(author_profile);
+         }
      });
 
-     console.log(userlist);
+//console.log(userlist);
 }
 
 function updateUserList (message) {
-    console.log('updateRoom ==========================');
-    if (message.response.type == 'add') {
-        userlist.set(message.response.client.id,message.response.client);
-        console.log(userlist);
-    }
-    if (message.response.type == 'remove') {
-        if (typeof message.response.client.id === 'string') {
-            //userlist.delete(message.response.client.id);
-            if (userlist.length >= 500) {
-                console.log('userlist array length:' + userlist.length);
-                console.log(userlist);
-                userlist = userlist.slice(300,userlist.length - 1);
-                console.log('userlist array spliced, lenght:' + userlist.length);
-                console.log(userlist);
+    //console.log('updateRoom ==========================');
+    if ('type' in message.response) {
+        //console.log('type in message.response');
+
+        if (message.response.type == 'add') {
+            userlist.set(message.response.client.id,message.response.client);
+            //console.log(userlist);
+        }
+        if (message.response.type == 'remove') {
+            if (typeof message.response.client.id === 'string') {
+                //userlist.delete(message.response.client.id);
+                if (userlist.length >= 500) {
+                    //console.log('userlist array length:' + userlist.length);
+                    //console.log(userlist);
+                    userlist = userlist.slice(300,userlist.length - 1);
+                    //console.log('userlist array spliced, lenght:' + userlist.length);
+                    //console.log(userlist);
+                }
             }
+        }
+    }
+    if ('room' in message.response) {
+        if ('publicData' in message.response.room) {
+            //var room_id = message.response.room.id;
         }
     }
 }
 
 function chatMessage(message) {
-                    console.log('message =============================>>>');
-                    console.log('attached:' + message.response.attached);
-                    console.log('mid:' + message.response.mid);
-                    console.log('owner:' + message.response.owner);
-                    console.log('owner_id:' + message.response.owner_id);
-                    console.log('text:' + message.response.text);
-                    console.log('textRaw:' + message.response.textRaw);
-                    console.log('textWithSmiles:' + message.response.textWithSmiles);
-                    console.log('message =============================>>>');
     msglist.set(message.response.mid,message.response);
-    console.log(msglist);
-    console.log('added to msglist');
+    //console.log(msglist);
+    //console.log('added to msglist');
 }
 
 window.addEventListener('beforeunload', function(event) {
@@ -669,12 +698,13 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
         if (typeof element === 'object' && element !== null && 'getAttribute' in element) {
             var id = element.getAttribute('data-id');
-            if (id !== 'null' && id !== 'undefined' && id.length > 0 ) {
-                console.log("%celement removed from div.chat-messages mid: " + id,'background: LemonChiffon;color: red');
-                console.log(element);
-                msglist.delete(id);
-                console.log('removed from msglist');
-                console.log(msglist);
+
+            if (id !== null && id !== undefined) {
+                //console.log("%celement removed from div.chat-messages mid: " + id,'background: LemonChiffon;color: red');
+                //console.log(element);
+                if (id.length > 0) msglist.delete(id);
+                //console.log('removed from msglist');
+                //console.log(msglist);
             }
         }
     });
@@ -758,13 +788,13 @@ textArea.addEventListener('input', () => {
                     //console.log(result.replace(/(.*[^<>\.\(\)\!\?\:\[\]]+)(\[\[\d+\]\])?$/,'$1.$2'));
                     //console.log(result.match(/(.*[^<>\.\(\)\!\?\:\[\]]+)(\[\[\d+\]\])?$/));
                     //console.log(result.search(/.*\[\[\d+\]\]$/));
-                    if (result.search(/.*\[\[\d+\]\]$/) == -1) { // твик из-за старого кода в antiCapsMat
-                        return result.replace(/(.*[^<>\.\(\)\!\?:\s\+]+)$/,'$1.'); // Подстановка точки в конце
+
+                    if (result.search(/.*\[\[\d+\]\]$/) == -1 && result.length > 2) { // твик из-за старого кода в antiCapsMat
+                        return result.replace(/(.*[^<>\.\(\)\!\?\:\s\+]+)$/,'$1.'); // Подстановка точки в конце
                     } else { return result } // твик из-за старого кода
                 } else {
                     return result; //.replace(/\s+$/)
                 }
-
             } else { return undefined }
         }
 
@@ -858,25 +888,30 @@ textArea.addEventListener('input', () => {
         }
 
         if ( url.indexOf('https://livacha.com/chat/') != -1 ) {
-/*
-            document.querySelector("div.form-control").addEventListener('keydown', (e) => {
+            if (AntiviblyadokEnabled == false) { return }
+
+            document.querySelector("textarea.form-control").addEventListener('keydown', (e) => {
                 if (e.key === 'Enter') {
-                    if (AntiviblyadokEnabled == false) { return }
+                    //console.log('%ctextarea.form-control','background: LemonChiffon;color: red');
                     var element = e.target;
-                    element.value = autocorrect(element.value,true,false);
+                    element.value = TextCorrector(element.value,true,true);
                     return
                 }
 
-            })
+            });
 
-            document.querySelector("div.form-control").addEventListener('click', (e) => {
-                if (AntiviblyadokEnabled == false) { return }
-                var element = document.querySelector("div.form-control");
-                element.value = autocorrect(element.value,true,true);
-                return
-            })
-*/
+           document.querySelector("div.chat-container").querySelectorAll("button.btn-secondary").forEach(function (userItem) {
+                if (userItem.innerText.indexOf("Послать") != -1 ) {
+                    userItem.addEventListener('click', (e) => {
+                        var element = document.querySelector("textarea.form-control");
+                        element.value = TextCorrector(element.value,true,true);
+                        return
+                    })
+                }
+           });
+
         }
+
 
 /*
 
@@ -914,7 +949,7 @@ textArea.addEventListener('input', () => {
             //console.log(arrayOfStrings);
         });
 */
-        var ignorelist_nick = ['Поменяйте ник'];
+        var ignorelist_nick = ['Поменяйте ник','Поменяйтe ник'];
 
 /*==================================================================================*/
         function antiCapsMat(m) {
@@ -1063,18 +1098,23 @@ textArea.addEventListener('input', () => {
                 i++
             })
 
-                m = $(m).html().toLowerCase(); // Перевод в нижний регистр.
+            m = $(m).html().toLowerCase(); // Перевод в нижний регистр.
 
-                for (var key in dict) { // Проверка на список нехороших слов
-                    var reg = new RegExp(key,'i');
-                    if (m.search(key) != -1) { // тег для показа скрытого сообщения
-                        m = '<div class="text service-tag" style="display: auto;" ondblclick=MsgClick(this);>'
-                            + dict[key] + '</div><div class="text text-body" style="display: none">' + m + '</div>';
-                        break;
-                    }
-                };
+            let shit_found = false;
 
-            m = autocorrect(m,true,true); // Исправление на первую заглавную и добавление точки в конце
+            for (var key in dict) { // Проверка на список нехороших слов
+                var reg = new RegExp(key,'i');
+                if (m.search(key) != -1) { // тег для показа скрытого сообщения
+                    m = '<div class="text service-tag" style="display: auto;" ondblclick=MsgClick(this);>'
+                        + dict[key] + '</div><div class="text text-body" style="display: none">' + m + '</div>';
+                    shit_found = true;
+                    break;
+                }
+            };
+
+            if (shit_found == false) {
+                m = TextCorrector(m,true,true); // Исправление на первую заглавную и добавление точки в конце
+            }
 
             o.map(function (h, i) {
                 m = m.split("[[" + i + "]]").join(h[0].outerHTML);
@@ -1100,14 +1140,14 @@ textArea.addEventListener('input', () => {
             var ResultArray = new Array();
             var result = new Array();
 
-            var nick_to_tags = m.match(/<span[^<>]+>[^<>]+<\/span>/g);
-            var nick_to_tag_data;
+            var nick_to_tag_data = m.match(/<span[^<>]+>[^<>]+<\/span>/g);
+            var nick_to_tags;
             var span_tags_inner = '';
 
-            if (nick_to_tags != null) {
-                for(let c = 0; c < nick_to_tags.length; c++){
-                    nick_to_tag_data = nick_to_tags[c].match(/<span[^<>]+>([^<>]+)<\/span>/);
-                    if (nick_to_tag_data != null) { span_tags_inner += nick_to_tag_data[1] }
+            if (nick_to_tag_data != null) {
+                for(let c = 0; c < nick_to_tag_data.length; c++){
+                    nick_to_tags = nick_to_tag_data[c].match(/<span[^<>]+>([^<>]+)<\/span>/);
+                    if (nick_to_tags != null) { span_tags_inner += nick_to_tags[1] }
                 }
             }
 //            console.log(span_tags_inner);
@@ -1206,16 +1246,29 @@ textArea.addEventListener('input', () => {
         const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
         $("div.chat-messages").bind('DOMNodeInserted', function (e) {
-
 //            if (AntiviblyadokEnabled == false) { return }
+            //console.log('%c','background: LemonChiffon;color: red');
             var element = e.target;
-            console.log(element);
-            var id = element.getAttribute('data-id');                         // id
+
+            if (typeof element !== 'object' || element === null) {
+                return;
+            }
+
+            var id = element.getAttribute('data-id'); // id
+            if (id === null || id === undefined) {
+                    return;
+            }
+
+            var message = msglist.get(id);
+
+            if (message === undefined) { return }
+
+/*
             var $mms = element.querySelector('span.text');     // message body backup
             console.log($mms);
             var t = $mms.innerHTML; // message body
             var n = element.querySelector('strong.nick, strong.nick-to').innerHTML;          // nick
-            var login = '';                                          // login
+
             console.log("chat =============================");
             console.log(id);
             console.log("n:" + n);
@@ -1223,14 +1276,12 @@ textArea.addEventListener('input', () => {
             console.log("t:" + t);
             console.log("chat =============================>");
 //            console.log(element.outerHTML);
+*/
 
-            var s = false;
             var reg = new RegExp();
             var date = new Date();
             var nick_to_subjects = '';
             var is_temp = false;
-            var is_author = false;
-            var is_me = false;
             var for_me = false;
             var for_author = false;
             var comment = '';
@@ -1253,15 +1304,59 @@ textArea.addEventListener('input', () => {
             const autoremove_from_ignorlist = false;
             const autoremove_from_ignorlist_time = 0; // 3 months
 
-            if (t != undefined) {
-                var a = t.match(/\*...\*/g);
-                if (a != null) {
-                    a.forEach(function (a) {
-                        t = repl(t, z, l);
-                    });
-                }
-                console.log('repl:' + t);
-            return;
+//            console.log('DOMNodeInserted1');
+//            console.log(message);
+//            console.log('DOMNodeInserted2');
+
+            var nickname = message.owner.nickname;
+            var profile = message.owner.info.profile.replace(/\/user\//,'');
+            var mobile = message.owner.info.mobile; // с мобильного или нет
+            var country = message.owner.info.country; // название страны
+            var country_iso = message.owner.info.country_iso; // код страны
+            var uid = message.owner.info.uid; // внутренний постоянный идентификатор профиля на блеваче
+            var sid = message.owner.sid; // хз что за идентификатор
+            var user_id = message.owner_id; // в массиве с юзерами
+            var is_moder = message.owner.moder; // смотрящий
+            var is_moderator = message.owner.moderator; // модератор сайта (предположительно)
+            var is_admin = message.owner.admin; // администратор сайта (предположительно)
+            var ignored = message.owner.ignored; // проверить
+//            var text = message.text;
+            var text = message.textWithSmiles;
+           // var textRaw = message.textRaw;
+            //var textWithSmiles = message.textWithSmiles;
+            var attached = message.attached; // прикреплённое что то ... проверить
+            var is_author = message.owner.owner;
+            var is_me = message.owner.self;
+
+            //nickname_self
+            //profile_self
+            //user_id_self
+            //author_user_id
+            //author_nickname
+            //author_profile
+
+            if (profile == '' && uid == '0' ) { is_temp = true }
+/*
+                    console.log('message =============================>>>');
+                    console.log('attached:' + message.attached);
+                    console.log('mid:' + message.mid);
+                    console.log('owner_id:' + message.owner_id);
+                    console.log('text:' + message.text);
+                    console.log('textRaw:' + message.textRaw);
+                    console.log('textWithSmiles:' + message.textWithSmiles);
+                    console.log('message =============================>>>');
+*/
+
+
+//            if (text != undefined) {
+//                var a = test.match(/\*...\*/g);
+//                if (a != null) {
+//                    a.forEach(function (a) {
+//                        t = repl(text, z, l);
+//                    });
+//                }
+//                console.log('repl:' + t);
+
                 //$(element).find("app-popova").click();
 /*                $(element).append( "<div class=\"mess-actions-self\">" +
                                   "<button class=\"btn btn-sm btn-secondary-pre\"" +
@@ -1269,44 +1364,26 @@ textArea.addEventListener('input', () => {
                                    "</i></button>" +
                                    "</div>" );
 */
-                if(n == nickname) { is_me = true }
 
-                var userdata = new Array("","","",false);
-
-                userdata = userlist.get(id);
-
-                if (typeof userdata === 'object') {
-                    if (userdata[1] == '') { is_temp = true }; login = userdata[1];
-                    if (userdata[2] == 'автор') { is_author = true }
-                    if (typeof userdata[3] === "boolean") {
-                        is_me = userdata[3];
-                        if (is_me == true && userdata[0] != nickname) {
-                            nickname = userdata[0];
-                        }
-                    }
-                }
-
-                if(n != nickname) { // не обрабатывать сообщения от себя
-                    if (typeof userdata === 'object') {
-                        //console.log(antiSpam(userdata[0],userdata[1],t));
-                        var antiSpamResult = antiSpam(userdata[0],userdata[1],t);
-                        if (antiSpamResult[0] > 0) { is_spam = true }
-                    }
+                if(!is_me) { // не обрабатывать сообщения от себя
+                    var antiSpamResult = antiSpam(nickname,profile,text);
+                    if (antiSpamResult[0] > 0) { is_spam = true }
                     let SpamResult;
-                    SpamResult = antiCapsMat(t);
-                    t = SpamResult[0]
+                    SpamResult = antiCapsMat(text);
+                    text = SpamResult[0];
+                    element.querySelector('span.text').innerHTML = text;
+                    //console.log('%cantiCapsMat:' + text,'background: LemonChiffon;color: red');
                     //console.log(SpamResult[1]); // данные сообщения для более глубокого разбора
                 }
 
-                //if (typeof userdata === 'object') { is_spam = antiSpam(userdata[0],t) }
-                //t = antiCapsMat(t); // обрабатывать сообщения от себя
 
-                $($mms).html(t);
+                //text = antiCapsMat(text); // обрабатывать сообщения от себя
 
-//                if (t.search("🐖") != -1 || t.search("🐷") != -1) { is_ukropitek = true }
-                if (t.search("🐖") != -1) { is_ukropitek = true }
-                if (t.search("🤮") != -1 || t.search("🤡") != -1 || t.search("🐓") != -1 ||
-                   (t.search("😭") != -1 || t.search('😫') != -1  || t.search('🥛') != -1 &&
+                //$($mms).html(t);
+
+                if (text.search("🐖") != -1) { is_ukropitek = true }
+                if (text.search("🤮") != -1 || text.search("🤡") != -1 || text.search("🐓") != -1 ||
+                   (text.search("😭") != -1 || text.search('😫') != -1  || text.search('🥛') != -1 &&
                     is_me == false)) { is_amoral = true }
 
                 var now = new Date();
@@ -1318,13 +1395,25 @@ textArea.addEventListener('input', () => {
                 function SetVal (a) {
                     ignore_date = new Date(a[3]);
                     comment = a[6];
-                    if (a[0] == n) { ignorelist_match = 'nick' }
-                    if (a[1] == login) {
-                        ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'login';
+                    if (a[0] == nickname) { ignorelist_match = 'nick' }
+                    if (a[1] == profile) {
+                        ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'profile';
                     }
                     //if (typeof comment == 'string' && comment !== null) { comment = a[i][6]; console.log (1); console.log(typeof comment )}
                 }
-
+//========================New==========================
+// [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time [5] counter
+// [6] comment [7] country [8] uid [9] reserved [10] reserved
+//=======================================================
+// [2] instruction: 0: - блокировать по нику
+// [2] instruction: 1: - блокировать по логину
+// [2] instruction: 2: - блокировать по uid
+// [2] instruction: 3: - блокировка на значение переопределяемой константы в днях
+// [2] instruction: 4: - перманентный бан
+// [2] instruction: 5: - reserved
+// [2] instruction: 6: - reserved
+// [2] instruction: 7: - reserved
+//=====================================================
                 for(let i = 0; i < ignorelist.length; i++){
                     // [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time [5] counter [6] comment [7] country
                     // [2] instruction: 0: блокировать по нику; 1: блокировать по логину; 2: блокировать по логину и нику;
@@ -1342,9 +1431,9 @@ textArea.addEventListener('input', () => {
 
                        if(is_temp == false && (
                           ((ignorelist[i][2] == ignore_nick_365d || ignorelist[i][2] == ignore_both_365d) &&
-                           ignorelist[i][0] == n) ||
+                           ignorelist[i][0] == nickname) ||
                           ((ignorelist[i][2] == ignore_login_365d || ignorelist[i][2] == ignore_both_365d) &&
-                           ignorelist[i][1] == login) ))
+                           ignorelist[i][1] == profile) ))
                           {
                               if (date_diff >= 31536000000 ) // удаление через 365 дней
                               {
@@ -1356,7 +1445,7 @@ textArea.addEventListener('input', () => {
                               }
 
                          } else if (is_temp == true && (ignorelist[i][2] == ignore_nick_temp_1d &&
-                                                        ignorelist[i][0] == n)) {
+                                                        ignorelist[i][0] == nickname)) {
                               if (date_diff >= 86400000 ) // удаление через 1 день
                               {
                                   ignorelist.splice(i, 1); // подумать над delete
@@ -1365,7 +1454,7 @@ textArea.addEventListener('input', () => {
                                   is_in_ignorelist = true;
                                   SetVal(ignorelist[i]);
                               }
-                         } else if (ignorelist[i][2] == ignore_both_1d && ignorelist[i][0] == n) {
+                         } else if (ignorelist[i][2] == ignore_both_1d && ignorelist[i][0] == nickname) {
                               if (date_diff >= 86400000 ) // удаление через 1 день
                               {
                                   ignorelist.splice(i, 1); // подумать над delete
@@ -1374,71 +1463,82 @@ textArea.addEventListener('input', () => {
                                   is_in_ignorelist = true;
                                   SetVal(ignorelist[i]);
                               }
-                         }
+                       }
 
                     if (hide_in_message == true && (ignorelist[i][2] == ignore_nick_365d || ignorelist[i][2] == ignore_both_365d ||
                                                     ignorelist[i][2] == ignore_both_1d || ignorelist[i][2] == 5)) {
-//                    if (hide_in_message == true) {
+////                    if (hide_in_message == true) {
                         reg = new RegExp("<span[^<>]+>" +
                         // .replace(/^\s+/,'').replace(/\s+$/,'')
                         escapeRegExp(ignorelist[i][0]) + "</span>",'i'); // понаблюдать за определением кому пишут
 
-                        if (t.search(reg) != -1) { message_to_ignored_nick = true };
+                        if (text.search(reg) != -1) { message_to_ignored_nick = true };
                         if (message_to_ignored_nick == true) {
-//                            console.log(reg);
-//                            console.log(message_to_ignored_nick);
+////                            console.log(reg);
+////                            console.log(message_to_ignored_nick);
                         }
                     }
                 }
+
                 }
+
 //console.log(levenshtein('Hello', 'HelA_1'));
 //console.log(ignorelist);
 
-                var nick_to_tags = t.match(/<span[^<>]+>[^<>]+<\/span>/g);
-                var nick_to_tag_data = new Array();
-                //console.log(nick_to_tags);
+                var nick_to_tag_data = text.match(/<span[^<>]+>[^<>]+<\/span>/g);
+                var nick_to_tags = new Array();
+                //console.log(nick_to_tag_data);
                 var message_to = new Array();
 
-                if (nick_to_tags != null) {
-                    for(let c = 0; c < nick_to_tags.length; c++){
-                        nick_to_tag_data = nick_to_tags[c].match(/<span[^<>]+data-client-id="([^<>"]+)">([^<>]+)<\/span>/);
-                        if (nick_to_tag_data != null) { message_to.push([nick_to_tag_data[1],nick_to_tag_data[2]]) }
+                if (nick_to_tag_data != null) {
+                    for(let c = 0; c < nick_to_tag_data.length; c++){
+                        nick_to_tags = nick_to_tag_data[c].match(/<span[^<>]+data-client-id="([^<>"]+)">([^<>]+)<\/span>/);
+                        if (nick_to_tags != null) { message_to.push([nick_to_tags[1],nick_to_tags[2]]) }
                         else {
-                            nick_to_tag_data = nick_to_tags[c].match(/<span[^<>]+(nick-not-found)[^<>]+>([^<>]+)<\/span>/);
-                            if (nick_to_tag_data != null) {
-                                message_to.push([nick_to_tag_data[1],nick_to_tag_data[2]])
+                            nick_to_tags = nick_to_tag_data[c].match(/<span[^<>]+(nick-not-found)[^<>]+>([^<>]+)<\/span>/);
+                            if (nick_to_tags != null) {
+                                message_to.push([nick_to_tags[1],nick_to_tags[2]])
                             }
                         }
                     }
-                    //console.log(message_to.join('|'));
+                    //console.log("%c" + nickname + " to " + message_to.join('|'),'background: LemonChiffon;color: red');
                 }
 
+            //nickname_self
+            //profile_self
+            //user_id_self
+            //author_user_id
+            //author_nickname
+            //author_profile
+
                 for (let key of userlist.keys()) {
-                    let data = new Array("","","",false);
-                    data = userlist.get(key);
+                    let data = userlist.get(key);
 
                     for(let c = 0; c < message_to.length; c++){
                         if (message_to[c][0] == key || message_to[c][0] == "nick-not-found" ) {
-                            if (message_to[c][1] == data[0] || message_to[c][1] == "nick-not-found" ) {
-                                //console.log(message_to[c][1]+ "," + nickname);
-                                nick_to_subjects += "|" + message_to[c][1];
-                                if ( message_to[c][1] == nickname ) { for_me = true }
+                            if (message_to[c][1] == data.nickname || message_to[c][1] == "nick-not-found" ) {
 
-                                if (author_nick == data[0] && author_login == data[1]) {
-                                    if ( data[2] == 'автор' || 'смотрящий') { for_author = true }
+                                nick_to_subjects += "|" + message_to[c][1];
+                                if ( message_to[c][1] == nickname_self ) { for_me = true }
+
+                                if (author_nickname == data.nickname && author_profile == data.info.profile && data.owner == true) {
+                                    for_author = true;
                                 }
 
-                                //console.log(data);
-                                //console.log("nick:" + message_to[c][1] + ",login:" + data[1])
+                                //console.log("nick:" + message_to[c][1] + ",profile:" + data.info.profile)
                             }
                         }
                     }
+                       // console.log('%cdata.info.profile:' + data.info.profile,'background: LemonChiffon;color: red');
+                       // console.log('%cdata.info.uid:' + data.info.uid,'background: LemonChiffon;color: red');
+                       // console.log('%chide_in_message:' + hide_in_message,'background: LemonChiffon;color: red');
+                       // console.log('%chide_temp_profile:' + hide_temp_profile,'background: LemonChiffon;color: red');
 
-                    if (hide_in_message == true && hide_temp_profile == true && data[0] == '') { // !!! проверить это место data[0] ==
+                    if (hide_in_message == true && hide_temp_profile == true && data.info.uid == '0') {
 
-                        reg = new RegExp("<span[^<>]+>" + escapeRegExp(data[0]) + "</span>");
+                        reg = new RegExp("<span[^<>]+>" + escapeRegExp(data.nickname) + "</span>");
 
-                        if (t.search(reg) != -1) {
+                        if (text.search(reg) != -1) {
                             message_to_ignored_nick = true;
                             if (message_to.length < 1) { break }
                         };
@@ -1446,20 +1546,32 @@ textArea.addEventListener('input', () => {
                 }
 
                 for(let i = 0; i < ignorelist_nick.length; i++){
-
+//console.log('ignorelist_nick1');
+//console.log('ignorelist_nick[i]:' + ignorelist_nick[i] + ",text:" + text);
                     if (hide_in_message == true) {
                         reg = new RegExp("<span[^<>]+>" +
                         escapeRegExp(ignorelist_nick[i].replace(/^\s+/,'').replace(/\s+$/,'')) + // понаблюдать за определением кому пишут
                         "</span>",'i');
-                        if (t.search(reg) != -1) { message_to_ignored_nick = true };
+                        if (text.search(reg) != -1) { message_to_ignored_nick = true };
+//console.log('ignorelist_nick2');
+//console.log('message_to_ignored_nick:' + message_to_ignored_nick);
+//console.log('ignorelist_nick[i]:' + ignorelist_nick[i] + ",nickname:" + nickname);
                     }
-                    if(ignorelist_nick[i] == n) {
+                    if(ignorelist_nick[i] == nickname) {
                         is_in_ignorelist = true;
                         ignorelist_match += ((ignorelist_match.length > 0) ? "+il_nick" : "");
-                        comment = "ignorelist_nick";
+
+                        comment = "il_nick";
+//                        console.log(typeof ignore_date);
+                        if (ignore_date === undefined) { ignore_date = new Date(ticks); }
+//                        console.log(typeof ignore_date);
+//console.log('ignorelist_nick3');
+//console.log('is_in_ignorelist:' + is_in_ignorelist);
+//console.log('ignorelist_match:' + ignorelist_match);
                     }
                 }
 
+/*
                 if (is_spam == true && is_me == false && is_author == false) { // автобан пидоров
                     let exists = false;
 
@@ -1472,40 +1584,43 @@ textArea.addEventListener('input', () => {
 
                         if (ignorelist[i] !== null) {
                             if (ignorelist[i][1] != '') {
-                                if (ignorelist[i][0] == n && ignorelist[i][1] == login) { exists = true }
+                                if (ignorelist[i][0] == nickname && ignorelist[i][1] == profile) { exists = true }
                             } else {
-                                if (ignorelist[i][0] == n && ignorelist[i][1] == '') { exists = true }
+                                if (ignorelist[i][0] == nickname && ignorelist[i][1] == '') { exists = true }
                             }
                         }
                     }
 //console.log(exists);
-//console.log("login: " + login);
+//console.log("profile: " + profile);
 
                     if (exists == false) {
                         if ( (is_spam == true && antiSpamResult[0] > 2 && is_ukropitek == true ) ){
-                            ignorelist.push([n,login,ignore_login_365d,date.getTime(),date.getTime(),0,
+                            ignorelist.push([nickname,profile,ignore_login_365d,date.getTime(),date.getTime(),0,
                             (is_spam ? 'is_spam(' + antiSpamResult[0] + ")" : '') +
                             (is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') + ' - автобан на 365 дней','']);
                             added_to_ignore == true;
-                            console.log("added to ignore: " + n + "|" + login + ": на 365 дней по логину");
+                            console.log("added to ignore: " + nickname + "|" + profile + ": на 365 дней по логину");
                             //console.log(ignorelist);
                         }
                         if ( (is_spam == true && antiSpamResult[0] > 4) ){
-                            ignorelist.push([n,login,ignore_both_1d,date.getTime(),date.getTime(),0,
+                            ignorelist.push([nickname,profile,ignore_both_1d,date.getTime(),date.getTime(),0,
                             (is_spam ? 'is_spam(' + antiSpamResult[0] + ")" : '') +
                             (is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') + ' - автобан на 1 день','']);
                             added_to_ignore == true;
-                            console.log("added to ignore: " + n + "|" + login + ": на 1 день по логину и нику");
+                            console.log("added to ignore: " + nickname + "|" + profile + ": на 1 день по логину и нику");
                             //console.log(ignorelist);
                         }
                     }
                 }
+*/
+                let removed = false;
 
-                if(is_in_ignorelist == true || (message_to_ignored_nick == true && for_author == false) || (is_temp == true && hide_temp_profile == true) ||
+                if(is_in_ignorelist == true || (message_to_ignored_nick == true && for_author == false) ||
+                   (is_temp == true && hide_temp_profile == true) ||
                    (is_ukropitek == true && hide_ukropitek == true)){
                     if(is_me == false && is_author == false) {
                       element.remove();
-                      s = true;
+                      removed = true;
                     }
                 }
 
@@ -1514,9 +1629,10 @@ textArea.addEventListener('input', () => {
                       element.remove();
                 }
 
-                if (typeof userdata === 'object') {
-                    var color = "";
-                    if (s == true) {
+
+                    let color;
+
+                    if (removed == true) {
                         color = "red";
                     } else if (is_me == true) {
                         color = "green";
@@ -1538,10 +1654,16 @@ textArea.addEventListener('input', () => {
 
                     console.log("%cchat(" + (date.getHours() < 10 ? '0' : '') + date.getHours() + ":" +
                                 (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() +
-                                "): " + userdata[0] + ":" + userdata[1] + ":" + userdata[2] + ":" + 'ul' + "=" +
-                                userlist.size + ":" + 'il' + "=" + ignorelist.length + ":" + "sa=" + SpamArray.length + ":" +
+                                "):" + nickname + ":" + profile + ":" + country_iso + ":" + (mobile ? 'phone' : 'pc') + ":" +
+                                "uid=" + uid + ":" +
+                                //"sid=" + sid + ":" +
+                                (ignored ? 'ignored_in_room!??' : '') + ":" +
+                                'ul' + "=" + userlist.size + ":" +
+                                'il' + "=" + ignorelist.length + ":" + "sa=" + SpamArray.length + ":" +
                                 (is_temp ? 'is_temp' : '') + ":" + (is_author ? 'is_author' : '') + ":" +
-                                (userdata[3] ? 'is_me' : '') + ":" + (for_me ? 'for_me' : '') + ":" +
+                                (is_moder ? 'room_moder' : '') + ":" + (is_moderator ? 'site_moder' : '') + ":" +
+                                (is_admin ? 'site_admin' : '') + ":" +
+                                (is_me ? 'is_me' : '') + ":" + (for_me ? 'for_me' : '') + ":" +
                                 (for_author ? 'for_author' : '') + ":" +
                                 (is_spam ? 'is_spam(' + antiSpamResult[0] + ')' : '') + ":" + (is_amoral ? 'is_amoral' : '') + ":" +
                                 (is_ukropitek ? 'is_ukropitek' : '') + ":" +
@@ -1552,8 +1674,6 @@ textArea.addEventListener('input', () => {
                                 (message_to_ignored_nick ? 'to_ignored_nick': '') + ":" +
                                 ((nick_to_subjects != '') ? 'to:' + nick_to_subjects : '')
                                 , (for_me ? 'background: LemonChiffon;' : '') + 'color: ' + color);
-                }
-           }
 
         });
     }
