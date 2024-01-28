@@ -175,6 +175,7 @@ var Scrpt = create("div",ScrptContent);
 
         var userlist = new Map();
         var msglist = new Map();
+        const ignore_time = 86400000 * 1 // время игнора в днях 1195 - 3 года, 86400000 - 1 день
 
         var ignorelist = new Array(); // '','',0,0,0
         var author_user_id;
@@ -189,11 +190,11 @@ var Scrpt = create("div",ScrptContent);
      //   console.log(nickname);
      //   if (typeof nickname === 'undefined') { nickname = "" };
 
-        const ignore_nick_365d = 0;
-        const ignore_login_365d = 1;
-        const ignore_both_365d = 2;
-        const ignore_nick_temp_1d = 3;
-        const ignore_both_1d = 4;
+        const ignore_nick_uid_country = 0;
+        const ignore_profile_uid_country = 1;
+        const ignore_all_params = 2;
+        const ignore_temp_profile = 3;
+        const ignore_permanent = 4;
 
 //        let e_app_nickname = document.getElementsByClassName("app-nickanme")[0]; // old
       //  let e_app_nickname = document.getElementsByClassName("nickname text-truncate")[0].getElementsByTagName("strong")[0].getElementsByTagName("a")[0];;
@@ -207,16 +208,24 @@ var Scrpt = create("div",ScrptContent);
         //console.log(author_nick + '|' + author_login + '|' + nickname); // на данной стадии не пишет в консоль !
 
 function SaveData() {
-                    // [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time [5] counter [6] comment [7] country
-                    // [2] instruction: 0: блокировать по нику; 1: блокировать по логину; 2: блокировать по логину и нику;
-                    // [2] instruction: 3: - бан на день нику для временных ников;
-                    // [2] instruction: 4: - бан на день по логину и нику;
-                    // [2] instruction: 5: - бан навсегда по логину и нику;
-                    //const ignore_nick_365d = 0;
-                    //const ignore_login_365d = 1;
-                    //const ignore_both_365d = 2;
-                    //const ignore_nick_temp_1d = 3;
-                    //const ignore_both_1d = 4;
+//========================New==========================
+// [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time [5] counter
+// [6] comment [7] country [8] uid [9] reserved [10] reserved
+//=======================================================
+// [2] instruction: 0: - блокировать по нику + uid + по стране с разбаном по значению константы в днях в коде
+// [2] instruction: 1: - блокировать по логину + uid + по стране с разбаном по значению константы в днях в коде
+// [2] instruction: 2: - блокировка по всем параметрам с разбаном по значению константы в днях в коде
+// [2] instruction: 3: - игнор на день по нику и стране для временных профилей
+// [2] instruction: 4: - перманентный игнор по всем параметрам
+// [2] instruction: 5: - reserved
+// [2] instruction: 6: - reserved
+// [2] instruction: 7: - reserved
+//const ignore_nick_uid_country = 0;
+//const ignore_profile_uid_country = 1;
+//const ignore_all_params = 2;
+//const ignore_temp_profile = 3;
+//const ignore_permanent = 4;
+//=====================================================
     let now = new Date();
     let ticks = now.getTime();
     let ignorelist_loaded = new Array();
@@ -242,7 +251,7 @@ function SaveData() {
         console.log("ignorelist.length:" + ignorelist.length + " + " + "ignorelist_loaded.length:" + ignorelist_loaded.length)
 	}
 
-    if (ignorelist_loaded !== 'undefined' || ignorelist_loaded.length > 0) {
+    if (ignorelist_loaded !== undefined || ignorelist_loaded.length > 0) {
     let exists = false;
 
     for(var i = 0; i < array1.length; i++) {
@@ -265,46 +274,41 @@ function SaveData() {
 //                console.log("array1[i][4]:" + array1[i][4]);
 //                console.log("array2[c]:" + array2[c]);
 //                console.log("array2[c][4]:" + typeof array2[c][4]);
-                    //const ignore_nick_365d = 0;
-                    //const ignore_login_365d = 1;
-                    //const ignore_both_365d = 2;
-                    //const ignore_nick_temp_1d = 3;
-                    //const ignore_both_1d = 4;
                 if (array1[i][4] < array2[c][4]) { // 86400000
-                    if ( (((ticks - array2[c][3]) > 1 * 24 * 3600000) && (array2[c][2] == ignore_nick_temp_1d ||
-                                                                array2[c][2] == ignore_both_1d) )
+                    if ( (((ticks - array2[c][3]) > 86400000) && (array2[c][2] == ignore_temp_profile) )
                         ||
-                       (((ticks - array2[c][3]) > 365 * 24 * 3600000) && (array2[c][2] == ignore_nick_365d ||
-                                                                array2[c][2] == ignore_login_365d ||
-                                                                array2[c][2] == ignore_both_365d)) ) {
+                       (((ticks - array2[c][3]) > ignore_time) && (array2[c][2] == ignore_nick_uid_country ||
+                                                                array2[c][2] == ignore_profile_uid_country ||
+                                                                array2[c][2] == ignore_all_params ||
+                                                                array2[c][2] == ignore_permanent)) ) {
                         console.log("%cantyviblyadok(" + ((now.getHours() < 10 && now.getHours() >= 0) ? "0" + now.getHours() : "") +
                                     ":" + ((now.getMinutes() < 10 && now.getMinutes() >= 0) ? "0" + now.getMinutes() : "") + "): " +
                                     "nick:" + array2[c][0] + "|login:" + array2[c][1] +
                                     "|removed from ignorelist by timeoffset > " +
-                                    ((array2[c][2] == ignore_nick_temp_1d) ? "ignore_nick_temp_1d" : "") +
-                                    ((array2[c][2] == ignore_both_1d) ? "ignore_both_1d" : "") +
-                                    ((array2[c][2] == ignore_nick_365d) ? "ignore_nick_365d" : "") +
-                                    ((array2[c][2] == ignore_login_365d) ? "ignore_login_365d" : "") +
-                                    ((array2[c][2] == ignore_both_365d) ? "ignore_both_365d" : ""),
+                                    ((array2[c][2] == ignore_nick_uid_country) ? "ignore_nick_uid_country" : "") +
+                                    ((array2[c][2] == ignore_profile_uid_country) ? "ignore_profile_uid_country" : "") +
+                                    ((array2[c][2] == ignore_all_params) ? "ignore_all_params" : "") +
+                                    ((array2[c][2] == ignore_temp_profile) ? "ignore_temp_profile" : "") +
+                                    ((array2[c][2] == ignore_permanent) ? "ignore_permanent" : ""),
                                     'background: LemonChiffon; color: red');
                     } else { ignorelist_temp.push(array2[c]) }
                 } else {
-                    if ( (((ticks - array1[i][3]) > 1 * 24 * 3600000) && (array1[i][2] == ignore_nick_temp_1d ||
-                                                                array1[i][2] == ignore_both_1d) )
+                    if ( (((ticks - array1[i][3]) > 86400000) && (array1[i][2] == ignore_temp_profile ) )
                         ||
-                       (((ticks - array1[i][3]) > 365 * 24 * 3600000) && (array1[i][2] == ignore_nick_365d ||
-                                                                array1[i][2] == ignore_login_365d ||
-                                                                array1[i][2] == ignore_both_365d)) ) {
+                       (((ticks - array1[i][3]) > ignore_time) && (array1[i][2] == ignore_nick_uid_country ||
+                                                                array1[i][2] == ignore_profile_uid_country ||
+                                                                array1[i][2] == ignore_all_params ||
+                                                                array1[i][2] == ignore_permanent)) ) {
 
                         console.log("%cantyviblyadok(" + ((now.getHours() < 10 && now.getHours() >= 0) ? "0" + now.getHours() : "") +
                                     ":" + ((now.getMinutes() < 10 && now.getMinutes() >= 0) ? "0" + now.getMinutes() : "") + "): " +
                                     "nick:" + array1[i][0] + "|login:" + array1[i][1] +
                                     "|removed from ignorelist by timeoffset > " +
-                                    ((array1[i][2] == ignore_nick_temp_1d) ? "ignore_nick_temp_1d" : "") +
-                                    ((array1[i][2] == ignore_both_1d) ? "ignore_both_1d" : "") +
-                                    ((array1[i][2] == ignore_nick_365d) ? "ignore_nick_365d" : "") +
-                                    ((array1[i][2] == ignore_login_365d) ? "ignore_login_365d" : "") +
-                                    ((array1[i][2] == ignore_both_365d) ? "ignore_both_365d" : ""),
+                                    ((array1[i][2] == ignore_nick_uid_country) ? "ignore_nick_uid_country" : "") +
+                                    ((array1[i][2] == ignore_profile_uid_country) ? "ignore_profile_uid_country" : "") +
+                                    ((array1[i][2] == ignore_all_params) ? "ignore_all_params" : "") +
+                                    ((array1[i][2] == ignore_temp_profile) ? "ignore_temp_profile" : "") +
+                                    ((array1[i][2] == ignore_permanent) ? "ignore_permanent" : ""),
                                     'background: LemonChiffon; color: red');
                     } else { ignorelist_temp.push(array1[i]) }
                 }
@@ -506,10 +510,18 @@ function messageDispather(data) {
                 }
                 case 'messRemoved': { // модерастом или владельцем трансляции
                     console.log('messRemoved =============================');
+                    console.log(message);
+                    console.log('removed by moderast('+ message.response.client.nickname + ':' +
+                                message.response.client.info.profile.replace(/\/user\//,'') + ':' +
+                                message.response.client.info.uid + ')');
                     break
                 }
                 case 'baned': { // модерастом или владельцем трансляции
                     console.log('baned =============================');
+                    console.log(message);
+                    console.log('baned: ('+ userlist.get(message.response.clientId).nickname + ':' +
+                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + ':' +
+                                userlist.get(message.response.clientId).info.uid + ')');
                     break
                 }
 
@@ -525,6 +537,12 @@ function messageDispather(data) {
 
                 case 'streamsListUpdate': {
                     //console.log('streamsListUpdate =========================');
+                    break
+                }
+
+                case 'streamOff': {
+                    console.log('streamOff =========================');
+                    console.log(message);
                     break
                 }
 
@@ -1320,8 +1338,8 @@ textArea.addEventListener('input', () => {
             const hide_temp_not_ru_country = true;
 
             const restrictedCountries = Array ( // boolean true - скрывать так же у зарегеных
-            ['UA',false],['NL',true],['VN',true],['GB',true],['EE',false],['FR',true],['PL',false],['US',false],
-            ['MD',false],['DE',false],['GE',true]
+            ['UA',false],['NL',true],['VN',true],['GB',false],['EE',false],['FR',true],['PL',false],['US',false],
+            ['MD',false],['DE',false],['GE',true],['AT',true]
             //,['ES',true],['HU',true],['DZ',false],['DK',false]
             );
 
@@ -1339,6 +1357,7 @@ textArea.addEventListener('input', () => {
             var mobile = message.owner.info.mobile; // с мобильного или нет
             var country = message.owner.info.country; // название страны
             var country_iso = message.owner.info.country_iso; // код страны
+            var city = message.owner.info.city; // город
             var uid = message.owner.info.uid; // внутренний постоянный идентификатор профиля на блеваче
             var sid = message.owner.sid; // хз что за идентификатор
             var user_id = message.owner_id; // в массиве с юзерами
@@ -1418,91 +1437,99 @@ textArea.addEventListener('input', () => {
                 var ignorelist_match = '';
                 var ignore_date;
 
-                function SetVal (a) {
-                    ignore_date = new Date(a[3]);
-                    comment = a[6];
-                    if (a[0] == nickname) { ignorelist_match = 'nick' }
-                    if (a[1] == profile) {
-                        ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'profile';
-                    }
-                    //if (typeof comment == 'string' && comment !== null) { comment = a[i][6]; console.log (1); console.log(typeof comment )}
-                }
 //========================New==========================
 // [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time [5] counter
 // [6] comment [7] country [8] uid [9] reserved [10] reserved
 //=======================================================
-// [2] instruction: 0: - блокировать по нику
-// [2] instruction: 1: - блокировать по логину
-// [2] instruction: 2: - блокировать по uid
-// [2] instruction: 3: - блокировка на значение переопределяемой константы в днях
-// [2] instruction: 4: - перманентный бан
+// [2] instruction: 0: - блокировать по нику + uid с разбаном по значению константы в днях в коде
+// [2] instruction: 1: - блокировать по логину + uid с разбаном по значению константы в днях в коде
+// [2] instruction: 2: - блокировка по всем параметрам с разбаном по значению константы в днях в коде
+// [2] instruction: 3: - игнор на день по нику и стране для временных профилей
+// [2] instruction: 4: - перманентный игнор по всем параметрам
 // [2] instruction: 5: - reserved
 // [2] instruction: 6: - reserved
 // [2] instruction: 7: - reserved
+//const ignore_nick_uid_country = 0;
+//const ignore_profile_uid_country = 1;
+//const ignore_all_params = 2;
+//const ignore_temp_profile = 3;
+//const ignore_permanent = 4;
 //=====================================================
+
+                function SetVars (i) {
+                    ignore_date = new Date(ignorelist[i][3]);
+                    date_diff = ticks - ignore_date.getTime();
+                    comment = ignorelist[i][6];
+                    is_in_ignorelist = true;
+
+                    if (ignorelist[i][2] != 4 && ignorelist[i][2] != 3 && date_diff >= ignore_time) {
+                        ignorelist.splice(i, 1);
+                        is_in_ignorelist = false;
+                        console.log(nickname + "|" + profile + " removed from ignore list by timeoffset");
+                        console.log(ignorelist);
+                        return;
+                    } else if (ignorelist[i][2] == 3 && date_diff >= 86400000) {
+                        ignorelist.splice(i, 1);
+                        is_in_ignorelist = false;
+                        console.log(nickname + "|" + profile + " removed from ignore list by timeoffset");
+                        console.log(ignorelist);
+                        return;
+                    }
+
+                    if (ignorelist[i][0] == nickname) { ignorelist_match = 'n' }
+                    if (ignorelist[i][1] == profile) ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'p';
+                    if (ignorelist[i][7] == country_iso) ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'c';
+                    if (ignorelist[i][8] == uid) ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'u';
+                }
+
+                is_in_ignorelist = false;
+
                 for(let i = 0; i < ignorelist.length; i++){
-                    // [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time [5] counter [6] comment [7] country
-                    // [2] instruction: 0: блокировать по нику; 1: блокировать по логину; 2: блокировать по логину и нику;
-                    // [2] instruction: 3: - бан на день нику для временных ников;
-                    // [2] instruction: 4: - бан на день по логину и нику;
-                    // [2] instruction: 5: - бан навсегда по логину и нику;
-                    //const ignore_nick_365d = 0;
-                    //const ignore_login_365d = 1;
-                    //const ignore_both_365d = 2;
-                    //const ignore_nick_temp_1d = 3;
-                    //const ignore_both_1d = 4;
 
-                if (ignorelist[i] !== null) {
-                    date_diff = ticks - new Date(ignorelist[i][3]).getTime();
-
-                       if(is_temp == false && (
-                          ((ignorelist[i][2] == ignore_nick_365d || ignorelist[i][2] == ignore_both_365d) &&
-                           ignorelist[i][0] == nickname) ||
-                          ((ignorelist[i][2] == ignore_login_365d || ignorelist[i][2] == ignore_both_365d) &&
-                           ignorelist[i][1] == profile) ))
-                          {
-                              if (date_diff >= 31536000000 ) // удаление через 365 дней
-                              {
-                                  ignorelist.splice(i, 1);
-                                  is_in_ignorelist = false;
-                              } else {
-                                  is_in_ignorelist = true;
-                                  SetVal(ignorelist[i]);
-                              }
-
-                         } else if (is_temp == true && (ignorelist[i][2] == ignore_nick_temp_1d &&
-                                                        ignorelist[i][0] == nickname)) {
-                              if (date_diff >= 86400000 ) // удаление через 1 день
-                              {
-                                  ignorelist.splice(i, 1); // подумать над delete
-                                  is_in_ignorelist = false;
-                              } else {
-                                  is_in_ignorelist = true;
-                                  SetVal(ignorelist[i]);
-                              }
-                         } else if (ignorelist[i][2] == ignore_both_1d && ignorelist[i][0] == nickname) {
-                              if (date_diff >= 86400000 ) // удаление через 1 день
-                              {
-                                  ignorelist.splice(i, 1); // подумать над delete
-                                  is_in_ignorelist = false;
-                              } else {
-                                  is_in_ignorelist = true;
-                                  SetVal(ignorelist[i]);
-                              }
-                       }
-
-                    if (hide_in_message == true && (ignorelist[i][2] == ignore_nick_365d || ignorelist[i][2] == ignore_both_365d ||
-                                                    ignorelist[i][2] == ignore_both_1d || ignorelist[i][2] == 5)) {
-////                    if (hide_in_message == true) {
-                        reg = new RegExp("<span[^<>]+>" +
-                        // .replace(/^\s+/,'').replace(/\s+$/,'')
+                if (ignorelist[i] !== null && ignorelist[i] !== undefined) {
+                    if (ignorelist[i][2] !== undefined) if (hide_in_message == true && (ignorelist[i][2] != ignore_profile_uid_country)) {
+                        reg = new RegExp("<span[^<>]+>" + // .replace(/^\s+/,'').replace(/\s+$/,'')
                         escapeRegExp(ignorelist[i][0]) + "</span>",'i'); // понаблюдать за определением кому пишут
 
                         if (text.search(reg) != -1) { message_to_ignored_nick = true };
                         if (message_to_ignored_nick == true) {
-////                            console.log(reg);
-////                            console.log(message_to_ignored_nick);
+//                            console.log(reg);
+//                            console.log(message_to_ignored_nick);
                         }
+                    }
+
+                    switch(ignorelist[i][2]) {
+                        case ignore_nick_uid_country:
+                            //console.log('ignore_nick_uid_country');
+                            if (ignorelist[i][0] == nickname || ignorelist[i][8] == uid) {
+                                SetVars(i);// удаление через ignore_time дней
+                            }
+                            break;
+                        case ignore_profile_uid_country:
+                            //console.log('ignore_profile_uid_country');
+                            if (ignorelist[i][1] == profile || ignorelist[i][8] == uid) {
+                                SetVars(i);// удаление через ignore_time дней
+                            }
+                            break;
+                        case ignore_all_params:
+                            //console.log('ignore_all_params');
+                            //console.log(nickname);
+                            if (ignorelist[i][2] == nickname || ignorelist[i][1] == profile || ignorelist[i][8] == uid) {
+                                SetVars(i);// удаление через ignore_time дней
+                            }
+                            break;
+                        case ignore_temp_profile:
+                            //console.log('ignore_temp_profile');
+                            if (ignorelist[i][2] == nickname && ignorelist[i][7] == country_iso) {
+                                SetVars(i);// удаление через ignore_time дней
+                            }
+                            break;
+                        case ignore_permanent:
+                            //console.log('ignore_permanent');
+                            if (ignorelist[i][2] == nickname || ignorelist[i][1] == profile || ignorelist[i][8] == uid) {
+                                SetVars(i);
+                            }
+                            break;
                     }
                 }
 
@@ -1699,10 +1726,12 @@ textArea.addEventListener('input', () => {
 
                     console.log("%cchat(" + (date.getHours() < 10 ? '0' : '') + date.getHours() + ":" +
                                 (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() +
-                                "):" + nickname + ":" + profile + ":" + country_iso + ":" + (mobile ? 'phone' : 'pc') + ":" +
+                                "):" + nickname + ":" + profile + ":" + country_iso +
+                                (city !== undefined && city != '' ? '(' + city + ')' : '') + ":" +
+                                (mobile ? 'phone' : 'pc') + ":" +
                                 "uid=" + uid + ":" +
                                 //"sid=" + sid + ":" +
-                                (ignored ? 'ignored_in_room!??' : '') + ":" +
+                                (ignored ? 'ignored_in_room!??:' : '') +
                                 'ul' + "=" + userlist.size + ":" +
                                 'il' + "=" + ignorelist.length + ":" + "sa=" + SpamArray.length + ":" +
                                 (is_temp ? 'is_temp' : '') + ":" + (is_author ? 'is_author' : '') + ":" +
@@ -1714,7 +1743,7 @@ textArea.addEventListener('input', () => {
                                 (is_ukropitek ? 'is_ukropitek' : '') + ":" + (is_restricted_country ? 'country_bl' : '') + ":" +
                                 (is_in_ignorelist ? 'ignored(' + (Math.ceil(Math.abs((ticks - ignore_date.getTime())) / (1000 * 3600 * 24))) +
                                 " д. (" + comment + "))" : '') + ":" +
-                                ((ignorelist_match != '') ? ignorelist_match : '') + ":" +
+                                ((ignorelist_match != '') ? 'match:' + ignorelist_match : '') + ":" +
                                 (added_to_ignore ? 'added_to_ignore' : '') + ":" +
                                 (message_to_ignored_nick ? 'to_ignored_nick': '') + ":" +
                                 ((nick_to_subjects != '') ? 'to:' + nick_to_subjects : '')
