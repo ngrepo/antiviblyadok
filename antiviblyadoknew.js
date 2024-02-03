@@ -4,8 +4,8 @@
 // @author      AntiviblyadokNew
 // @version     0.5
 // @namespace   https://livacha.com/
-// @match       https://livacha.com/chat*
-// @match       https://livacha.com/post*
+// @match       https://livacha.com/*
+// @match       https://smiles.su/dist/*
 // @connect     livacha.com
 // @run-at      document-start
 // @noframes
@@ -175,7 +175,7 @@ var Scrpt = create("div",ScrptContent);
 
         var userlist = new Map();
         var msglist = new Map();
-        const ignore_time = 86400000 * 1 // время игнора в днях 1195 - 3 года, 86400000 - 1 день
+        const ignore_time = 86400000 * 1195 // время игнора в днях 1195 - 3 года, 86400000 - 1 день
 
         var ignorelist = new Array(); // '','',0,0,0
         var author_user_id;
@@ -785,10 +785,12 @@ textArea.addEventListener('input', () => {
             if (typeof s === 'string' && typeof anticaps === 'boolean' &&  typeof auto_dot === 'boolean' ) {
                 const autocorrect_enabled = true; if (autocorrect_enabled == false) { return }
 
-                s = s.replace(/наврен/gi,'наверн',);
-                s = s.replace(/чтоли/gi,'что ли',);
-                s = s.replace(/врядли/gi,'вряд ли',);
-                s = s.replace(/вроед/gi,'вроде',);
+                s = s.replace(/наврен/gi,'наверн');
+                s = s.replace(/чтоли/gi,'что ли');
+                s = s.replace(/врядли/gi,'вряд ли');
+                s = s.replace(/вроед/gi,'вроде');
+                s = s.replace(/вроед/gi,'вроде');
+                s = s.replace(/\)$|\) $/gi,' :smile:');
 
                 var arrayOfStrings = s.split(/(#[^#:]+:|:[^:]+:|\. |\!|\?|\)|\()/); // Делим на предложения, ники, смайлы
                 //console.log(arrayOfStrings);
@@ -928,7 +930,7 @@ textArea.addEventListener('input', () => {
                 if (e.key === 'Enter') {
                     //console.log('%ctextarea.form-control','background: LemonChiffon;color: red');
                     var element = e.target;
-                    element.value = TextCorrector(element.value,true,true);
+                    element.value = TextCorrector(element.value,true,false);
                     return
                 }
 
@@ -938,7 +940,7 @@ textArea.addEventListener('input', () => {
                 if (userItem.innerText.indexOf("Послать") != -1 ) {
                     userItem.addEventListener('click', (e) => {
                         var element = document.querySelector("textarea.form-control");
-                        element.value = TextCorrector(element.value,true,true);
+                        element.value = TextCorrector(element.value,true,false);
                         return
                     })
                 }
@@ -1023,6 +1025,7 @@ textArea.addEventListener('input', () => {
             tm = no_span_tag.replace(/^.*🇺🇦.*/, "🐖"); if (tm != no_span_tag) { m = tm }
             tm = no_span_tag.replace(/^.*🇬🇧.*/, "🐖"); if (tm != no_span_tag) { m = tm }
             tm = no_span_tag.replace(/^.*🇺🇸.*/, "🐖"); if (tm != no_span_tag) { m = tm }
+            tm = no_span_tag.replace(/^.*🏳‍🌈.*/, "🐔"); if (tm != no_span_tag) { m = tm }
             tm = no_span_tag.replace(/.*(і|ї).*/, "🐖"); if (tm != no_span_tag) { m = tm }
 
 //🐷🐖🐔🐓🐗🪓🔪
@@ -1373,13 +1376,6 @@ textArea.addEventListener('input', () => {
             var is_author = message.owner.owner;
             var is_me = message.owner.self;
 
-            //nickname_self
-            //profile_self
-            //user_id_self
-            //author_user_id
-            //author_nickname
-            //author_profile
-
             if (profile == '' && uid == '0' ) { is_temp = true }
 /*
                     console.log('message =============================>>>');
@@ -1477,9 +1473,12 @@ textArea.addEventListener('input', () => {
                     }
 
                     if (ignorelist[i][0] == nickname) { ignorelist_match = 'n' }
-                    if (ignorelist[i][1] == profile) ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'p';
-                    if (ignorelist[i][7] == country_iso) ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'c';
-                    if (ignorelist[i][8] == uid) ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'u';
+                    if (ignorelist[i][1] == profile && ignorelist[i][1] != '')
+                        ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'p';
+                    if (ignorelist[i][7] == country_iso && ignorelist[i][7] != '')
+                        ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'c';
+                    if (ignorelist[i][8] == uid && ignorelist[i][8] != '0' && ignorelist[i][8] != '')
+                        ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'u';
                 }
 
                 is_in_ignorelist = false;
@@ -1557,13 +1556,6 @@ textArea.addEventListener('input', () => {
                     //console.log("%c" + nickname + " to " + message_to.join('|'),'background: LemonChiffon;color: red');
                 }
 
-            //nickname_self
-            //profile_self
-            //user_id_self
-            //author_user_id
-            //author_nickname
-            //author_profile
-
                 for (let key of userlist.keys()) {
                     let data = userlist.get(key);
 
@@ -1599,41 +1591,45 @@ textArea.addEventListener('input', () => {
                 }
 
                 for(let i = 0; i < ignorelist_nick.length; i++){
-//console.log('ignorelist_nick1');
-//console.log('ignorelist_nick[i]:' + ignorelist_nick[i] + ",text:" + text);
                     if (hide_in_message == true) {
                         reg = new RegExp("<span[^<>]+>" +
                         escapeRegExp(ignorelist_nick[i].replace(/^\s+/,'').replace(/\s+$/,'')) + // понаблюдать за определением кому пишут
                         "</span>",'i');
                         if (text.search(reg) != -1) { message_to_ignored_nick = true };
-//console.log('ignorelist_nick2');
-//console.log('message_to_ignored_nick:' + message_to_ignored_nick);
-//console.log('ignorelist_nick[i]:' + ignorelist_nick[i] + ",nickname:" + nickname);
                     }
                     if(ignorelist_nick[i] == nickname) {
                         is_in_ignorelist = true;
-                        ignorelist_match += ((ignorelist_match.length > 0) ? "+il_nick" : "");
+                        ignorelist_match += ((ignorelist_match.length > 0) ? "|iln" : "");
+                        ignorelist_match += ((ignorelist_match.length = 0) ? "iln" : "");
+                        ignorelist_match += ((ignorelist_match.length = 0) ? comment = "il_nick" : "");
 
-                        comment = "il_nick";
-//                        console.log(typeof ignore_date);
-                        if (ignore_date === undefined) { ignore_date = new Date(ticks); }
-//                        console.log(typeof ignore_date);
-//console.log('ignorelist_nick3');
-//console.log('is_in_ignorelist:' + is_in_ignorelist);
-//console.log('ignorelist_match:' + ignorelist_match);
+                        if (ignore_date === undefined) { ignore_date = new Date(ticks) }
                     }
                 }
 
-/*
+
                 if (is_spam == true && is_me == false && is_author == false) { // автобан пидоров
                     let exists = false;
 
                     for(let i = 0; i < ignorelist.length; i++) {
-                    // [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time [5] counter [6] comment [7] country
-                    // [2] instruction: 0: блокировать по нику; 1: блокировать по логину; 2: блокировать по логину и нику;
-                    // [2] instruction: 3: - бан на день нику для временных ников;
-                    // [2] instruction: 4: - бан на день по логину и нику;
-                    // [2] instruction: 5: - бан навсегда по логину и нику;
+//========================New==========================
+// [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time [5] counter
+// [6] comment [7] country [8] uid [9] reserved [10] reserved
+//=======================================================
+// [2] instruction: 0: - блокировать по нику + uid с разбаном по значению константы в днях в коде
+// [2] instruction: 1: - блокировать по логину + uid с разбаном по значению константы в днях в коде
+// [2] instruction: 2: - блокировка по всем параметрам с разбаном по значению константы в днях в коде
+// [2] instruction: 3: - игнор на день по нику и стране для временных профилей
+// [2] instruction: 4: - перманентный игнор по всем параметрам
+// [2] instruction: 5: - reserved
+// [2] instruction: 6: - reserved
+// [2] instruction: 7: - reserved
+//const ignore_nick_uid_country = 0;
+//const ignore_profile_uid_country = 1;
+//const ignore_all_params = 2;
+//const ignore_temp_profile = 3;
+//const ignore_permanent = 4;
+//=====================================================
 
                         if (ignorelist[i] !== null) {
                             if (ignorelist[i][1] != '') {
@@ -1648,15 +1644,16 @@ textArea.addEventListener('input', () => {
 
                     if (exists == false) {
                         if ( (is_spam == true && antiSpamResult[0] > 2 && is_ukropitek == true ) ){
-                            ignorelist.push([nickname,profile,ignore_login_365d,date.getTime(),date.getTime(),0,
+                            ignorelist.push([nickname,profile,ignore_profile_uid_country,date.getTime(),date.getTime(),0,
                             (is_spam ? 'is_spam(' + antiSpamResult[0] + ")" : '') +
-                            (is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') + ' - автобан на 365 дней','']);
+                            (is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') + " - автобан на " + ignore_time / 86400000 + " дней",'']);
                             added_to_ignore == true;
-                            console.log("added to ignore: " + nickname + "|" + profile + ": на 365 дней по логину");
+                            console.log("added to ignore: " + nickname + "|" + profile + ": на " + ignore_time / 86400000 + " дней по логину");
                             //console.log(ignorelist);
                         }
+
                         if ( (is_spam == true && antiSpamResult[0] > 4) ){
-                            ignorelist.push([nickname,profile,ignore_both_1d,date.getTime(),date.getTime(),0,
+                            ignorelist.push([nickname,profile,ignore_temp_profile,date.getTime(),date.getTime(),0,
                             (is_spam ? 'is_spam(' + antiSpamResult[0] + ")" : '') +
                             (is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') + ' - автобан на 1 день','']);
                             added_to_ignore == true;
@@ -1665,7 +1662,6 @@ textArea.addEventListener('input', () => {
                         }
                     }
                 }
-*/
 
                 for (let i = 0; i < restrictedCountries.length; i++) {
                     if (hide_temp_not_ru_country == true && country_iso != 'RU' && is_temp == true) {
