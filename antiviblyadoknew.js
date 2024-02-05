@@ -206,6 +206,14 @@ var Scrpt = create("div",ScrptContent);
       //  console.log(author_login);
 
         //console.log(author_nick + '|' + author_login + '|' + nickname); // на данной стадии не пишет в консоль !
+function handleElement(e1,e2,a_temp) {
+    var x = a + b
+    return x;
+}
+
+// при вызове на место формального параметра func будет
+// подставлен фактический аргумент-функция sun
+// mult(sun);
 
 function SaveData() {
 //========================New==========================
@@ -225,6 +233,13 @@ function SaveData() {
 //const ignore_all_params = 2;
 //const ignore_temp_profile = 3;
 //const ignore_permanent = 4;
+    //var myentry = {nick: '', login: '', instruction: 0, time_offset: 0, mod_time: 0, comment: '', country: '', uid: 0};
+
+    //let entry = new Object();
+    //entry.nick = 'nick';
+    //entry.login = 'login';
+
+    //entry.hasOwnProperty('nick');
 //=====================================================
     let now = new Date();
     let ticks = now.getTime();
@@ -252,28 +267,28 @@ function SaveData() {
 	}
 
     if (ignorelist_loaded !== undefined || ignorelist_loaded.length > 0) {
-    let exists = false;
 
-    for(var i = 0; i < array1.length; i++) {
-        exists = false;
+    let existsUID = false;
+    let existsProfile = false;
+    let existsNick = false;
 
-        for(var c = 0; c < array2.length; c++) {
-            if (array1[i] !== null && array2[c] !== null && array1[i] !== undefined && array2[c] !== undefined) {
-                if (array1[i][1] == array2[c][1] && array1[i][0] == array2[c][0]){
-                    exists = true;
-                    break;
-                }
+    for(let i = 0; i < array1.length; i++) {
+        existsUID = false;
+        existsProfile = false;
+        existsNick = false;
+
+        var c;
+
+        for(c = 0; c < array2.length; c++) {
+            if (array1[i] != undefined && array2[c] != undefined && array1[i] != '' && array2[c] != '') {
+                if ((array1[i][8] == array2[c][8] && array1[i][8] != '' || array1[i][8] != '')) { existsUID = true;}
+                if (array1[i][1] == array2[c][1]) { existsProfile = true;}
+                if (array1[i][0] == array2[c][0]) { existsNick = true;}
+                if (existsUID == true || existsProfile == true || existsNick == true) { break; }
             }
         }
 
-        if (exists == true) {
-//            console.log("exists = true;" + array1[i][1] + "|" + array2[c][1]);
-            if (array1[i] !== null && array2[c] !== null &&
-                array1[i] !== undefined && array2[c] !== undefined &&
-                array1[i] != '' && array2[c] != '') {
-//                console.log("array1[i][4]:" + array1[i][4]);
-//                console.log("array2[c]:" + array2[c]);
-//                console.log("array2[c][4]:" + typeof array2[c][4]);
+        if (existsUID == true || existsProfile == true || existsNick == true) {
                 if (array1[i][4] < array2[c][4]) { // 86400000
                     if ( (((ticks - array2[c][3]) > 86400000) && (array2[c][2] == ignore_temp_profile) )
                         ||
@@ -312,7 +327,6 @@ function SaveData() {
                                     'background: LemonChiffon; color: red');
                     } else { ignorelist_temp.push(array1[i]) }
                 }
-            }
         } else {
 //                    console.log("===");
 //                    console.log(array1[i]);
@@ -545,8 +559,8 @@ function messageDispather(data) {
                     console.log('baned ============================='); // норм
                     console.log(message);
                     console.log('baned: ('+ userlist.get(message.response.clientId).nickname + ':' +
-                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + '): ' +
-                                userlist.get(message.response.clientId).info.uid + 'text: ' +
+                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + '):' +
+                                userlist.get(message.response.clientId).info.uid + ':text: (' +
                                 message.response.text.replace(/(<([^>]+)> ?)/gi,'') + ')');
                     break;
                 }
@@ -837,7 +851,7 @@ textArea.addEventListener('input', () => {
                 s = s.replace(/врядли/gi,'вряд ли');
                 s = s.replace(/вроед/gi,'вроде');
                 s = s.replace(/вроед/gi,'вроде');
-//                s = s.replace(/\) ?$|\\ ?$/gi,' :smile:');
+                s = s.replace(/\) ?$|\\ ?$/gi,' :smile:');
 
                 var arrayOfStrings = s.split(/(#[^#:]+:|:[^:]+:|\. |\!|\?|\)|\()/); // Делим на предложения, ники, смайлы
                 //console.log(arrayOfStrings);
@@ -1032,7 +1046,7 @@ textArea.addEventListener('input', () => {
             //console.log(arrayOfStrings);
         });
 */
-        var ignorelist_nick = ['Поменяйте ник','Поменяйтe ник'];
+        var ignorelist_nick = ['Поменяйте ник','Поменяйтe ник','panic..don&#039;t','don&amp;#039;t panic..','don&amp;#039;t worry..'];
 
 /*==================================================================================*/
         function antiCapsMat(m) {
@@ -1376,6 +1390,7 @@ textArea.addEventListener('input', () => {
             var added_to_ignore = false;
 
             var is_in_ignorelist = false;
+            var is_in_ignorelist_nick = false;
             var message_to_ignored_nick = false;
 
             const hide_in_message = true;
@@ -1537,8 +1552,8 @@ textArea.addEventListener('input', () => {
                 if (ignorelist[i] !== null && ignorelist[i] !== undefined) {
                     if (ignorelist[i][2] !== undefined) if (hide_in_message == true && (ignorelist[i][2] != ignore_profile_uid_country)) {
                         reg = new RegExp("<span[^<>]+>" + // .replace(/^\s+/,'').replace(/\s+$/,'')
-                        escapeRegExp(ignorelist[i][0]) + "</span>",'i'); // понаблюдать за определением кому пишут
-
+                        escapeRegExp(escapeHtml(ignorelist[i][0])) + "</span>",'i'); // понаблюдать за определением кому пишут
+//console.log(escapeRegExp(escapeHtml(ignorelist[i][0])) + ':' + text);
                         if (text.search(reg) != -1) { message_to_ignored_nick = true };
                         if (message_to_ignored_nick == true) {
 //                            console.log(reg);
@@ -1611,13 +1626,14 @@ textArea.addEventListener('input', () => {
                             //if (message_to[c][1].search(/don/) != -1) console.log('message_to[c][1]:' + message_to[c][1] +
                             //' data.nickname:' + escapeRegExp(data.nickname);
                     //console.log("%c" + message_to[c][1] + " | " + data.nickname,'background: LemonChiffon;color: red');
-                        if (data.nickname.search(/worry/) != -1) console.log(message_to[c][1] + "|" + escapeHtml(data.nickname));
+//                        if (data.nickname.search(/worry|panic/) != -1) console.log(message_to[c][1] + "|" + escapeHtml(data.nickname));
+//                        if (data.nickname.search(/worry|panic/) != -1) console.log(message_to[c][1] == escapeHtml(data.nickname));
                         if (message_to[c][0] == key || message_to[c][0] == "nick-not-found" ) {
                             if (message_to[c][1] == escapeHtml(data.nickname) || message_to[c][1] == "nick-not-found" ) {
                                 nick_to_subjects += ((nick_to_subjects.length > 0) ? "|" + message_to[c][1] : message_to[c][1]);
                                 if ( message_to[c][1] == nickname_self ) { for_me = true }
 
-                                if (author_nickname == data.nickname && author_profile == data.info.profile && data.owner == true) {
+                                if (author_nickname == escapeHtml(data.nickname) && author_profile == data.info.profile && data.owner == true) {
                                     for_author = true;
                                 }
 
@@ -1633,11 +1649,12 @@ textArea.addEventListener('input', () => {
                     if (hide_in_message == true && hide_temp_profile == true && data.info.uid == '0') {
 
                         reg = new RegExp("<span[^<>]+>" + escapeRegExp(escapeHtml(data.nickname)) + "</span>");
-console.log(escapeRegExp(escapeHtml(data.nickname)) + "|" + text);
+//console.log(escapeRegExp(escapeHtml(data.nickname)) + "|" + text);
                         if (text.search(reg) != -1) {
                             message_to_ignored_nick = true;
                             if (message_to.length < 1) { break }
                         };
+//console.log(message_to_ignored_nick);
                     }
                 }
 
@@ -1649,9 +1666,11 @@ console.log(escapeRegExp(escapeHtml(data.nickname)) + "|" + text);
                         "</span>",'i');
 //console.log(escapeRegExp(escapeHtml(ignorelist_nick[i])) + "|" + text);
                         if (text.search(reg) != -1) { message_to_ignored_nick = true };
+//console.log("message_to_ignored_nick:" + message_to_ignored_nick);
                     }
                     if(ignorelist_nick[i] == nickname) {
-                        is_in_ignorelist = true;
+//                        is_in_ignorelist = true;
+                        is_in_ignorelist_nick = true;
                         if (ignorelist_match.length > 0) {
                             ignorelist_match += "|iln";
                             comment = "iln";
@@ -1738,7 +1757,8 @@ console.log(escapeRegExp(escapeHtml(data.nickname)) + "|" + text);
 
                 let red = false;
 
-                if(is_in_ignorelist == true || (message_to_ignored_nick == true && for_author == false) ||
+                if(is_in_ignorelist == true || is_in_ignorelist_nick == true ||
+                   (message_to_ignored_nick == true && for_author == false) ||
                    (is_temp == true && hide_temp_profile == true) ||
                    (is_restricted_country == true && hide_countries == true) ||
                    (is_ukropitek == true && hide_ukropitek == true)){
@@ -1796,7 +1816,7 @@ console.log(escapeRegExp(escapeHtml(data.nickname)) + "|" + text);
                                 (is_in_ignorelist && !is_temp ? 'IGNORED(' + (
                                  Math.ceil(Math.abs((ticks - ignore_date.getTime())) / (1000 * 3600 * 24))) +
                                 " д. (" + comment + ")):" : '') +
-                                (is_in_ignorelist && is_temp ? 'IGNORED:' : '') +
+                                ((is_in_ignorelist && is_temp) || is_in_ignorelist_nick ? 'IGNORED:' : '') +
                                 ((ignorelist_match != '') ? 'match:(' + ignorelist_match + '):' : '') +
                                 (added_to_ignore ? 'added_to_ignore:' : '') +
                                 (message_to_ignored_nick ? 'to_ignored_nick:': '') +
