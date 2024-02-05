@@ -510,65 +510,82 @@ function messageDispather(data) {
                 }
                 case 'typedMess': {
                     console.log('typedMess =============================');
+                    console.log(message);
                     break;
                 }
-
                 case 'messRemoved': { // модерастом или владельцем трансляции
-                    console.log('messRemoved =============================');
-                    //console.log(message);
-                    console.log('removed by moderast('+ message.response.client.nickname + ':' +
+                    console.log('messRemoved ============================='); // owner иногда недоступен из msglist.get(message.response.mid);
+                    console.log(message);
+                    let msg = msglist.get(message.response.mid);
+
+                    console.log(msg);
+                    console.log('removed by moderast ('+ message.response.client.nickname + ':' +
                                 message.response.client.info.profile.replace(/\/user\//,'') + ':' +
-                                message.response.client.info.uid + ')');
+                                message.response.client.info.uid + '): msg of user (' +
+                                msg.owner.nickname + ':' +
+                                msg.owner.info.profile.replace(/\/user\//,'') + ':' +
+                                msg.owner.info.uid + '): text:' + msg.textRaw);
+                    break;
+                }
+                case 'messRemovedFiltered': {
+                    console.log('messRemovedFiltered =============================');
+                    console.log(message);
+                    let msg = msglist.get(message.response.mid);
+
+                    console.log(msg);
+                    console.log('removed by moderast ('+ message.response.client.nickname + ':' +
+                                message.response.client.info.profile.replace(/\/user\//,'') + ':' +
+                                message.response.client.info.uid + '): msg of user (' +
+                                msg.owner.nickname + ':' +
+                                msg.owner.info.profile.replace(/\/user\//,'') + ':' +
+                                msg.owner.info.uid + '): text:' + msg.textRaw);
                     break;
                 }
                 case 'baned': { // модерастом или владельцем трансляции
-                    console.log('baned =============================');
-                    //console.log(message);
+                    console.log('baned ============================='); // норм
+                    console.log(message);
                     console.log('baned: ('+ userlist.get(message.response.clientId).nickname + ':' +
-                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + ':' +
-                                userlist.get(message.response.clientId).info.uid + ':' +
+                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + '): ' +
+                                userlist.get(message.response.clientId).info.uid + 'text: ' +
                                 message.response.text.replace(/(<([^>]+)> ?)/gi,'') + ')');
                     break;
                 }
-
                 case 'updateRoom': {
                     updateUserList(message);
                     break;
                 }
-
                 case 'streamsUpdate': {
 //                    console.log('streamsUpdate =============================');
 //                    console.log(message);
                     break;
                 }
-
                 case 'streamOff': {
                     console.log('streamOff =========================');
                     console.log(message);
                     break;
                 }
-
                 case 'streamsListUpdate': {
                     //console.log('streamsListUpdate =========================');
                     break;
                 }
-
                 case 'likeMe': {
                     //console.log('likeMe =========================');
                     break;
                 }
-
                 case 'donate': {
                     console.log('donate =========================');
                     console.log(message);
                     break;
                 }
-
                 case 'subscribe': {
-                    //console.log('subscribe =========================');
+                    console.log('subscribe =========================');
                     break;
                 }
-
+                case 'notify': { // уведомление об том, что на ваш коментарий ответили
+                    console.log('notify =========================');
+                    console.log(message);
+                    break;
+                }
                 default:{
                     console.log('default unknown message: ' + message.mess + ' =====================');
                     break;
@@ -784,6 +801,23 @@ document.addEventListener("DOMContentLoaded", function(event) {
             return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
         }
 
+        function escapeHtml(text) {
+        	return text
+        	.replace(/&/g, "&amp;")
+        	.replace(/</g, "&lt;")
+        	.replace(/>/g, "&gt;")
+        	.replace(/"/g, "&quot;")
+        	.replace(/'/g, "&#039;");
+        }
+
+        function unescapeHtml(text) {
+        	return text
+        	.replace(/&amp;/g, "\&")
+        	.replace(/&lt;/g, "<")
+        	.replace(/&gt;/g, ">")
+        	.replace(/&quot;/g, "\"")
+        	.replace(/&#039;/g, "'");
+        }
 /*
 const textArea = document.getElementById('my_text_area');
 textArea.addEventListener('input', () => {
@@ -803,7 +837,7 @@ textArea.addEventListener('input', () => {
                 s = s.replace(/врядли/gi,'вряд ли');
                 s = s.replace(/вроед/gi,'вроде');
                 s = s.replace(/вроед/gi,'вроде');
-                s = s.replace(/\)$|\) $/gi,' :smile:');
+//                s = s.replace(/\) ?$|\\ ?$/gi,' :smile:');
 
                 var arrayOfStrings = s.split(/(#[^#:]+:|:[^:]+:|\. |\!|\?|\)|\()/); // Делим на предложения, ники, смайлы
                 //console.log(arrayOfStrings);
@@ -1121,21 +1155,20 @@ textArea.addEventListener('input', () => {
                 '.*(с|з|по|па)(дохни|дыхай).*': '😭',
                 '.*умри.*': '😭',
                 '.*труп.*': '😭',
+                '.*пр(а|о)коп.*': '😭',
+                '.*юрпоп.*': '😭',
+                '.*яйц(а|е)шлёп.*': '😭',
+                '.*спид|вич.*': '😭',
+                '.*б(о|а)?мж.*': '😭',
+                '.*теплотрас.*': '😭',
+                '.*мил(о|а)стын.*': '😭',
+                '.*бездомн.*': '😭',
+                '.*на зон(у|а|ы|е).*': '😭',
+                '.*тюрьм.*': '😭',
+                '.*как в хату входить.*': '😭',
+                '.*зону топтал.*': '😭',
+                '.*сизо.*': '😭',
 /*=================================================================*/
-                 '.*б(о|а)?мж.*': '🤮',
-                 '.*теплотрас.*': '🤮',
-                 '.*мил(о|а)стын.*': '🤮',
-                 '.*бездомн.*': '🤮',
-/*=================================================================*/
-                 '.*на зон(у|а|ы|е).*': '🐓',
-                 '.*тюрьм.*': '🐓',
-                 '.*как в хату входить.*': '🐓',
-                 '.*зону топтал.*': '🐓',
-                 '.*сизо.*': '🐓',
-/*=================================================================*/
-                 '.*пр(а|о)коп.*': '🤡',
-                 '.*юрпоп.*': '🤡',
-                 '.*яйц(а|е)шлёп.*': '🤡'
             };
 
             m = $("<tag>" + m + "</tag>");
@@ -1355,8 +1388,8 @@ textArea.addEventListener('input', () => {
 
             const restrictedCountries = Array ( // boolean true - скрывать так же у зарегеных
             ['UA',false],['NL',true],['VN',true],['GB',false],['EE',false],['FR',true],['PL',false],['US',false],
-            ['MD',false],['DE',false],['GE',true],['AT',true]
-            //,['ES',true],['HU',true],['DZ',false],['DK',false],['BA',true]
+            ['MD',false],['DE',false],['GE',true],['AT',true],['BA',true],['NO',true]
+            //,['ES',true],['HU',true],['DZ',false],['DK',false]
             );
 
             const autoban_ukropitek = true;
@@ -1474,10 +1507,12 @@ textArea.addEventListener('input', () => {
                     if (ignorelist[i][2] != 4 && ignorelist[i][2] != 3 && date_diff >= ignore_time) {
                         ignorelist.splice(i, 1);
                         is_in_ignorelist = false;
+                        console.log('date_diff >= ignore_time');
                         console.log(nickname + "|" + profile + " removed from ignore list by timeoffset");
                         console.log(ignorelist);
                         return;
                     } else if (ignorelist[i][2] == 3 && date_diff >= 86400000) {
+                        console.log('date_diff >= 86400000');
                         ignorelist.splice(i, 1);
                         is_in_ignorelist = false;
                         console.log(nickname + "|" + profile + " removed from ignore list by timeoffset");
@@ -1492,6 +1527,7 @@ textArea.addEventListener('input', () => {
                         ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'c';
                     if (ignorelist[i][8] == uid && ignorelist[i][8] != '0' && ignorelist[i][8] != '')
                         ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'u';
+
                 }
 
                 is_in_ignorelist = false;
@@ -1513,32 +1549,32 @@ textArea.addEventListener('input', () => {
                     switch(ignorelist[i][2]) {
                         case ignore_nick_uid_country:
                             //console.log('ignore_nick_uid_country');
-                            if (ignorelist[i][0] == nickname || ignorelist[i][8] == uid) {
+                            if ((ignorelist[i][0] == nickname || ignorelist[i][8] == uid) && uid !== 0) {
                                 SetVars(i);// удаление через ignore_time дней
                             }
                             break;
                         case ignore_profile_uid_country:
                             //console.log('ignore_profile_uid_country');
-                            if (ignorelist[i][1] == profile || ignorelist[i][8] == uid) {
+                            if ((ignorelist[i][1] == profile || ignorelist[i][8] == uid) && uid !== 0) {
                                 SetVars(i);// удаление через ignore_time дней
                             }
                             break;
                         case ignore_all_params:
                             //console.log('ignore_all_params');
                             //console.log(nickname);
-                            if (ignorelist[i][2] == nickname || ignorelist[i][1] == profile || ignorelist[i][8] == uid) {
+                            if ((ignorelist[i][2] == nickname || ignorelist[i][1] == profile || ignorelist[i][8] == uid) && uid !== 0) {
                                 SetVars(i);// удаление через ignore_time дней
                             }
                             break;
                         case ignore_temp_profile:
                             //console.log('ignore_temp_profile');
-                            if (ignorelist[i][2] == nickname && ignorelist[i][7] == country_iso) {
+                            if (ignorelist[i][2] == nickname && ignorelist[i][7] == country_iso  && uid === 0) {
                                 SetVars(i);// удаление через ignore_time дней
                             }
                             break;
                         case ignore_permanent:
                             //console.log('ignore_permanent');
-                            if (ignorelist[i][2] == nickname || ignorelist[i][1] == profile || ignorelist[i][8] == uid) {
+                            if ((ignorelist[i][2] == nickname || ignorelist[i][1] == profile || ignorelist[i][8] == uid) && uid !== 0) {
                                 SetVars(i);
                             }
                             break;
@@ -1571,11 +1607,13 @@ textArea.addEventListener('input', () => {
 
                 for (let key of userlist.keys()) {
                     let data = userlist.get(key);
-
                     for(let c = 0; c < message_to.length; c++){
+                            //if (message_to[c][1].search(/don/) != -1) console.log('message_to[c][1]:' + message_to[c][1] +
+                            //' data.nickname:' + escapeRegExp(data.nickname);
                     //console.log("%c" + message_to[c][1] + " | " + data.nickname,'background: LemonChiffon;color: red');
+                        if (data.nickname.search(/worry/) != -1) console.log(message_to[c][1] + "|" + escapeHtml(data.nickname));
                         if (message_to[c][0] == key || message_to[c][0] == "nick-not-found" ) {
-                            if (message_to[c][1] == data.nickname || message_to[c][1] == "nick-not-found" ) {
+                            if (message_to[c][1] == escapeHtml(data.nickname) || message_to[c][1] == "nick-not-found" ) {
                                 nick_to_subjects += ((nick_to_subjects.length > 0) ? "|" + message_to[c][1] : message_to[c][1]);
                                 if ( message_to[c][1] == nickname_self ) { for_me = true }
 
@@ -1594,8 +1632,8 @@ textArea.addEventListener('input', () => {
 
                     if (hide_in_message == true && hide_temp_profile == true && data.info.uid == '0') {
 
-                        reg = new RegExp("<span[^<>]+>" + escapeRegExp(data.nickname) + "</span>");
-
+                        reg = new RegExp("<span[^<>]+>" + escapeRegExp(escapeHtml(data.nickname)) + "</span>");
+console.log(escapeRegExp(escapeHtml(data.nickname)) + "|" + text);
                         if (text.search(reg) != -1) {
                             message_to_ignored_nick = true;
                             if (message_to.length < 1) { break }
@@ -1606,19 +1644,25 @@ textArea.addEventListener('input', () => {
                 for(let i = 0; i < ignorelist_nick.length; i++){
                     if (hide_in_message == true) {
                         reg = new RegExp("<span[^<>]+>" +
-                        escapeRegExp(ignorelist_nick[i].replace(/^\s+/,'').replace(/\s+$/,'')) + // понаблюдать за определением кому пишут
+                        //escapeRegExp(ignorelist_nick[i].replace(/^\s+/,'').replace(/\s+$/,'')) + // понаблюдать за определением кому пишут
+                        escapeRegExp(escapeHtml(ignorelist_nick[i])) + // понаблюдать за определением кому пишут
                         "</span>",'i');
+//console.log(escapeRegExp(escapeHtml(ignorelist_nick[i])) + "|" + text);
                         if (text.search(reg) != -1) { message_to_ignored_nick = true };
                     }
                     if(ignorelist_nick[i] == nickname) {
                         is_in_ignorelist = true;
-                        ignorelist_match += ((ignorelist_match.length > 0) ? "|iln" : "iln");
-                        ignorelist_match += ((ignorelist_match.length = 0) ? comment = "iln" : "");
+                        if (ignorelist_match.length > 0) {
+                            ignorelist_match += "|iln";
+                            comment = "iln";
+                        } else {
+                            ignorelist_match += "iln";
+                            comment = "";
+                        }
 
                         if (ignore_date === undefined) { ignore_date = new Date(ticks) }
                     }
                 }
-
 
                 if (is_spam == true && is_me == false && is_author == false) { // автобан пидоров
                     let exists = false;
@@ -1738,25 +1782,26 @@ textArea.addEventListener('input', () => {
                                 (city !== undefined && city != '' ? '(' + city + ')' : '') + ":" +
                                 "uid=" + uid + ":" +
                                 //"sid=" + sid + ":" +
-                                (mobile ? 'phone:' : '') +
                                 (ignored ? 'ignored_in_room!??:' : '') +
                                 'ul' + "=" + userlist.size + ":" +
                                 'il' + "=" + ignorelist.length + ":" + "sa=" + SpamArray.length + ":" +
+                                (mobile ? 'phone:' : '') +
                                 (is_temp ? 'is_temp:' : '') + (is_author ? 'is_author:' : '') +
                                 (is_moder ? 'room_moder:' : '') + (is_moderator ? 'site_moder:' : '') +
                                 (is_admin ? 'site_admin:' : '') +
                                 (is_me ? 'is_me:' : '') + (for_me ? 'for_me:' : '') +
                                 (for_author ? 'for_author:' : '') +
-                                (is_spam ? 'is_spam(' + antiSpamResult[0] + '):' : '') + (is_amoral ? 'is_amoral:' : '') +
+                                (is_spam ? 'spam_found(' + antiSpamResult[0] + ')msg:' : '') + (is_amoral ? 'is_amoral:' : '') +
                                 (is_ukropitek ? 'is_ukropitek:' : '') + (is_restricted_country ? 'country_bl:' : '') +
-                                (is_in_ignorelist ? 'IGNORED(' + (
+                                (is_in_ignorelist && !is_temp ? 'IGNORED(' + (
                                  Math.ceil(Math.abs((ticks - ignore_date.getTime())) / (1000 * 3600 * 24))) +
                                 " д. (" + comment + ")):" : '') +
-                                ((ignorelist_match != '') ? 'match:' + ignorelist_match + ':' : '') +
+                                (is_in_ignorelist && is_temp ? 'IGNORED:' : '') +
+                                ((ignorelist_match != '') ? 'match:(' + ignorelist_match + '):' : '') +
                                 (added_to_ignore ? 'added_to_ignore:' : '') +
                                 (message_to_ignored_nick ? 'to_ignored_nick:': '') +
                                 ((nick_to_subjects != '') ? 'to:' + nick_to_subjects : '')
-                                , (for_me ? 'background: LemonChiffon;' : '') + 'color: ' + color);
+                                ,(for_me ? 'background: LemonChiffon;' : '') + 'color: ' + color);
 
         });
     }
