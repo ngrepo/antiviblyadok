@@ -375,85 +375,97 @@ function MsgClick(e) {
     }
 }
 
-//var AddToIgnoreListFunc = function AddToIgnoreList(e) {
 function AddToIgnoreList(e) {
     if (AntiviblyadokEnabled == false) { return }
 
+//========================New==========================
+// [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time [5] counter
+// [6] comment [7] country [8] uid [9] reserved [10] reserved
+//=======================================================
+// [2] instruction: 0: - блокировать по нику + uid с разбаном по значению константы в днях в коде
+// [2] instruction: 1: - блокировать по логину + uid с разбаном по значению константы в днях в коде
+// [2] instruction: 2: - блокировка по всем параметрам с разбаном по значению константы в днях в коде
+// [2] instruction: 3: - игнор на день по нику и стране для временных профилей
+// [2] instruction: 4: - перманентный игнор по всем параметрам
+// [2] instruction: 5: - reserved
+// [2] instruction: 6: - reserved
+// [2] instruction: 7: - reserved
+const ignore_nick_uid_country = 0;
+const ignore_profile_uid_country = 1;
+const ignore_all_params = 2;
+const ignore_temp_profile = 3;
+const ignore_permanent = 4;
+//=====================================================
     var element = e.parentElement.parentElement;
-    var id = element.getAttribute('data-id');                          // id
-    var nn = $(element).find("div.nick").find("span.nick-to").html();  // nick from tag
+    var id = element.getAttribute('data-id');                                 // id
+    var nn = element.querySelector('strong.nick, strong.nick-to').innerHTML;  // nick from tag
+
+    if (typeof msglist.get(id) == undefined) { return; }
+    var profile = msglist.get(id).owner.info.profile.replace(/\/user\//,'');
+    var nickname = msglist.get(id).owner.nickname;
+    var uid = msglist.get(id).owner.info.uid;
+    var owner = msglist.get(id).owner.owner; if (owner == undefined) {owner = false}
+    var self = msglist.get(id).owner.self; if (self == undefined) {self = false}
+    var country = msglist.get(id).owner.info.country_iso;
     var exists = false;
-    var userdata = new Array("","","",false);
-
+/*
     console.log('Nick from tag:' + nn);
-    console.log(id); // для только что забаненных в чате, проверить ещё это
-    console.log(userlist); // для только что забаненных в чате, проверить ещё это
+    console.log(id);
+    console.log(nickname);
+    console.log(profile);
+    console.log(uid);
+    console.log(owner);
+    console.log(self);
+    console.log(country);
+*/
     if (id === null) { return } // для только что забаненных в чате, проверить ещё это
-
-        userdata = userlist.get(id);
-//        console.log(userdata);
-        if (typeof userdata != 'undefined') {
-            var n = userdata[0];
-            var login = userdata[1];
-
-            if (userdata[2] == 'автор') {
-                alert('Нельзя добавить в игнор автора!');
-                return;
-            }
-            if (typeof userdata[3] == true || n == nickname) {
-                alert('Нельзя добавить в игнор себя!');
-                return;
-            }
+    if (owner == true) {
+        alert('Нельзя добавить в игнор автора!');
+        return;
+    }
+    if (self == true || nickname == nickname_self) {
+        alert('Нельзя добавить в игнор себя!');
+        return;
+    }
 
         let mode = -1;
         let comment = "ui";
-        if (login == '' && n != '' && confirm("Добавить в игнор временный профиль \"" + n + "\"?")) { mode = ignore_nick_temp_1d }
-        if (login != '' && n != '') {
-            if (confirm("Добавить в игнор \"" + n + "\" по логину ?")) { mode = ignore_login_365d }
-            if (n != "Поменяйтe ник" && confirm("Добавить в игнор \"" + n + "\" по никнейму + логину ?")) { mode = ignore_both_365d }
+        if (profile == '' && nickname != '' && confirm("Добавить в игнор временный профиль \"" + nickname + "\"?")) { mode = ignore_temp_profile }
+        if (profile != '' && nickname != '') {
+            if (confirm("Добавить в игнор \"" + nickname + "\" по логину + uid ?")) { mode = ignore_profile_uid_country }
+            if (nickname != "Поменяйтe ник" && confirm("Добавить в игнор \"" + nickname + "\" по никнейму + логину + uid ?")) { mode = ignore_all_params }
             if (mode != -1) { comment = prompt("Комментарий:","ui") }
             if (comment == null) { mode = -1 }
         }
 
         if (mode != -1) {
                     for(let i = 0; i < ignorelist.length; i++) {
-                    // [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time [5] counter [6] comment [7] country
-                    // [2] instruction: 0: блокировать по нику; 1: блокировать по логину; 2: блокировать по логину и нику;
-                    // [2] instruction: 3: - бан на день нику для временных ников;
-                    // [2] instruction: 4: - бан на день по логину и нику;
-                    // [2] instruction: 5: - бан навсегда по логину и нику;
-                    //const ignore_nick_365d = 0;
-                    //const ignore_login_365d = 1;
-                    //const ignore_both_365d = 2;
-                    //const ignore_nick_temp_1d = 3;
-                    //const ignore_both_1d = 4;
-
                         if (ignorelist[i] !== null) {
-                            if ((ignorelist[i][0] == n && ignorelist[i][1] == login) ||
-                                 (ignorelist[i][0] == n && ignorelist[i][1] == '')) { exists = true }
+                            if ((ignorelist[i][0] == nickname && ignorelist[i][1] == profile) ||
+                                 (ignorelist[i][0] == nickname && ignorelist[i][1] == '')) { exists = true }
                         }
                     }
 
                     if (exists == false) {
                         var date = new Date();
 
-                        if (login == '' && n != '') {
-                            ignorelist.push([n,login,mode,date.getTime(),date.getTime(),0,comment,''])
-                            console.log("added to ignore using button: " + n + "|" + login + ": на 1 день по нику для временного профиля");
+                        if (profile == '' && nickname != '' && uid == 0) {
+                            ignorelist.push([nickname,profile,ignore_temp_profile,date.getTime(),date.getTime(),0,comment,country,uid,0,0]);
+                            console.log("added to ignore using button: " + nickname + ": на 1 день по нику для временного профиля");
                             //console.log(ignorelist);
-                            SaveData();
+                            //SaveData();
                         }
-                        if (login != '' && n != '') {
-                            ignorelist.push([n,login,mode,date.getTime(),date.getTime(),0,comment,''])
-                            console.log("added to ignore using button: " + n + "|" + login + ": на 365 дней по логину");
+                        if (profile != '' && nickname != '' && uid != 0) {
+                            ignorelist.push([nickname,profile,ignore_all_params,date.getTime(),date.getTime(),0,comment,country,uid,0,0]);
+                            console.log("added to ignore using button: " + nickname + "|" + profile + "|" + uid + ": на " +
+                                        ignore_time / 86400000 + "дней по логину");
                             //console.log(ignorelist);
-                            SaveData();
+                            //SaveData();
                         }
                     }
 
         element.remove();
         }
-    }
 }
 
 function OnOffFilter()
@@ -561,7 +573,7 @@ function messageDispather(data) {
                     console.log('baned: ('+ userlist.get(message.response.clientId).nickname + ':' +
                                 userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + '):' +
                                 userlist.get(message.response.clientId).info.uid + ':text: (' +
-                                message.response.text.replace(/(<([^>]+)> ?)/gi,'') + ')');
+                                message.response.text + ')');
                     break;
                 }
                 case 'updateRoom': {
@@ -1046,7 +1058,8 @@ textArea.addEventListener('input', () => {
             //console.log(arrayOfStrings);
         });
 */
-        var ignorelist_nick = ['Поменяйте ник','Поменяйтe ник','panic..don&#039;t','don&amp;#039;t panic..','don&amp;#039;t worry..'];
+        var ignorelist_nick = ['Поменяйте ник','Поменяйтe ник']
+                               //,'panic..don&#039;t','don&amp;#039;t panic..','don&amp;#039;t worry..'];
 
 /*==================================================================================*/
         function antiCapsMat(m) {
@@ -1398,8 +1411,8 @@ textArea.addEventListener('input', () => {
             const hide_amoral = false;
             const hide_spam = true;
             const hide_temp_profile = false;
-            const hide_countries = true;
-            const hide_temp_not_ru_country = true;
+            const hide_countries = false;
+            const hide_temp_not_ru_country = false;
 
             const restrictedCountries = Array ( // boolean true - скрывать так же у зарегеных
             ['UA',false],['NL',true],['VN',true],['GB',false],['EE',false],['FR',true],['PL',false],['US',false],
@@ -1460,12 +1473,12 @@ textArea.addEventListener('input', () => {
 //                console.log('repl:' + t);
 
                 //$(element).find("app-popova").click();
-/*                $(element).append( "<div class=\"mess-actions-self\">" +
+                $(element).append( "<div class=\"mess-actions-self\">" +
                                   "<button class=\"btn btn-sm btn-secondary-pre\"" +
                                    "data-title=\"В игнор\" onclick=AddToIgnoreList(this);><i class=\"fa fa-remove btn-saw-out\">" +
                                    "</i></button>" +
                                    "</div>" );
-*/
+
 
                 if(!is_me) { // не обрабатывать сообщения от себя
                     var antiSpamResult = antiSpam(nickname,profile,text);
@@ -1484,8 +1497,8 @@ textArea.addEventListener('input', () => {
                 //$($mms).html(t);
 
                 if (text.search("🐖") != -1) { is_ukropitek = true }
-                if (text.search("🤮") != -1 || text.search("🤡") != -1 || text.search("🐓") != -1 ||
-                   (text.search("😭") != -1 || text.search('😫') != -1  || text.search('🥛') != -1 &&
+                if (text.search("🤮") != -1 || (text.search("😭") != -1 ||
+                    text.search('😫') != -1 || text.search('🥛') != -1 &&
                     is_me == false)) { is_amoral = true }
 
                 var now = new Date();
@@ -1612,8 +1625,9 @@ textArea.addEventListener('input', () => {
                         if (nick_to_tags != null) { message_to.push([nick_to_tags[1],nick_to_tags[2]]) }
                         else {
                             nick_to_tags = nick_to_tag_data[c].match(/<span[^<>]+(nick-not-found)[^<>]+>([^<>]+)<\/span>/);
+                            //console.log(nick_to_tags);
                             if (nick_to_tags != null) {
-                                message_to.push([nick_to_tags[1],nick_to_tags[2]])
+                                message_to.push([nick_to_tags[1],nick_to_tags[2]]);
                             }
                         }
                     }
@@ -1622,25 +1636,26 @@ textArea.addEventListener('input', () => {
 
                 for (let key of userlist.keys()) {
                     let data = userlist.get(key);
+
                     for(let c = 0; c < message_to.length; c++){
-                            //if (message_to[c][1].search(/don/) != -1) console.log('message_to[c][1]:' + message_to[c][1] +
-                            //' data.nickname:' + escapeRegExp(data.nickname);
-                    //console.log("%c" + message_to[c][1] + " | " + data.nickname,'background: LemonChiffon;color: red');
-//                        if (data.nickname.search(/worry|panic/) != -1) console.log(message_to[c][1] + "|" + escapeHtml(data.nickname));
-//                        if (data.nickname.search(/worry|panic/) != -1) console.log(message_to[c][1] == escapeHtml(data.nickname));
                         if (message_to[c][0] == key || message_to[c][0] == "nick-not-found" ) {
-                            if (message_to[c][1] == escapeHtml(data.nickname) || message_to[c][1] == "nick-not-found" ) {
+                            function add(){
                                 nick_to_subjects += ((nick_to_subjects.length > 0) ? "|" + message_to[c][1] : message_to[c][1]);
                                 if ( message_to[c][1] == nickname_self ) { for_me = true }
 
                                 if (author_nickname == escapeHtml(data.nickname) && author_profile == data.info.profile && data.owner == true) {
                                     for_author = true;
                                 }
+                            }
 
-                                //console.log("nick:" + message_to[c][1] + ",profile:" + data.info.profile)
+                            if (message_to[c][0] == "nick-not-found" && message_to[c][1] != escapeHtml(data.nickname)) {
+                                if (nick_to_subjects.indexOf(message_to[c][1]) == -1) add();
+                            } else if (message_to[c][1] == escapeHtml(data.nickname)) {
+                                if (nick_to_subjects.indexOf(message_to[c][1]) == -1) add();
                             }
                         }
                     }
+
                        // console.log('%cdata.info.profile:' + data.info.profile,'background: LemonChiffon;color: red');
                        // console.log('%cdata.info.uid:' + data.info.uid,'background: LemonChiffon;color: red');
                        // console.log('%chide_in_message:' + hide_in_message,'background: LemonChiffon;color: red');
@@ -1652,7 +1667,7 @@ textArea.addEventListener('input', () => {
 //console.log(escapeRegExp(escapeHtml(data.nickname)) + "|" + text);
                         if (text.search(reg) != -1) {
                             message_to_ignored_nick = true;
-                            if (message_to.length < 1) { break }
+                            if (message_to.length < 1) { break; }
                         };
 //console.log(message_to_ignored_nick);
                     }
@@ -1721,18 +1736,20 @@ textArea.addEventListener('input', () => {
                         if ( (is_spam == true && antiSpamResult[0] > 2 && is_ukropitek == true ) ){
                             ignorelist.push([nickname,profile,ignore_profile_uid_country,date.getTime(),date.getTime(),0,
                             (is_spam ? 'is_spam(' + antiSpamResult[0] + ")" : '') +
-                            (is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') + " - автобан на " + ignore_time / 86400000 + " дней",'']);
+                            (is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') + " - автобан на " +
+                            ignore_time / 86400000 + " дней",country,uid,0,0]);
                             added_to_ignore == true;
-                            console.log("added to ignore: " + nickname + "|" + profile + ": на " + ignore_time / 86400000 + " дней по логину");
+                            console.log("added to ignore: " + nickname + "|" + profile + "|" + uid + ": на " +
+                            ignore_time / 86400000 + " дней по логину");
                             //console.log(ignorelist);
                         }
 
                         if ( (is_spam == true && antiSpamResult[0] > 4) ){
                             ignorelist.push([nickname,profile,ignore_temp_profile,date.getTime(),date.getTime(),0,
                             (is_spam ? 'is_spam(' + antiSpamResult[0] + ")" : '') +
-                            (is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') + ' - автобан на 1 день','']);
+                            (is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') + ' - автобан на 1 день',country,uid,0,0]);
                             added_to_ignore == true;
-                            console.log("added to ignore: " + nickname + "|" + profile + ": на 1 день по логину и нику");
+                            console.log("added to ignore: " + nickname + "|" + profile + "|" + uid + ": на 1 день по логину и нику");
                             //console.log(ignorelist);
                         }
                     }
