@@ -175,6 +175,8 @@ var Scrpt = create("div",ScrptContent);
 
         var userlist = new Map();
         var msglist = new Map();
+        var users_max = 0;
+
         const ignore_time = 86400000 * 1195 // время игнора в днях 1195 - 3 года, 86400000 - 1 день
 
         var ignorelist = new Array(); // '','',0,0,0
@@ -397,8 +399,9 @@ const ignore_temp_profile = 3;
 const ignore_permanent = 4;
 //=====================================================
     var element = e.parentElement.parentElement;
+    if (element == undefined) { return; }
     var id = element.getAttribute('data-id');                                 // id
-    var nn = element.querySelector('strong.nick, strong.nick-to').innerHTML;  // nick from tag
+//    var nn = element.querySelector('strong.nick, strong.nick-to').innerHTML;  // nick from tag
 
     if (typeof msglist.get(id) == undefined) { return; }
     var profile = msglist.get(id).owner.info.profile.replace(/\/user\//,'');
@@ -458,7 +461,7 @@ const ignore_permanent = 4;
                         if (profile != '' && nickname != '' && uid != 0) {
                             ignorelist.push([nickname,profile,ignore_all_params,date.getTime(),date.getTime(),0,comment,country,uid,0,0]);
                             console.log("added to ignore using button: " + nickname + "|" + profile + "|" + uid + ": на " +
-                                        ignore_time / 86400000 + "дней по логину");
+                                        ignore_time / 86400000 + " дней по логину");
                             //console.log(ignorelist);
                             //SaveData();
                         }
@@ -568,12 +571,22 @@ function messageDispather(data) {
                     break;
                 }
                 case 'baned': { // модерастом или владельцем трансляции
-                    console.log('baned ============================='); // норм
+                    console.log('baned =============================');
                     console.log(message);
+                    console.log(userlist.get(message.response.clientId));
                     console.log('baned: ('+ userlist.get(message.response.clientId).nickname + ':' +
-                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + '):' +
-                                userlist.get(message.response.clientId).info.uid + ':text: (' +
+                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') +
+                                userlist.get(message.response.clientId).info.uid + '):text:(' +
                                 message.response.text + ')');
+                    break;
+                }
+                case 'ban': { // модерастом или владельцем трансляции
+                    console.log('ban =============================');
+                    console.log(message);
+                  /*  console.log('baned: ('+ userlist.get(message.response.clientId).nickname + ':' +
+                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') +
+                                userlist.get(message.response.clientId).info.uid + '):text:(' +
+                                message.response.text + ')'); */
                     break;
                 }
                 case 'updateRoom': {
@@ -609,6 +622,11 @@ function messageDispather(data) {
                 }
                 case 'notify': { // уведомление об том, что на ваш коментарий ответили
                     console.log('notify =========================');
+                    console.log(message);
+                    break;
+                }
+                case 'roomDestroyed': {
+                    console.log('roomDestroyed =========================');
                     console.log(message);
                     break;
                 }
@@ -677,6 +695,8 @@ function addToUserList (message) {
          }
      });
 
+     if (userlist.size > users_max) users_max = userlist.size;
+
 //console.log(userlist);
 }
 
@@ -687,18 +707,28 @@ function updateUserList (message) {
 
         if (message.response.type == 'add') {
             userlist.set(message.response.client.id,message.response.client);
+            if (userlist.size > users_max) {
+                users_max = userlist.size;
+                console.log('users_max=' + users_max + ':users_max*2=' + users_max * 2);
+            }
             //console.log(userlist);
         }
         if (message.response.type == 'remove') {
             if (typeof message.response.client.id === 'string') {
                 //userlist.delete(message.response.client.id);
-                if (userlist.length >= 500) {
-                    //console.log('userlist array length:' + userlist.length);
-                    //console.log(userlist);
-                    userlist = userlist.slice(300,userlist.length - 1);
-                    //console.log('userlist array spliced, lenght:' + userlist.length);
-                    //console.log(userlist);
+
+                if (userlist.size >= users_max * 2) {
+                    console.log('userlist size:' + userlist.size);
+                    console.log(userlist);
+                    let i = 0;
+                    for (let key of userlist.keys()) {
+                        if (i <= users_max) userlist.delete(key);
+                        i++;
+                    }
+                    console.log('userlist reduced, size:' + userlist.size);
+                    console.log(userlist);
                 }
+
             }
         }
     }
@@ -792,9 +822,24 @@ document.addEventListener("DOMContentLoaded", function(event) {
             if (id !== null && id !== undefined) {
                 //console.log("%celement removed from div.chat-messages mid: " + id,'background: LemonChiffon;color: red');
                 //console.log(element);
-                if (id.length > 0) msglist.delete(id);
-                //console.log('removed from msglist');
-                //console.log(msglist);
+
+                //if (id.length > 0) {
+                    //msglist.delete(id);
+                    //console.log('removed from msglist');
+                    //console.log(msglist);
+                //}
+
+                if (msglist.size >= 111) {
+                    console.log('msglist size:' + msglist.size);
+                    console.log(msglist);
+                    let i = 0;
+                    for (let key of msglist.keys()) {
+                        if (i <= 30) msglist.delete(key);
+                        i++;
+                    }
+                    console.log('msglist reduced, size:' + msglist.size);
+                    console.log(msglist);
+                }
             }
         }
     });
@@ -863,7 +908,7 @@ textArea.addEventListener('input', () => {
                 s = s.replace(/врядли/gi,'вряд ли');
                 s = s.replace(/вроед/gi,'вроде');
                 s = s.replace(/вроед/gi,'вроде');
-                s = s.replace(/\) ?$|\\ ?$/gi,' :smile:');
+                //s = s.replace(/\) ?$|\\ ?$/gi,' :smile:');
 
                 var arrayOfStrings = s.split(/(#[^#:]+:|:[^:]+:|\. |\!|\?|\)|\()/); // Делим на предложения, ники, смайлы
                 //console.log(arrayOfStrings);
@@ -1408,17 +1453,18 @@ textArea.addEventListener('input', () => {
 
             const hide_in_message = true;
             const hide_ukropitek = true;
-            const hide_amoral = false;
+            const hide_amoral = true;
             const hide_spam = true;
             const hide_temp_profile = false;
-            const hide_countries = false;
-            const hide_temp_not_ru_country = false;
+            const hide_countries = true;
+            const hide_temp_not_ru_country = true;
 
             const restrictedCountries = Array ( // boolean true - скрывать так же у зарегеных
-            ['UA',false],['NL',true],['VN',true],['GB',false],['EE',false],['FR',true],['PL',false],['US',false],
+            ['UA',false],['NL',true],['VN',true],['GB',false],['EE',false],['FR',true],['PL',true],['US',false],
             ['MD',false],['DE',false],['GE',true],['AT',true],['BA',true],['NO',true]
             //,['ES',true],['HU',true],['DZ',false],['DK',false]
             );
+
 
             const autoban_ukropitek = true;
             const autoban_ukropitek_treshold_msg = 2;
@@ -1496,10 +1542,9 @@ textArea.addEventListener('input', () => {
 
                 //$($mms).html(t);
 
-                if (text.search("🐖") != -1) { is_ukropitek = true }
-                if (text.search("🤮") != -1 || (text.search("😭") != -1 ||
-                    text.search('😫') != -1 || text.search('🥛') != -1 &&
-                    is_me == false)) { is_amoral = true }
+                if (text.search("🐖") != -1 || text.search("🐷") != -1) { is_ukropitek = true };
+                if ((text.search("🤮") != -1 || text.search("😭") != -1 || text.search('😫') != -1 &&
+                    is_me == false)) { is_amoral = true } // || text.search('🥛') != -1
 
                 var now = new Date();
                 var ticks = now.getTime();
@@ -1556,6 +1601,36 @@ textArea.addEventListener('input', () => {
                     if (ignorelist[i][8] == uid && ignorelist[i][8] != '0' && ignorelist[i][8] != '')
                         ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'u';
 
+                    if ((ignorelist[i][1] == profile && ignorelist[i][1] != '') || ignorelist[i][8] == '') {
+                        let ignorelist_match_n = ''; // автообновление данных выблядков в игнорлисте
+                        if (ignorelist[i][0] != nickname) {
+                            ignorelist[i][0] = nickname;
+                            ignorelist_match_n += ((ignorelist_match_n.length > 0) ? "|" : "") + 'n';
+                        }
+                        if (ignorelist[i][1] != profile) {
+                            ignorelist[i][1] = profile;
+                            ignorelist_match_n += ((ignorelist_match_n.length > 0) ? "|" : "") + 'p';
+                        }
+                        if (ignorelist[i][7] != country_iso) {
+                            ignorelist[i][7] = country_iso;
+                            ignorelist_match_n += ((ignorelist_match_n.length > 0) ? "|" : "") + 'c';
+                        }
+                        if (ignorelist[i][8] == '') {
+                            ignorelist[i][8] = uid;
+                            ignorelist_match_n += ((ignorelist_match_n.length > 0) ? "|" : "") + 'u';
+                        }
+                        if (ignorelist_match_n != '') {
+                            console.log('%cignorelist entry updated for (' + nickname + ':' + profile + ':' +
+                                        uid + ':' + country_iso + '):old:(' + ignorelist_match + '):new added:(' +
+                                        ignorelist_match_n + ')','background: LemonChiffon;color:red');
+                            ignorelist_match += ((ignorelist_match.length > 0) ? "|" + ignorelist_match_n : ignorelist_match_n);
+                        }
+                    }
+/*
+                    if (ignorelist[i][1] == '' && (ignorelist[i][8] == '0' || ignorelist[i][8] != '')) { // автообновление данных для временных профилей
+                        if (ignorelist[i][0] == nickname && ignorelist[i][7] != country_iso) ignorelist[i][7] = country_iso;
+                    }
+*/
                 }
 
                 is_in_ignorelist = false;
@@ -1820,7 +1895,7 @@ textArea.addEventListener('input', () => {
                                 "uid=" + uid + ":" +
                                 //"sid=" + sid + ":" +
                                 (ignored ? 'ignored_in_room!??:' : '') +
-                                'ul' + "=" + userlist.size + ":" +
+                                'ul' + "=" + userlist.size + ":" + 'ml' + "=" + msglist.size + ":" +
                                 'il' + "=" + ignorelist.length + ":" + "sa=" + SpamArray.length + ":" +
                                 (mobile ? 'phone:' : '') +
                                 (is_temp ? 'is_temp:' : '') + (is_author ? 'is_author:' : '') +
@@ -1832,7 +1907,7 @@ textArea.addEventListener('input', () => {
                                 (is_ukropitek ? 'is_ukropitek:' : '') + (is_restricted_country ? 'country_bl:' : '') +
                                 (is_in_ignorelist && !is_temp ? 'IGNORED(' + (
                                  Math.ceil(Math.abs((ticks - ignore_date.getTime())) / (1000 * 3600 * 24))) +
-                                " д. (" + comment + ")):" : '') +
+                                " д.(" + comment + ")):" : '') +
                                 ((is_in_ignorelist && is_temp) || is_in_ignorelist_nick ? 'IGNORED:' : '') +
                                 ((ignorelist_match != '') ? 'match:(' + ignorelist_match + '):' : '') +
                                 (added_to_ignore ? 'added_to_ignore:' : '') +
