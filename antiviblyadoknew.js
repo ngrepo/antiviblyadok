@@ -704,20 +704,23 @@ function updateUserList (message) {
     //console.log('updateRoom ==========================');
     if ('type' in message.response) {
         //console.log('type in message.response');
-
+//        console.log(message);
         if (message.response.type == 'add') {
             userlist.set(message.response.client.id,message.response.client);
-            if (userlist.size > users_max) {
-                users_max = userlist.size;
-                console.log('users_max=' + users_max + ':users_max*2=' + users_max * 2);
-            }
-            //console.log(userlist);
+            if (message.response.count > users_max) { users_max = message.response.count }
+            //console.log('message.response.count=' + message.response.count + ':users_max=' +
+            //users_max + ':users_max*2=' + users_max * 2);
         }
+            //console.log(userlist);
         if (message.response.type == 'remove') {
             if (typeof message.response.client.id === 'string') {
                 //userlist.delete(message.response.client.id);
+                //console.log('message.response.count=' + message.response.count + ':users_max=' +
+                //users_max + ':users_max*2=' + users_max * 2);
 
-                if (userlist.size >= users_max * 2) {
+//                let users_to_del = (users_max >= 150 ? 300 : 100);
+
+                if (userlist.size >= users_max * 4) {
                     console.log('userlist size:' + userlist.size);
                     console.log(userlist);
                     let i = 0;
@@ -831,14 +834,14 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
                 if (msglist.size >= 111) {
                     console.log('msglist size:' + msglist.size);
-                    console.log(msglist);
+                    //console.log(msglist);
                     let i = 0;
                     for (let key of msglist.keys()) {
                         if (i <= 30) msglist.delete(key);
                         i++;
                     }
                     console.log('msglist reduced, size:' + msglist.size);
-                    console.log(msglist);
+                    //console.log(msglist);
                 }
             }
         }
@@ -1620,9 +1623,13 @@ textArea.addEventListener('input', () => {
                             ignorelist_match_n += ((ignorelist_match_n.length > 0) ? "|" : "") + 'u';
                         }
                         if (ignorelist_match_n != '') {
+                            ignorelist[i][3] = date.getTime(); ignore_date = new Date(ignorelist[i][3]);
+                            ignorelist[i][4] = date.getTime();
+
                             console.log('%cignorelist entry updated for (' + nickname + ':' + profile + ':' +
                                         uid + ':' + country_iso + '):old:(' + ignorelist_match + '):new added:(' +
                                         ignorelist_match_n + ')','background: LemonChiffon;color:red');
+
                             ignorelist_match += ((ignorelist_match.length > 0) ? "|" + ignorelist_match_n : ignorelist_match_n);
                         }
                     }

@@ -1,5 +1,6 @@
 livacha.com/i/beeps/money.ogg
 livacha.com/i/beeps/ban.ogg
+livacha.com/upload/chat_room/donate_voice/*
 livacha.com##div[data-url*="/chat/atyhuws245123"]
 livacha.com##div[data-url*="/chat/rfgecnf"]
 livacha.com##div[data-url*="/chat/jhe145yy46SGH"]
@@ -203,7 +204,8 @@ livacha.com##div[data-url*="/chat/nadin27nadin"]
 #livacha.com##img:has-text(/loading_stream.jpg/)
 livacha.com##.doska-wrap
 livacha.com##DIV#promo_home
-
+//livacha.com##DIV.modal-dialog
+//livacha.com##DIV.modal-dialog-centered
 livacha.com##div[data-url*="/user/inkmoto"]
 
 

@@ -1,0 +1,44 @@
+function TagParser(text){
+	var found_text = ''; var state = 0; var fpos; var lpos; var c = 0;
+	var usertag = false; var livetag = false; var videotag = false; var TagArray = new Array(); OwnerTagID = 0;
+
+	while (true){
+		if (text[c] == '<') {
+			if (state == 0) {
+				fpos = c;
+				if (found_text != '') TagArray.push([found_text,0,0]);
+				found_text = '';
+				state = 1;
+			}
+		} else if (text[c] == '>') {
+			if (state == 1) {
+				lpos = c;
+				TagArray.push([text.substring(fpos,lpos + 1),1,0]);
+				state = 0;
+			};
+		} else if (state == 0 && c < text.length) found_text += text[c];
+		if (c >= text.length) break;
+		c++;
+	}
+	if (found_text != '') { TagArray.push([found_text,0,0]) }
+
+	for(var c = 0; c < TagArray.length; c++){
+		if (!usertag) if (TagArray[c][0].indexOf('<a href="/user/') != -1) {
+			usertag = true; OwnerTagID = 2 ; TagArray[c][1] = OwnerTagID; TagArray[c][2] = OwnerTagID;
+		}
+		if (!livetag) if (TagArray[c][0].indexOf('<a href="/live/') != -1) {
+			livetag = true; OwnerTagID = 3; TagArray[c][1] = OwnerTagID; TagArray[c][2] = OwnerTagID;
+		}
+		if (!videotag) if (TagArray[c][0].indexOf('<a href="/video/') != -1) {
+			videotag = true; OwnerTagID = 4; TagArray[c][1] = OwnerTagID; TagArray[c][2] = OwnerTagID;
+		}
+		if (usertag || livetag || videotag) {
+			TagArray[c][2] = OwnerTagID;
+			if (TagArray[c][0].indexOf('</a>') != -1) {
+				usertag = false; livetag = false; videotag = false;
+				TagArray[c][1] = 5;  TagArray[c][2] = OwnerTagID; OwnerTagID = 0;
+			}
+		}
+	}
+	return TagArray;
+}
