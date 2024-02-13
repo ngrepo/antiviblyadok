@@ -719,7 +719,18 @@ function updateUserList (message) {
                 //users_max + ':users_max*2=' + users_max * 2);
 
 //                let users_to_del = (users_max >= 150 ? 300 : 100);
-
+                if (userlist.size >= 111) {
+                    console.log('userlist size:' + userlist.size);
+                    console.log(userlist);
+                    let i = 0;
+                    for (let key of userlist.keys()) {
+                        if (i <= 15) userlist.delete(key);
+                        i++;
+                    }
+                    console.log('userlist reduced, size:' + userlist.size);
+                    console.log(userlist);
+                }
+/*
                 if (userlist.size >= users_max * 4) {
                     console.log('userlist size:' + userlist.size);
                     console.log(userlist);
@@ -731,7 +742,7 @@ function updateUserList (message) {
                     console.log('userlist reduced, size:' + userlist.size);
                     console.log(userlist);
                 }
-
+*/
             }
         }
     }
@@ -837,7 +848,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     //console.log(msglist);
                     let i = 0;
                     for (let key of msglist.keys()) {
-                        if (i <= 30) msglist.delete(key);
+                        if (i <= 15) msglist.delete(key);
                         i++;
                     }
                     console.log('msglist reduced, size:' + msglist.size);
@@ -1443,6 +1454,7 @@ textArea.addEventListener('input', () => {
             var for_me = false;
             var for_author = false;
             var comment = '';
+            var div_chat_mess_count = 0;
 
             var is_ukropitek = false;
             var is_amoral = false;
@@ -1453,6 +1465,7 @@ textArea.addEventListener('input', () => {
             var is_in_ignorelist = false;
             var is_in_ignorelist_nick = false;
             var message_to_ignored_nick = false;
+            var from_restricted_country = false;
 
             const hide_in_message = true;
             const hide_ukropitek = true;
@@ -1464,7 +1477,7 @@ textArea.addEventListener('input', () => {
 
             const restrictedCountries = Array ( // boolean true - скрывать так же у зарегеных
             ['UA',false],['NL',true],['VN',true],['GB',false],['EE',false],['FR',true],['PL',true],['US',false],
-            ['MD',false],['DE',false],['GE',true],['AT',true],['BA',true],['NO',true]
+            ['MD',false],['DE',false],['GE',true],['AT',true],['BA',false],['NO',true]
             //,['ES',true],['HU',true],['DZ',false],['DK',false]
             );
 
@@ -1510,7 +1523,7 @@ textArea.addEventListener('input', () => {
                     console.log('textWithSmiles:' + message.textWithSmiles);
                     console.log('message =============================>>>');
 */
-
+            div_chat_mess_count = document.querySelectorAll('.mess-row').length;
 
 //            if (text != undefined) {
 //                var a = test.match(/\*...\*/g);
@@ -1554,6 +1567,27 @@ textArea.addEventListener('input', () => {
                 var date_diff = 0;
                 var ignorelist_match = '';
                 var ignore_date;
+
+                function isRestrictedCountry(country,temp_profile) {
+                    let result = false;
+                    for (let i = 0; i < restrictedCountries.length; i++) {
+                        if (hide_temp_not_ru_country == true && country != 'RU' && temp_profile == true) {
+                            result = true;
+                        }
+                        if (restrictedCountries[i][0] == country) {
+                             if (restrictedCountries[i][1] == true) {
+                                 result = true;
+                                 break;
+                             } else {
+                                 if (temp_profile == true) {
+                                     result = true;
+                                     break;
+                                 }
+                             }
+                        }
+                    }
+                    return result;
+                }
 
 //========================New==========================
 // [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time [5] counter
@@ -1718,22 +1752,39 @@ textArea.addEventListener('input', () => {
 
                 for (let key of userlist.keys()) {
                     let data = userlist.get(key);
+                    let temp_profile = false; if (data.info.uid == '0') { temp_profile = true }
 
                     for(let c = 0; c < message_to.length; c++){
                         if (message_to[c][0] == key || message_to[c][0] == "nick-not-found" ) {
+
                             function add(){
                                 nick_to_subjects += ((nick_to_subjects.length > 0) ? "|" + message_to[c][1] : message_to[c][1]);
-                                if ( message_to[c][1] == nickname_self ) { for_me = true }
+                                if ( message_to[c][1] == nickname_self && message_to[c][0] == key &&
+                                    (data.self !== true ? false : true)) { for_me = true }
 
-                                if (author_nickname == escapeHtml(data.nickname) && author_profile == data.info.profile && data.owner == true) {
+                                if (author_nickname == escapeHtml(data.nickname) && author_profile == data.info.profile) {
                                     for_author = true;
+                                    //console.log(author_profile + ':' + data.info.profile + ':' + data.owner);
+                                    //console.log(data);
+                                }
+
+                                if (message_to_ignored_nick == false) {
+                                    //console.log(data.info);
+                                    message_to_ignored_nick = isRestrictedCountry(data.info.country_iso);
+                                    from_restricted_country = message_to_ignored_nick;
+                                    //console.log('data.info.country_iso:'  + data.info.country_iso + ':data.nickname:' + data.nickname +
+                                    //':isRestrictedCountry:' + isRestrictedCountry(data.info.country_iso) + ':message_to_ignored_nick:' + message_to_ignored_nick);
                                 }
                             }
 
-                            if (message_to[c][0] == "nick-not-found" && message_to[c][1] != escapeHtml(data.nickname)) {
-                                if (nick_to_subjects.indexOf(message_to[c][1]) == -1) add();
+                            if (message_to[c][0] == "nick-not-found" && message_to[c][1] != escapeHtml(data.nickname)) { // тут всё верно
+                                if (nick_to_subjects.indexOf(message_to[c][1]) == -1) {
+                                    add();
+                                }
                             } else if (message_to[c][1] == escapeHtml(data.nickname)) {
-                                if (nick_to_subjects.indexOf(message_to[c][1]) == -1) add();
+                                if (nick_to_subjects.indexOf(message_to[c][1]) == -1) {
+                                    add();
+                                }
                             }
                         }
                     }
@@ -1742,9 +1793,8 @@ textArea.addEventListener('input', () => {
                        // console.log('%cdata.info.uid:' + data.info.uid,'background: LemonChiffon;color: red');
                        // console.log('%chide_in_message:' + hide_in_message,'background: LemonChiffon;color: red');
                        // console.log('%chide_temp_profile:' + hide_temp_profile,'background: LemonChiffon;color: red');
-
-                    if (hide_in_message == true && hide_temp_profile == true && data.info.uid == '0') {
-
+/*
+                    if (hide_in_message == true && hide_temp_profile == true && temp_profile == true) {
                         reg = new RegExp("<span[^<>]+>" + escapeRegExp(escapeHtml(data.nickname)) + "</span>");
 //console.log(escapeRegExp(escapeHtml(data.nickname)) + "|" + text);
                         if (text.search(reg) != -1) {
@@ -1753,6 +1803,7 @@ textArea.addEventListener('input', () => {
                         };
 //console.log(message_to_ignored_nick);
                     }
+*/
                 }
 
                 for(let i = 0; i < ignorelist_nick.length; i++){
@@ -1779,6 +1830,8 @@ textArea.addEventListener('input', () => {
                         if (ignore_date === undefined) { ignore_date = new Date(ticks) }
                     }
                 }
+
+                is_restricted_country = isRestrictedCountry(country_iso,is_temp);
 
                 if (is_spam == true && is_me == false && is_author == false) { // автобан пидоров
                     let exists = false;
@@ -1837,23 +1890,6 @@ textArea.addEventListener('input', () => {
                     }
                 }
 
-                for (let i = 0; i < restrictedCountries.length; i++) {
-                    if (hide_temp_not_ru_country == true && country_iso != 'RU' && is_temp == true) {
-                        is_restricted_country = true;
-                    }
-                    if (restrictedCountries[i][0] == country_iso) {
-                         if (restrictedCountries[i][1] == true) {
-                             is_restricted_country = true;
-                             break;
-                         } else {
-                             if (is_temp == true) {
-                                 is_restricted_country = true;
-                                 break;
-                             }
-                         }
-                    }
-                }
-
                 let red = false;
 
                 if(is_in_ignorelist == true || is_in_ignorelist_nick == true ||
@@ -1870,6 +1906,7 @@ textArea.addEventListener('input', () => {
 
                 if((is_spam == true && is_me == false && hide_spam == true) ||
                    (is_amoral == true && is_me == false && for_author == false && hide_amoral == true)){
+                      if (hide_amoral == true && is_amoral == true) red = true;
                       element.remove();
                 }
 
@@ -1903,6 +1940,7 @@ textArea.addEventListener('input', () => {
                                 //"sid=" + sid + ":" +
                                 (ignored ? 'ignored_in_room!??:' : '') +
                                 'ul' + "=" + userlist.size + ":" + 'ml' + "=" + msglist.size + ":" +
+                                'cm' + "=" + div_chat_mess_count + ":" +
                                 'il' + "=" + ignorelist.length + ":" + "sa=" + SpamArray.length + ":" +
                                 (mobile ? 'phone:' : '') +
                                 (is_temp ? 'is_temp:' : '') + (is_author ? 'is_author:' : '') +
@@ -1919,6 +1957,7 @@ textArea.addEventListener('input', () => {
                                 ((ignorelist_match != '') ? 'match:(' + ignorelist_match + '):' : '') +
                                 (added_to_ignore ? 'added_to_ignore:' : '') +
                                 (message_to_ignored_nick ? 'to_ignored_nick:': '') +
+                                (message_to_ignored_nick && from_restricted_country ? 'from_country_bl:': '') +
                                 ((nick_to_subjects != '') ? 'to:' + nick_to_subjects : '')
                                 ,(for_me ? 'background: LemonChiffon;' : '') + 'color: ' + color);
 
