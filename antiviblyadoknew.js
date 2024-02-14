@@ -456,14 +456,14 @@ const ignore_permanent = 4;
                             ignorelist.push([nickname,profile,ignore_temp_profile,date.getTime(),date.getTime(),0,comment,country,uid,0,0]);
                             console.log("added to ignore using button: " + nickname + ": на 1 день по нику для временного профиля");
                             //console.log(ignorelist);
-                            //SaveData();
+                            SaveData();
                         }
                         if (profile != '' && nickname != '' && uid != 0) {
                             ignorelist.push([nickname,profile,ignore_all_params,date.getTime(),date.getTime(),0,comment,country,uid,0,0]);
                             console.log("added to ignore using button: " + nickname + "|" + profile + "|" + uid + ": на " +
                                         ignore_time / 86400000 + " дней по логину");
                             //console.log(ignorelist);
-                            //SaveData();
+                            SaveData();
                         }
                     }
 
@@ -548,12 +548,16 @@ function messageDispather(data) {
                     let msg = msglist.get(message.response.mid);
 
                     console.log(msg);
-                    console.log('removed by moderast ('+ message.response.client.nickname + ':' +
+                    console.log('removed by moderast (' + (message.response.hasOwnProperty('client') == true ? message.response.client.nickname + ':' +
                                 message.response.client.info.profile.replace(/\/user\//,'') + ':' +
-                                message.response.client.info.uid + '): msg of user (' +
-                                msg.owner.nickname + ':' +
-                                msg.owner.info.profile.replace(/\/user\//,'') + ':' +
-                                msg.owner.info.uid + '): text:' + msg.textRaw);
+                                message.response.client.info.uid : userlist.get(message.response.clientId).nickname + ':' +
+                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') +
+                                userlist.get(message.response.clientId).info.uid + '):text:(' +
+                                message.response.text + ')') +
+                                (msg != undefined ? '):msg of user(' + msg.owner.nickname + ':' +
+                                 msg.owner.info.profile.replace(/\/user\//,'') + ':' + msg.owner.info.uid +
+                                 '):text:' + msg.textRaw : '')); // '):text:' + msg.textRaw
+                    break;
                     break;
                 }
                 case 'messRemovedFiltered': {
@@ -562,12 +566,15 @@ function messageDispather(data) {
                     let msg = msglist.get(message.response.mid);
 
                     console.log(msg);
-                    console.log('removed by moderast ('+ message.response.client.nickname + ':' +
+                    console.log('removed by moderast (' + (message.response.hasOwnProperty('client') == true ? message.response.client.nickname + ':' +
                                 message.response.client.info.profile.replace(/\/user\//,'') + ':' +
-                                message.response.client.info.uid + '): msg of user (' +
-                                msg.owner.nickname + ':' +
-                                msg.owner.info.profile.replace(/\/user\//,'') + ':' +
-                                msg.owner.info.uid + '): text:' + msg.textRaw);
+                                message.response.client.info.uid : userlist.get(message.response.clientId).nickname + ':' +
+                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') +
+                                userlist.get(message.response.clientId).info.uid + '):text:(' +
+                                message.response.textRaw + ')') +
+                                (msg != undefined ? '):msg of user(' + msg.owner.nickname + ':' +
+                                 msg.owner.info.profile.replace(/\/user\//,'') + ':' + msg.owner.info.uid +
+                                 '):text:' + msg.text : ''));
                     break;
                 }
                 case 'baned': { // модерастом или владельцем трансляции
@@ -582,6 +589,15 @@ function messageDispather(data) {
                 }
                 case 'ban': { // модерастом или владельцем трансляции
                     console.log('ban =============================');
+                    console.log(message);
+                    console.log('ban: ('+ userlist.get(message.response.clientId).nickname + ':' +
+                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') +
+                                userlist.get(message.response.clientId).info.uid + '):text:(' +
+                                message.response.text + ')');
+                    break;
+                }
+                case 'selfUpdate': { // модерастом или владельцем трансляции
+                    console.log('selfUpdate =============================');
                     console.log(message);
                   /*  console.log('baned: ('+ userlist.get(message.response.clientId).nickname + ':' +
                                 userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') +
@@ -632,6 +648,7 @@ function messageDispather(data) {
                 }
                 default:{
                     console.log('default unknown message: ' + message.mess + ' =====================');
+                    console.log(message);
                     break;
                 }
             }
@@ -719,7 +736,7 @@ function updateUserList (message) {
                 //users_max + ':users_max*2=' + users_max * 2);
 
 //                let users_to_del = (users_max >= 150 ? 300 : 100);
-                if (userlist.size >= 111) {
+/*                if (userlist.size >= 111) {
                     console.log('userlist size:' + userlist.size);
                     console.log(userlist);
                     let i = 0;
@@ -730,19 +747,19 @@ function updateUserList (message) {
                     console.log('userlist reduced, size:' + userlist.size);
                     console.log(userlist);
                 }
-/*
-                if (userlist.size >= users_max * 4) {
+*/
+                if (userlist.size >= users_max * 3) {
                     console.log('userlist size:' + userlist.size);
                     console.log(userlist);
                     let i = 0;
                     for (let key of userlist.keys()) {
-                        if (i <= users_max) userlist.delete(key);
+                        if (i <= users_max / 2) userlist.delete(key);
                         i++;
                     }
                     console.log('userlist reduced, size:' + userlist.size);
                     console.log(userlist);
                 }
-*/
+
             }
         }
     }
@@ -842,8 +859,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     //console.log('removed from msglist');
                     //console.log(msglist);
                 //}
+                let div_chat_mess_count = document.querySelectorAll('.mess-row').length;
+                if (div_chat_mess_count == 0) div_chat_mess_count = 111;
 
-                if (msglist.size >= 111) {
+                if (msglist.size >= div_chat_mess_count + 25) {
                     console.log('msglist size:' + msglist.size);
                     //console.log(msglist);
                     let i = 0;
@@ -1476,8 +1495,8 @@ textArea.addEventListener('input', () => {
             const hide_temp_not_ru_country = true;
 
             const restrictedCountries = Array ( // boolean true - скрывать так же у зарегеных
-            ['UA',false],['NL',true],['VN',true],['GB',false],['EE',false],['FR',true],['PL',true],['US',false],
-            ['MD',false],['DE',false],['GE',true],['AT',true],['BA',false],['NO',true]
+            ['UA',false],['NL',true],['VN',false],['GB',false],['EE',false],['FR',true],['PL',false],['US',false],
+            ['MD',false],['DE',false],['GE',true],['AT',false],['BA',false],['NO',false]
             //,['ES',true],['HU',true],['DZ',false],['DK',false]
             );
 
@@ -1663,7 +1682,7 @@ textArea.addEventListener('input', () => {
                             console.log('%cignorelist entry updated for (' + nickname + ':' + profile + ':' +
                                         uid + ':' + country_iso + '):old:(' + ignorelist_match + '):new added:(' +
                                         ignorelist_match_n + ')','background: LemonChiffon;color:red');
-
+                            SaveData();
                             ignorelist_match += ((ignorelist_match.length > 0) ? "|" + ignorelist_match_n : ignorelist_match_n);
                         }
                     }
@@ -1876,6 +1895,7 @@ textArea.addEventListener('input', () => {
                             added_to_ignore == true;
                             console.log("added to ignore: " + nickname + "|" + profile + "|" + uid + ": на " +
                             ignore_time / 86400000 + " дней по логину");
+                            SaveData();
                             //console.log(ignorelist);
                         }
 
@@ -1885,6 +1905,7 @@ textArea.addEventListener('input', () => {
                             (is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') + ' - автобан на 1 день',country,uid,0,0]);
                             added_to_ignore == true;
                             console.log("added to ignore: " + nickname + "|" + profile + "|" + uid + ": на 1 день по логину и нику");
+                            SaveData();
                             //console.log(ignorelist);
                         }
                     }
