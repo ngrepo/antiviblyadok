@@ -356,7 +356,7 @@ function SaveData() {
     }
     } else (ignorelist_temp = ignorelist.slice(0))
 
-//console.log("Func SaveData:");
+console.log("Func SaveData:");
 console.log(ignorelist_temp);
       if((typeof(localStorage) != 'undefined') && (ignorelist.length > 0)) { localStorage.setItem('ignorelist', JSON.stringify(ignorelist_temp)) }
 }
@@ -368,11 +368,11 @@ function MsgClick(e) {
     var TextBody = e.parentElement.getElementsByClassName("text-body")[0];
 
     if (typeof TextBody !== 'undefined') {
-        e.parentElement.innerHTML = '<div class="text service-tag" style="display: auto" ondblclick=MsgClick(this);>' +
+        e.parentElement.innerHTML = '<div class="text service-tag" style="display: inline" ondblclick=MsgClick(this);>' +
         ServiceTag.innerHTML + '</div> ' + TextBody.innerHTML;
         TextBody.remove;
     } else {
-        let service_tag_html = '<div class="text service-tag" style="display: auto" ondblclick=MsgClick(this);>' +
+        let service_tag_html = '<div class="text service-tag" style="display: inline" ondblclick=MsgClick(this);>' +
         ServiceTag.innerHTML + '</div>';
         let text_body_html = e.parentElement.innerHTML.replace(ServiceTag.outerHTML,'');
         e.parentElement.innerHTML = service_tag_html + '<div class="text text-body" style="display: none">' + text_body_html + '</div>';
@@ -553,7 +553,7 @@ function messageDispather(data) {
                     console.log('removed by moderast (' + (message.response.hasOwnProperty('client') == true ? message.response.client.nickname + ':' +
                                 message.response.client.info.profile.replace(/\/user\//,'') + ':' +
                                 message.response.client.info.uid : userlist.get(message.response.clientId).nickname + ':' +
-                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') +
+                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + ':' +
                                 userlist.get(message.response.clientId).info.uid + '):text:(' +
                                 message.response.text + ')') +
                                 (msg != undefined ? '):msg of user(' + msg.owner.nickname + ':' +
@@ -567,15 +567,15 @@ function messageDispather(data) {
 //                    let msg = msglist.get(message.response.mid);
                     let usr = userlist.get(message.response.clientId);
                     //console.log(usr);
-                    console.log('all messages of user removed (' + usr.nickname + ':' + usr.info.profile + ':' + usr.info.uid + ')');
+                    console.log('all messages of user removed (' + usr.nickname + ':' + usr.info.profile.replace(/\/user\//,'') + ':' + usr.info.uid + ')');
                     break;
                 }
                 case 'baned': { // модерастом или владельцем трансляции
                     console.log('banned =============================');
                     console.log(message);
                     console.log(userlist.get(message.response.clientId));
-                    console.log('banned: ('+ userlist.get(message.response.clientId).nickname + ':' +
-                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') +
+                    console.log('banned:('+ userlist.get(message.response.clientId).nickname + ':' +
+                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + ':' +
                                 userlist.get(message.response.clientId).info.uid + '):text:(' +
                                 message.response.text + ')');
                     break;
@@ -584,7 +584,7 @@ function messageDispather(data) {
                     console.log('ban =============================');
                     console.log(message);
                     console.log('ban: ('+ userlist.get(message.response.clientId).nickname + ':' +
-                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') +
+                                userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + ':' +
                                 userlist.get(message.response.clientId).info.uid + '):text:(' +
                                 message.response.text + ')');
                     break;
@@ -593,7 +593,7 @@ function messageDispather(data) {
                     console.log('ignor =============================');
                     console.log(message);
                     if (message.type == "added") console.log('added to ignor: ('+ userlist.get(message.clientId).nickname + ':' +
-                                userlist.get(message.clientId).info.profile.replace(/\/user\//,'') +
+                                userlist.get(message.clientId).info.profile.replace(/\/user\//,'') + ':' +
                                 userlist.get(message.clientId).info.uid);
                     break;
                 }
@@ -602,7 +602,7 @@ function messageDispather(data) {
                     console.log(message);
                     let usr = message.response.client;
                     //console.log(usr);
-                    console.log('usr banned (' + usr.nickname + ':' + usr.info.profile + ':' + usr.info.uid + ')');
+                    console.log('me_was_banned:(' + usr.nickname + ':' + usr.info.profile + ':' + usr.info.uid + ')');
                     break;
                 }
                 case 'updateRoom': {
@@ -1303,7 +1303,7 @@ textArea.addEventListener('input', () => {
             for (var key in dict) { // Проверка на список нехороших слов
                 var reg = new RegExp(key,'i');
                 if (m.search(key) != -1) { // тег для показа скрытого сообщения
-                    m = '<div class="text service-tag" style="display: auto;" ondblclick=MsgClick(this);>'
+                    m = '<div class="text service-tag" style="display: inline;" ondblclick=MsgClick(this);>'
                         + dict[key] + '</div><div class="text text-body" style="display: none">' + m + '</div>';
                     shit_found = true;
                     break;
