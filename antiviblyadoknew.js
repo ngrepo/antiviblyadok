@@ -574,9 +574,9 @@ function messageDispather(data) {
                     console.log('banned =============================');
                     console.log(message);
                     console.log(userlist.get(message.response.clientId));
-                    console.log('banned:('+ userlist.get(message.response.clientId).nickname + ':' +
+                    console.log(('banned:(' + userlist.get(message.response.clientId) != undefined ? userlist.get(message.response.clientId).nickname + ':' +
                                 userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + ':' +
-                                userlist.get(message.response.clientId).info.uid + '):text:(' +
+                                userlist.get(message.response.clientId).info.uid : 'banned:("хз"' ) + '):text:(' +
                                 message.response.text + ')');
                     break;
                 }
@@ -662,6 +662,7 @@ function messageDispather(data) {
 }
 
 function userAthorized (message) {
+    console.log(message);
                     console.log('authorized =========================');
                     console.log('id:' + message.response.id);
                     console.log('nickname:' + message.response.client.info.nickname);
@@ -686,21 +687,38 @@ function userAthorized (message) {
 }
 
 function roomJoin (message) {
-     console.log('joined =============================');
+    console.log('joined =============================');
+    console.log(message);
+    console.log(userlist);
 
-     console.log(userlist);
-     message.response.lastMessages.forEach(function(item, i, arr) {
-         if (userlist.has(item.owner.id) == false) {
-             userlist.set(item.owner.id,item.owner);
-//             console.log('added to userlist');
-         };
+    let owner_found = false;
 
-         msglist.set(item.mid,item);
-         msglist_loaded = true;
+    message.response.lastMessages.forEach(function(item, i, arr) {
+        if (item.owner == true) {
+            author_user_id = item.owner.id;
+            author_nickname = item.owner.info.nickname;
+            author_profile = item.owner.info.profile;
+            owner_found = true;
+        }
+        if (userlist.has(item.owner.id) == false) {
+            userlist.set(item.owner.id,item.owner);
+//            console.log('added to userlist');
+        };
+
+        msglist.set(item.mid,item);
+        msglist_loaded = true;
 //         console.log('added to msglist');
-     });
-     console.log(userlist);
-     console.log(msglist);
+    });
+
+    if (owner_found == false) {
+        let e_app_nickname = document.getElementsByClassName("nickname text-truncate")[0].getElementsByTagName("strong")[0].getElementsByTagName("a")[0];
+        author_nickname = e_app_nickname.innerHTML;                    // nick
+        author_profile = e_app_nickname.href.match(/(\/user\/.+)/)[0]; // login
+        author_user_id = '';
+    }
+
+    console.log(userlist);
+    console.log(msglist);
 }
 
 function addToUserList (message) {
@@ -710,7 +728,7 @@ function addToUserList (message) {
      message.response.list.forEach(function(item, i, arr) {
          userlist.set(item.id,item);
 
-         if (i == 0 && (item.owner == true || item.moder == true)) {
+         if (item.owner == true) {
              author_user_id = item.id;
              author_nickname = item.info.nickname;
              author_profile = item.info.profile;
@@ -735,6 +753,11 @@ function updateUserList (message) {
             if (message.response.count > users_max) { users_max = message.response.count }
             //console.log('message.response.count=' + message.response.count + ':users_max=' +
             //users_max + ':users_max*2=' + users_max * 2);
+            if (message.response.client.owner == true) {
+                author_user_id = message.response.client.id;
+                author_nickname = message.response.client.info.nickname;
+                author_profile = message.response.client.info.profile;
+         }
         }
             //console.log(userlist);
         if (message.response.type == 'remove') {
@@ -1453,6 +1476,7 @@ textArea.addEventListener('input', () => {
             }
 
             var id = element.getAttribute('data-id'); // id
+
             if (id === null || id === undefined) {
                     return;
             }
@@ -1767,6 +1791,8 @@ textArea.addEventListener('input', () => {
 
 //console.log(levenshtein('Hello', 'HelA_1'));
 //console.log(ignorelist);
+//console.log(author_nickname);
+//console.log(author_profile);
 
                 var nick_to_tag_data = text.match(/<span[^<>]+>[^<>]+<\/span>/g);
                 var nick_to_tags = new Array();
