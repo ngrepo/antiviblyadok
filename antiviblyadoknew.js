@@ -200,6 +200,8 @@ var Scrpt = create("div",ScrptContent);
         const ignore_temp_profile = 3;
         const ignore_permanent = 4;
 
+        const d_send = 0;
+        const d_recv = 1;
 //        let e_app_nickname = document.getElementsByClassName("app-nickanme")[0]; // old
       //  let e_app_nickname = document.getElementsByClassName("nickname text-truncate")[0].getElementsByTagName("strong")[0].getElementsByTagName("a")[0];;
       //  var author_id = '';                                              // id
@@ -963,7 +965,7 @@ textArea.addEventListener('input', () => {
 })
 */
 
-        function TextCorrector (s,anticaps,auto_dot) {
+        function TextCorrector (s,anticaps,auto_dot,direction) {
             if (typeof s === 'string' && typeof anticaps === 'boolean' &&  typeof auto_dot === 'boolean' ) {
                 const autocorrect_enabled = true; if (autocorrect_enabled == false) { return }
 
@@ -975,7 +977,10 @@ textArea.addEventListener('input', () => {
                 s = s.replace(/тчо/gi,'вроде');
                 s = s.replace(/из за/gi,'из-за');
                 s = s.replace(/корчое/gi,'короче');
-                //s = s.replace(/\) ?$|\\ ?$/gi,' :smile:');
+
+                if (direction == d_send) {
+                    s = s.replace(/\) ?$|\\ ?$/gi,' :smile: ');
+                }
 
                 var arrayOfStrings = s.split(/(#[^#:]+:|:[^:]+:|\. |\!|\?|\)|\()/); // Делим на предложения, ники, смайлы
                 //console.log(arrayOfStrings);
@@ -1115,7 +1120,7 @@ textArea.addEventListener('input', () => {
                 if (e.key === 'Enter') {
                     //console.log('%ctextarea.form-control','background: LemonChiffon;color: red');
                     var element = e.target;
-                    element.value = TextCorrector(element.value,true,false);
+                    element.value = TextCorrector(element.value,true,false,d_send);
                     return
                 }
 
@@ -1125,7 +1130,7 @@ textArea.addEventListener('input', () => {
                 if (userItem.innerText.indexOf("Послать") != -1 ) {
                     userItem.addEventListener('click', (e) => {
                         var element = document.querySelector("textarea.form-control");
-                        element.value = TextCorrector(element.value,true,false);
+                        element.value = TextCorrector(element.value,true,false,d_send);
                         return
                     })
                 }
@@ -1336,7 +1341,7 @@ textArea.addEventListener('input', () => {
             };
 
             if (shit_found == false) {
-                m = TextCorrector(m,true,true); // Исправление на первую заглавную и добавление точки в конце
+                m = TextCorrector(m,true,true,d_recv); // Исправление на первую заглавную и добавление точки в конце
             }
 
             o.map(function (h, i) {
@@ -1776,7 +1781,7 @@ textArea.addEventListener('input', () => {
                             break;
                         case ignore_temp_profile:
                             //console.log('ignore_temp_profile');
-                            if (ignorelist[i][0] == nickname && ignorelist[i][7] == country_iso  && uid === 0) {
+                            if (ignorelist[i][0] == nickname && ignorelist[i][7] == country_iso  && (uid == 0 || uid == undefined)) {
                                 SetVars(i);
                             }
                             break;
