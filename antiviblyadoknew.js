@@ -973,6 +973,8 @@ textArea.addEventListener('input', () => {
                 s = s.replace(/вроед/gi,'вроде');
                 s = s.replace(/вроед/gi,'вроде');
                 s = s.replace(/тчо/gi,'вроде');
+                s = s.replace(/из за/gi,'из-за');
+                s = s.replace(/корчое/gi,'короче');
                 //s = s.replace(/\) ?$|\\ ?$/gi,' :smile:');
 
                 var arrayOfStrings = s.split(/(#[^#:]+:|:[^:]+:|\. |\!|\?|\)|\()/); // Делим на предложения, ники, смайлы
@@ -1545,7 +1547,7 @@ textArea.addEventListener('input', () => {
 //            console.log('DOMNodeInserted2');
 
             var nickname = message.owner.nickname;
-            var profile = message.owner.info.profile.replace(/\/user\//,'');
+            var profile = (message.owner.info.profile != undefined ? profile = message.owner.info.profile.replace(/\/user\//,'') : profile = '');
             var mobile = message.owner.info.mobile; // с мобильного или нет
             var country = message.owner.info.country; // название страны
             var country_iso = message.owner.info.country_iso; // код страны
@@ -1564,7 +1566,7 @@ textArea.addEventListener('input', () => {
             var attached = message.attached; // прикреплённое что то ... проверить
             var is_author = message.owner.owner;
             var joinAt = message.owner.joinAt; // дата регистрации
-            var is_me = false; (message.owner.self !== true ? is_me = false : is_me = true);
+            var is_me = (message.owner.self !== true ? is_me = false : is_me = true);
 
             if (profile == '' && uid == '0' ) { is_temp = true }
 /*
@@ -1613,8 +1615,8 @@ textArea.addEventListener('input', () => {
                 //$($mms).html(t);
 
                 if (text.search("🐖") != -1 || text.search("🐷") != -1) { is_ukropitek = true };
-                if ((text.search("🤮") != -1 || text.search("😭") != -1 || text.search('😫') != -1 &&
-                    is_me == false)) { is_amoral = true } // || text.search('🥛') != -1
+                if ((text.search("🤮") != -1 || text.search("😭") != -1 || text.search('😫') != -1) &&
+                    is_me == false) { is_amoral = true } // || text.search('🥛') != -1
 
                 var now = new Date();
                 var ticks = now.getTime();
@@ -1754,33 +1756,33 @@ textArea.addEventListener('input', () => {
 
                     switch(ignorelist[i][2]) {
                         case ignore_nick_uid_country:
-                            //console.log('ignore_nick_uid_country');
-                            if ((ignorelist[i][0] == nickname || ignorelist[i][8] == uid) && uid !== 0) {
-                                SetVars(i);// удаление через ignore_time дней
+                            console.log('ignore_nick_uid_country');
+                            if ((ignorelist[i][0] == nickname || ignorelist[i][8] == uid) && uid > 0) {
+                                SetVars(i);
                             }
                             break;
                         case ignore_profile_uid_country:
                             //console.log('ignore_profile_uid_country');
-                            if ((ignorelist[i][1] == profile || ignorelist[i][8] == uid) && uid !== 0) {
-                                SetVars(i);// удаление через ignore_time дней
+                            if ((ignorelist[i][1] == profile || ignorelist[i][8] == uid) && uid > 0) {
+                                SetVars(i);
                             }
                             break;
                         case ignore_all_params:
                             //console.log('ignore_all_params');
                             //console.log(nickname);
-                            if ((ignorelist[i][2] == nickname || ignorelist[i][1] == profile || ignorelist[i][8] == uid) && uid !== 0) {
-                                SetVars(i);// удаление через ignore_time дней
+                            if ((ignorelist[i][0] == nickname || ignorelist[i][1] == profile || ignorelist[i][8] == uid) && (uid > 0)) {
+                                SetVars(i);
                             }
                             break;
                         case ignore_temp_profile:
                             //console.log('ignore_temp_profile');
-                            if (ignorelist[i][2] == nickname && ignorelist[i][7] == country_iso  && uid === 0) {
-                                SetVars(i);// удаление через ignore_time дней
+                            if (ignorelist[i][0] == nickname && ignorelist[i][7] == country_iso  && uid === 0) {
+                                SetVars(i);
                             }
                             break;
                         case ignore_permanent:
                             //console.log('ignore_permanent');
-                            if ((ignorelist[i][2] == nickname || ignorelist[i][1] == profile || ignorelist[i][8] == uid) && uid !== 0) {
+                            if ((ignorelist[i][0] == nickname || ignorelist[i][1] == profile || ignorelist[i][8] == uid) && uid > 0) {
                                 SetVars(i);
                             }
                             break;
@@ -1971,8 +1973,8 @@ textArea.addEventListener('input', () => {
                     }
                 }
 
-                if((is_spam == true && is_me == false && hide_spam == true) ||
-                   (is_amoral == true && is_me == false && for_author == false && hide_amoral == true)){
+                if((is_spam == true && is_me == false && is_author == false && hide_spam == true) ||
+                   (is_amoral == true && is_me == false && for_author == false && is_author == false && hide_amoral == true)){
                       if (hide_amoral == true && is_amoral == true) red = true;
                       element.remove();
                 }
@@ -2025,7 +2027,7 @@ textArea.addEventListener('input', () => {
                                 (for_author ? 'for_author:' : '') +
                                 (is_spam ? 'spam_found(' + antiSpamResult[0] + ')msg:' : '') + (is_amoral ? 'is_amoral:' : '') +
                                 (is_ukropitek ? 'is_ukropitek:' : '') + (is_restricted_country ? 'country_bl:' : '') +
-                                (is_in_ignorelist && !is_temp ? 'IGNORED(' + (
+                                (is_in_ignorelist && !is_temp && !is_me && !is_author ? 'IGNORED(' + (
                                  Math.ceil(Math.abs((ticks - ignore_date.getTime())) / (1000 * 3600 * 24))) +
                                 " д.(" + comment + ")):" : '') +
                                 ((is_in_ignorelist && is_temp) || is_in_ignorelist_nick ? 'IGNORED:' : '') +
