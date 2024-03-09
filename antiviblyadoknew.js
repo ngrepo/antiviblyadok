@@ -576,9 +576,10 @@ function messageDispather(data) {
                     console.log('banned =============================');
                     console.log(message);
                     console.log(userlist.get(message.response.clientId));
-                    console.log(('banned:(' + userlist.get(message.response.clientId) != undefined ? userlist.get(message.response.clientId).nickname + ':' +
+                    console.log('banned:(' + ((userlist.get(message.response.clientId) != undefined &&
+                                message.response.clientId != '') ? userlist.get(message.response.clientId).nickname + ':' +
                                 userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + ':' +
-                                userlist.get(message.response.clientId).info.uid : 'banned:("хз"' ) + '):text:(' +
+                                userlist.get(message.response.clientId).info.uid : '"хз"' ) + '):text:(' +
                                 message.response.text + ')');
                     break;
                 }
@@ -781,12 +782,12 @@ function updateUserList (message) {
                     console.log(userlist);
                 }
 */
-                if (userlist.size >= users_max * 3) {
+                if (userlist.size >= users_max * 5) {
                     console.log('userlist size:' + userlist.size);
                     //console.log(userlist);
                     let i = 0;
                     for (let key of userlist.keys()) {
-                        if (i <= users_max / 2) userlist.delete(key);
+                        if (i <= users_max / 4) userlist.delete(key);
                         i++;
                     }
                     console.log('userlist reduced, size:' + userlist.size);
@@ -1553,12 +1554,12 @@ textArea.addEventListener('input', () => {
 //            console.log('DOMNodeInserted2');
 
             var nickname = message.owner.nickname;
-            var profile = (message.owner.info.profile != undefined ? profile = message.owner.info.profile.replace(/\/user\//,'') : profile = '');
-            var mobile = message.owner.info.mobile; // с мобильного или нет
-            var country = message.owner.info.country; // название страны
-            var country_iso = message.owner.info.country_iso; // код страны
-            var city = message.owner.info.city; // город
-            var uid = message.owner.info.uid; // внутренний постоянный идентификатор профиля на блеваче
+            var profile = (message.owner.info.profile != undefined && message.owner.info.profile != '' ? profile = message.owner.info.profile.replace(/\/user\//,'') : profile = '');
+            var mobile = (message.owner.info.mobile != undefined ? mobile = message.owner.info.mobile : mobile = ''); // с мобильного или нет
+            var country = (message.owner.info.country != undefined ? country = message.owner.info.country : country = ''); // название страны
+            var country_iso = (message.owner.info.country_iso != undefined ? country_iso = message.owner.info.country_iso : country_iso = ''); // код страны
+            var city = (message.owner.info.city != undefined ? city = message.owner.info.city : city = ''); // город
+            var uid = (message.owner.info.uid != undefined ? uid = message.owner.info.uid : uid = 0); // внутренний постоянный идентификатор профиля на блеваче
             var sid = message.owner.sid; // хз что за идентификатор
             var user_id = message.owner_id; // в массиве с юзерами
             var is_moder = message.owner.moder; // смотрящий
@@ -1832,7 +1833,37 @@ textArea.addEventListener('input', () => {
                         if (message_to[c][0] == key || message_to[c][0] == "nick-not-found" ) {
 
                             function add(){
-                                nick_to_subjects += ((nick_to_subjects.length > 0) ? "|" + message_to[c][1] : message_to[c][1]);
+                                let ignorelist_match = '';
+
+                                if (message_to_ignored_nick == true) {
+                                    for(let i = 0; i < ignorelist.length; i++){
+                                        if (ignorelist[i] !== null && ignorelist[i] !== undefined) {
+                                            if (ignorelist[i][0] == data.nickname) { ignorelist_match = 'n' }
+                                            if (ignorelist[i][1] == data.info.profile.replace(/\/user\//,'') && ignorelist[i][1] != '')
+                                                ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'p';
+                                            if (ignorelist[i][8] == data.info.uid && ignorelist[i][8] != '0' && ignorelist[i][8] != '')
+                                                ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'u';
+
+                                            if (ignorelist_match.length > 0) {
+                                                if (ignorelist[i][7] == data.info.country_iso && ignorelist[i][7] != '' && ignorelist[i][7] != undefined)
+                                                ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'c';
+
+                                                ignorelist_match = ((ignorelist_match.length > 0) ? ignorelist_match = "{" + ignorelist_match + "}" : "");
+
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if (message_to_ignored_nick == true) {
+                                    nick_to_subjects += ((nick_to_subjects.length > 0) ? "|(" + message_to[c][1] + ignorelist_match + ")" :
+                                                         message_to[c][1] + ignorelist_match);
+
+                                } else {
+                                    nick_to_subjects += ((nick_to_subjects.length > 0) ? message_to[c][1] + ignorelist_match : message_to[c][1] + ignorelist_match);
+                                }
+
                                 if ( message_to[c][1] == nickname_self && message_to[c][0] == key &&
                                     (data.self !== true ? false : true)) { for_me = true }
                                     //console.log(author_nickname + ':' + data.info.nickname + ':' + author_profile + ':' + data.info.profile + ':' + data.owner);
