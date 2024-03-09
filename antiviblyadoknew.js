@@ -979,7 +979,7 @@ textArea.addEventListener('input', () => {
                 s = s.replace(/корчое/gi,'короче');
 
                 if (direction == d_send) {
-                    s = s.replace(/\) ?$|\\ ?$/gi,' :smile: ');
+//                    s = s.replace(/\) ?$|\\ ?$/gi,' :smile: ');
                 }
 
                 var arrayOfStrings = s.split(/(#[^#:]+:|:[^:]+:|\. |\!|\?|\)|\()/); // Делим на предложения, ники, смайлы
@@ -1205,9 +1205,9 @@ textArea.addEventListener('input', () => {
             m = m.replace(/^.*<img.*126359.*/, "🐖"); // хохлы
             m = m.replace(/^.*<img.*223972.*/, "🐖"); // хохлы
             m = m.replace(/^.*<img.*195311.*/, "🐖"); // хохлы
-            m = m.replace(/^.*<img.*126173.*/, "🐖"); // бриташка
-            m = m.replace(/^.*<img.*126401.*/, "🐖"); // бриташка
-            m = m.replace(/^.*<img.*126171.*/, "🐖"); // пиндошка
+            m = m.replace(/^.*<img.*126173.*/, "🤮"); // бриташка
+            m = m.replace(/^.*<img.*126401.*/, "🤮"); // бриташка
+            m = m.replace(/^.*<img.*126171.*/, "🤮"); // пиндошка
 
             m = m.replace(/^.*<img.*Ei_aaBHZgb9tueQMUzemVxdDvDh38zvhtt5OsW2US4l.*/, "🤮"); // мерзость
             m = m.replace(/^.*<img.*HQrqpmNxtC6HsUorlq5TaeUC2l8N8HoMcuZiJOu9.*/, "🤮"); // мерзость
@@ -1215,10 +1215,10 @@ textArea.addEventListener('input', () => {
             // не учитываем символы в никах:
             let no_span_tag = m.replace(/<span[^<>]+>[^<>]+<\/span>/i,''); let tm;
             tm = no_span_tag.replace(/^.*🇺🇦.*/, "🐖"); if (tm != no_span_tag) { m = tm }
-            tm = no_span_tag.replace(/^.*🇬🇧.*/, "🐖"); if (tm != no_span_tag) { m = tm }
-            tm = no_span_tag.replace(/^.*🇺🇸.*/, "🐖"); if (tm != no_span_tag) { m = tm }
+            tm = no_span_tag.replace(/^.*🇬🇧.*/, "🤮"); if (tm != no_span_tag) { m = tm }
+            tm = no_span_tag.replace(/^.*🇺🇸.*/, "🤮"); if (tm != no_span_tag) { m = tm }
             tm = no_span_tag.replace(/^.*🏳‍🌈.*/, "🐔"); if (tm != no_span_tag) { m = tm }
-            tm = no_span_tag.replace(/.*(і|ї).*/, "🐖"); if (tm != no_span_tag) { m = tm }
+            tm = no_span_tag.replace(/.*(і|ї).*/, "🐷"); if (tm != no_span_tag) { m = tm }
 
 //🐷🐖🐔🐓🐗🪓🔪
 //:134477: - антинацист
@@ -1517,6 +1517,7 @@ textArea.addEventListener('input', () => {
             var div_chat_mess_count = 0;
 
             var is_ukropitek = false;
+            var is_hohloflag = false;
             var is_amoral = false;
             var is_spam = false;
             var is_restricted_country = false;
@@ -1619,7 +1620,9 @@ textArea.addEventListener('input', () => {
 
                 //$($mms).html(t);
 
-                if (text.search("🐖") != -1 || text.search("🐷") != -1) { is_ukropitek = true };
+                if (text.search("🐖") != -1) { is_hohloflag = true };
+                if (text.search("🐷") != -1) { is_ukropitek = true };
+                if (text.search('🥛') != -1) { is_amoral = true }
                 if ((text.search("🤮") != -1 || text.search("😭") != -1 || text.search('😫') != -1) &&
                     is_me == false) { is_amoral = true } // || text.search('🥛') != -1
 
@@ -1762,32 +1765,32 @@ textArea.addEventListener('input', () => {
                     switch(ignorelist[i][2]) {
                         case ignore_nick_uid_country:
                             console.log('ignore_nick_uid_country');
-                            if ((ignorelist[i][0] == nickname || ignorelist[i][8] == uid) && uid > 0) {
+                            if (ignorelist[i][0] == nickname || (ignorelist[i][8] == uid && uid > 0)) {
                                 SetVars(i);
                             }
                             break;
                         case ignore_profile_uid_country:
                             //console.log('ignore_profile_uid_country');
-                            if ((ignorelist[i][1] == profile || ignorelist[i][8] == uid) && uid > 0) {
+                            if (ignorelist[i][1] == profile || (ignorelist[i][8] == uid && uid > 0)) {
                                 SetVars(i);
                             }
                             break;
                         case ignore_all_params:
                             //console.log('ignore_all_params');
                             //console.log(nickname);
-                            if ((ignorelist[i][0] == nickname || ignorelist[i][1] == profile || ignorelist[i][8] == uid) && (uid > 0)) {
+                            if (ignorelist[i][0] == nickname || ignorelist[i][1] == profile || (ignorelist[i][8] == uid && uid > 0)) {
                                 SetVars(i);
                             }
                             break;
                         case ignore_temp_profile:
                             //console.log('ignore_temp_profile');
-                            if (ignorelist[i][0] == nickname && ignorelist[i][7] == country_iso  && (uid == 0 || uid == undefined)) {
+                            if (ignorelist[i][0] == nickname && ignorelist[i][7] == country_iso && (uid == 0 || uid == undefined || uid == '')) {
                                 SetVars(i);
                             }
                             break;
                         case ignore_permanent:
                             //console.log('ignore_permanent');
-                            if ((ignorelist[i][0] == nickname || ignorelist[i][1] == profile || ignorelist[i][8] == uid) && uid > 0) {
+                            if (ignorelist[i][0] == nickname || ignorelist[i][1] == profile || (ignorelist[i][8] == uid && uid > 0)) {
                                 SetVars(i);
                             }
                             break;
@@ -1940,10 +1943,12 @@ textArea.addEventListener('input', () => {
 //console.log("profile: " + profile);
 
                     if (exists == false) {
-                        if ( (is_spam == true && antiSpamResult[0] > 3 && is_ukropitek == true ) && is_temp == false ){
+                        if ( (is_spam == true && antiSpamResult[0] > 3 && (is_ukropitek == true || is_hohloflag == true) ) && is_temp == false ){
                             ignorelist.push([nickname,profile,ignore_profile_uid_country,date.getTime(),date.getTime(),0,
                             (is_spam ? 'is_spam(' + antiSpamResult[0] + ")" : '') +
-                            (is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') + " - автобан на " +
+                            (is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') +
+                            (is_hohloflag ? 'is_hohloflag(' + antiSpamResult[0] + ")" : '') +
+                            " - автобан на " +
                             ignore_time / 86400000 + " дней",country_iso,uid,0,0]);
                             added_to_ignore == true;
                             console.log("added to ignore: " + nickname + "|" + profile + "|" + uid + ": на " +
@@ -1953,11 +1958,11 @@ textArea.addEventListener('input', () => {
                         }
 
                         if ( (is_spam == true && antiSpamResult[0] > 4) && is_temp == true ){
-                            ignorelist.push([nickname,profile,ignore_temp_profile,date.getTime(),date.getTime(),0,
-                            (is_spam ? 'is_spam(' + antiSpamResult[0] + ")" : '') +
-                            (is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') + ' - автобан на 1 день',country_iso,uid,0,0]);
-                            added_to_ignore == true;
-                            console.log("added to ignore: " + nickname + "|" + profile + "|" + uid + ": на 1 день по логину и нику");
+                            //ignorelist.push([nickname,profile,ignore_temp_profile,date.getTime(),date.getTime(),0,
+                            //(is_spam ? 'is_spam(' + antiSpamResult[0] + ")" : '') +
+                            //(is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') + ' - автобан на 1 день',country_iso,uid,0,0]);
+                            //added_to_ignore == true;
+                            //console.log("added to ignore: " + nickname + "|" + profile + "|" + uid + ": на 1 день по логину и нику");
                             //SaveData();
                             //console.log(ignorelist);
                         }
@@ -1970,7 +1975,7 @@ textArea.addEventListener('input', () => {
                    (message_to_ignored_nick == true && for_author == false && for_me == false) ||
                    (is_temp == true && hide_temp_profile == true) ||
                    (is_restricted_country == true && hide_countries == true) ||
-                   (is_ukropitek == true && hide_ukropitek == true)){
+                   ((is_ukropitek == true || is_hohloflag == true) && hide_ukropitek == true)){
                     if(is_me == false && is_author == false) {
 
                       red = true;
@@ -1996,7 +2001,7 @@ textArea.addEventListener('input', () => {
                         color = "orange";
                     } else if (is_author == true) {
                         color = "purple";
-                    } else if (is_ukropitek == true) {
+                    } else if (is_ukropitek == true || is_hohloflag == true) {
                         color = "Yellow"; //Brown
                     } else if (is_amoral == true) {
                         color = "Grey";
@@ -2026,13 +2031,14 @@ textArea.addEventListener('input', () => {
                                 'il' + "=" + ignorelist.length + ":" + "sa=" + SpamArray.length + ":" +
                                 (mobile ? 'phone:' : '') +
                                 (is_temp ? 'is_temp:' : '') + (is_author ? 'is_author:' : '') +
-                                (is_moder ? 'room_moder:' : '') + (is_moderator ? 'site_moder:' : '') +
-                                (is_admin ? 'site_admin:' : '') +
+                                (is_moder ? 'is_room_moder:' : '') + (is_moderator ? 'is_site_moder:' : '') +
+                                (is_admin ? 'is_site_admin:' : '') +
                                 (is_me ? 'is_me:' : '') + (for_me ? 'for_me:' : '') +
                                 (for_author ? 'for_author:' : '') +
                                 (is_spam ? 'spam_found(' + antiSpamResult[0] + ')msg:' : '') + (is_amoral ? 'is_amoral:' : '') +
-                                (is_ukropitek ? 'is_ukropitek:' : '') + (is_restricted_country ? 'country_bl:' : '') +
-                                (is_in_ignorelist && !is_temp && !is_me && !is_author ? 'IGNORED(' + (
+                                (is_hohloflag ? 'is_hohloflag:' : '') + (is_ukropitek ? 'is_ukropitek:' : '') +
+                                (is_restricted_country ? 'country_bl:' : '') +
+                                (is_in_ignorelist && !is_temp && !is_me && !is_author && !is_in_ignorelist_nick ? 'IGNORED(' + (
                                  Math.ceil(Math.abs((ticks - ignore_date.getTime())) / (1000 * 3600 * 24))) +
                                 " д.(" + comment + ")):" : '') +
                                 ((is_in_ignorelist && is_temp) || is_in_ignorelist_nick ? 'IGNORED:' : '') +
