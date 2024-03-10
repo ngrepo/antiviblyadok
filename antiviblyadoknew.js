@@ -426,6 +426,7 @@ const ignore_permanent = 4;
     console.log(self);
     console.log(country);
 */
+
     if (id === null) { return } // для только что забаненных в чате, проверить ещё это
     if (owner == true) {
         alert('Нельзя добавить в игнор автора!');
@@ -448,7 +449,7 @@ const ignore_permanent = 4;
 
         if (mode != -1) {
                     for(let i = 0; i < ignorelist.length; i++) {
-                        if (ignorelist[i] !== null) {
+                        if (ignorelist[i] != undefined) {
                             if ((ignorelist[i][0] == nickname && ignorelist[i][1] == profile) ||
                                  (ignorelist[i][0] == nickname && ignorelist[i][1] == '')) { exists = true }
                         }
@@ -467,10 +468,21 @@ const ignore_permanent = 4;
                             ignorelist.push([nickname,profile,ignore_all_params,date.getTime(),date.getTime(),0,comment,country,uid,0,0]);
                             console.log("added to ignore using button: " + nickname + "|" + profile + "|" + uid + ": на " +
                                         ignore_time / 86400000 + " дней по логину");
+                            //console.log(nickname);
                             //console.log(ignorelist);
                             SaveData();
                         }
                     }
+
+            let useritem;
+
+            document.querySelectorAll('.mess-row').forEach(function (userItem) { // снести все сообщения из чата заигноренного
+                useritem = msglist.get(userItem.getAttribute('data-id')).owner;
+                //console.log(useritem.nickname + "|" + nickname + ":" + useritem.info.profile + "|/user/" + profile + ":" + useritem.info.uid + "|" + uid );
+                if (useritem.nickname == nickname && useritem.info.profile == ("/user/" + profile) && useritem.info.uid == uid ) {
+                    userItem.remove();
+                }
+           });
 
         element.remove();
         }
@@ -499,7 +511,7 @@ if (BtnOnOff.value == 'Выкл'){
                  (AntiviblyadokEnabled ? color = 'Green' : color = 'Red')) ;
 }
 
-function RemoveFromIgnore(nickname,profile,uid)
+function RemoveFromIgnore(nickname,profile,uid,savedata)
 {
     let args = '';
     let counter = 0;
@@ -507,7 +519,7 @@ function RemoveFromIgnore(nickname,profile,uid)
     function rem(array,index){
         array[index] = undefined;
         counter += 1;
-        save();
+        if (savedata !== false) save();
     }
 
     if (nickname != undefined && nickname != '') { args += 'n' }
@@ -545,10 +557,10 @@ function RemoveFromIgnore(nickname,profile,uid)
                 if (ignorelist[i][8] == uid && ignorelist[i][8] != '') rem(ignorelist,i);
                 break;
             default:
-                console.log("Syntax: remove('nickname','profile','uid')");
+                console.log("Syntax: remove('nickname','profile','uid',false)");
                 console.log("Example: remove('nickname','profile','uid')");
                 console.log("Example: remove('nickname','profile')");
-                console.log("Example: remove('','','uid')");
+                console.log("Example: remove('','','uid',false)");
                 return 'No args found';
                 break;
         }
