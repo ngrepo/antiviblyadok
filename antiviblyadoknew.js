@@ -366,6 +366,7 @@ console.log(ignorelist_temp);
 //var MsgClickFunc = function MsgClick(e) {
 function MsgClick(e) {
     var element = e.parentElement;
+    if (element == undefined) return;
     var ServiceTag = e.parentElement.getElementsByClassName("service-tag")[0];
     var TextBody = e.parentElement.getElementsByClassName("text-body")[0];
 
@@ -498,9 +499,68 @@ if (BtnOnOff.value == 'Выкл'){
                  (AntiviblyadokEnabled ? color = 'Green' : color = 'Red')) ;
 }
 
+function RemoveFromIgnore(nickname,profile,uid)
+{
+    let args = '';
+    let counter = 0;
+
+    function rem(array,index){
+        array[index] = undefined;
+        counter += 1;
+        save();
+    }
+
+    if (nickname != undefined && nickname != '') { args += 'n' }
+    if (profile != undefined  && profile != '')  { args += 'p' }
+    if (uid != undefined      && uid != '')      { args += 'u' }
+
+    for(let i = 0; i < ignorelist.length; i++) {
+        if (ignorelist[i] == undefined) { continue }
+
+        switch (args) {
+            case 'npu':
+                if ((ignorelist[i][8] == uid && ignorelist[i][8] != '') &&
+                    (ignorelist[i][1] == profile && ignorelist[i][1] != '')
+                    && (ignorelist[i][0] == nickname && ignorelist[i][0] != '')) rem(ignorelist,i);
+                break;
+            case 'np':
+                if ((ignorelist[i][1] == profile && ignorelist[i][1] != '')
+                    && (ignorelist[i][0] == nickname && ignorelist[i][0] != '')) rem(ignorelist,i);
+                break;
+            case 'pu':
+                if ((ignorelist[i][8] == uid && ignorelist[i][8] != '') &&
+                    (ignorelist[i][1] == profile && ignorelist[i][1] != '')) rem(ignorelist,i);
+                break;
+            case 'nu':
+                if ((ignorelist[i][8] == uid && ignorelist[i][8] != '') &&
+                    (ignorelist[i][0] == nickname && ignorelist[i][0] != '')) rem(ignorelist,i);
+                break;
+            case 'n':
+                if (ignorelist[i][0] == nickname && ignorelist[i][0] != '') rem(ignorelist,i);
+                break;
+            case 'p':
+                if (ignorelist[i][1] == profile && ignorelist[i][1] != '') rem(ignorelist,i);
+                break;
+            case 'u':
+                if (ignorelist[i][8] == uid && ignorelist[i][8] != '') rem(ignorelist,i);
+                break;
+            default:
+                console.log("Syntax: remove('nickname','profile','uid')");
+                console.log("Example: remove('nickname','profile','uid')");
+                console.log("Example: remove('nickname','profile')");
+                console.log("Example: remove('','','uid')");
+                return 'No args found';
+                break;
+        }
+    }
+    if (counter > 0) { return counter + ' element' + (counter > 1 ? 's ' : ' ') + 'removed' } else { return 'Element(s) not found' }
+}
+
 exportFunction(AddToIgnoreList, unsafeWindow, { defineAs: "AddToIgnoreList" });
 exportFunction(MsgClick, unsafeWindow, { defineAs: "MsgClick" });
 exportFunction(OnOffFilter, unsafeWindow, { defineAs: "OnOffFilter" });
+exportFunction(RemoveFromIgnore, unsafeWindow, { defineAs: "remove" });
+exportFunction(SaveData, unsafeWindow, { defineAs: "save" });
 
 //const JS123 = `
 //`;
@@ -1310,6 +1370,7 @@ textArea.addEventListener('input', () => {
                 '.*мил(о|а)стын.*': '😭',
                 '.*бездомн.*': '😭',
                 '.*на зон(у|а|ы|е).*': '😭',
+                '.*з(э|е)к(у|а|и).*': '😭',
                 '.*тюрьм.*': '😭',
                 '.*как в хату входить.*': '😭',
                 '.*зону топтал.*': '😭',
@@ -1825,6 +1886,10 @@ textArea.addEventListener('input', () => {
                     //console.log("%c" + nickname + " to " + message_to.join('|'),'background: LemonChiffon;color: red');
                 }
 
+function CheckInIgnoreList(nickname,profile,uid,country) {
+
+}
+
                 for (let key of userlist.keys()) {
                     let data = userlist.get(key);
                     let temp_profile = false; if (data.info.uid == '0') { temp_profile = true }
@@ -1835,34 +1900,31 @@ textArea.addEventListener('input', () => {
                             function add(){
                                 let ignorelist_match = '';
 
-                                if (message_to_ignored_nick == true) {
+                                if (message_to_ignored_nick == true && is_temp == false) {
                                     for(let i = 0; i < ignorelist.length; i++){
                                         if (ignorelist[i] !== null && ignorelist[i] !== undefined) {
-                                            if (ignorelist[i][0] == data.nickname) { ignorelist_match = 'n' }
-                                            if (ignorelist[i][1] == data.info.profile.replace(/\/user\//,'') && ignorelist[i][1] != '')
-                                                ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'p';
-                                            if (ignorelist[i][8] == data.info.uid && ignorelist[i][8] != '0' && ignorelist[i][8] != '')
-                                                ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'u';
+                                            if (ignorelist[i][0] == data.nickname && ignorelist_match.indexOf('n') == -1) { ignorelist_match = 'n' }
+                                            if (ignorelist[i][1] == data.info.profile.replace(/\/user\//,'') && ignorelist[i][1] != '' &&
+                                                ignorelist_match.indexOf('p') == -1) ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'p';
+                                            if (ignorelist[i][8] == data.info.uid && ignorelist[i][8] != '0' && ignorelist[i][8] != '' &&
+                                                ignorelist_match.indexOf('u') == -1) ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'u';
 
-                                            if (ignorelist_match.length > 0) {
+                                            if (ignorelist_match.length > 0 && ignorelist_match.indexOf('c') == -1) {
                                                 if (ignorelist[i][7] == data.info.country_iso && ignorelist[i][7] != '' && ignorelist[i][7] != undefined)
-                                                ignorelist_match += ((ignorelist_match.length > 0) ? "|" : "") + 'c';
-
-                                                ignorelist_match = ((ignorelist_match.length > 0) ? ignorelist_match = "{" + ignorelist_match + "}" : "");
-
-                                                break;
+                                                { ignorelist_match += "|c"; }
                                             }
                                         }
                                     }
                                 }
 
-                                if (message_to_ignored_nick == true) {
-                                    nick_to_subjects += ((nick_to_subjects.length > 0) ? "|(" + message_to[c][1] + ignorelist_match + ")" :
+                                ignorelist_match = ((ignorelist_match.length > 0) ? ignorelist_match = "{" + ignorelist_match + "}" : "");
+                                //if (message_to_ignored_nick == true && is_temp == false) {
+                                    nick_to_subjects += ((nick_to_subjects.length > 0) ? "|" + message_to[c][1] + ignorelist_match:
                                                          message_to[c][1] + ignorelist_match);
 
-                                } else {
-                                    nick_to_subjects += ((nick_to_subjects.length > 0) ? message_to[c][1] + ignorelist_match : message_to[c][1] + ignorelist_match);
-                                }
+                                //} else {
+                                //    nick_to_subjects += ((nick_to_subjects.length > 0) ? "|" + message_to[c][1] + ignorelist_match : message_to[c][1] + ignorelist_match);
+                                //}
 
                                 if ( message_to[c][1] == nickname_self && message_to[c][0] == key &&
                                     (data.self !== true ? false : true)) { for_me = true }
@@ -1899,17 +1961,7 @@ textArea.addEventListener('input', () => {
                        // console.log('%cdata.info.uid:' + data.info.uid,'background: LemonChiffon;color: red');
                        // console.log('%chide_in_message:' + hide_in_message,'background: LemonChiffon;color: red');
                        // console.log('%chide_temp_profile:' + hide_temp_profile,'background: LemonChiffon;color: red');
-/*
-                    if (hide_in_message == true && hide_temp_profile == true && temp_profile == true) {
-                        reg = new RegExp("<span[^<>]+>" + escapeRegExp(escapeHtml(data.nickname)) + "</span>");
-//console.log(escapeRegExp(escapeHtml(data.nickname)) + "|" + text);
-                        if (text.search(reg) != -1) {
-                            message_to_ignored_nick = true;
-                            if (message_to.length < 1) { break; }
-                        };
-//console.log(message_to_ignored_nick);
-                    }
-*/
+
                 }
 
                 for(let i = 0; i < ignorelist_nick.length; i++){
@@ -1962,7 +2014,7 @@ textArea.addEventListener('input', () => {
 //const ignore_permanent = 4;
 //=====================================================
 
-                        if (ignorelist[i] !== null) {
+                        if (ignorelist[i] != undefined) {
                             if (ignorelist[i][1] != '') {
                                 if (ignorelist[i][0] == nickname && ignorelist[i][1] == profile) { exists = true }
                             } else {
