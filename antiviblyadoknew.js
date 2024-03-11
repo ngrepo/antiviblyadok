@@ -173,6 +173,8 @@ var Scrpt = create("div",ScrptContent);
 	document.getElementById('content').appendChild(Scrpt); */
         var AntiviblyadokEnabled = true;
 
+        var url = window.location.href;
+
         var userlist = new Map();
         var msglist = new Map();
         var users_max = 0;
@@ -183,7 +185,13 @@ var Scrpt = create("div",ScrptContent);
 
         var ignorelist_nick = ['Поменяйте ник','Поменяйтe ник'];
 
-        var ignorelist_stream = [['Психея','m94794'],['KISS ME','KatyaLeto']];
+        var ignorelist_stream = [['Психея','m94794','наставил выблядков в модерасты'],
+                                 ['KISS ME','KatyaLeto','чмо, кидает в чёрный список'],
+                                 ['TiVi','tivi','шлак'],
+                                 ['✅ᗫoᏰᏒo','Nevskiy','шлак'],
+                                 ['ВероНика','rfgecnf','шлак'],
+                                 ['Брюня','jovtoblakitna','хохлопидорша, кидает в чёрный список'],
+                                 ['$$$ Капитан Америка $$$','vaso12345','пиндос']];
 
         var author_user_id;
         var author_nickname;
@@ -704,8 +712,9 @@ function messageDispather(data) {
                     break;
                 }
                 case 'streamsListUpdate': {
-                    console.log('streamsListUpdate =========================');
-                    console.log(message);
+                    //console.log('streamsListUpdate =========================');
+                    //console.log(message);
+                    filterStreams();
                     break;
                 }
                 case 'likeMe': {
@@ -901,6 +910,8 @@ function chatMessage(message) {
 }
 
 function filterStreams() {
+    if ( url == 'https://livacha.com/') {
+
     let element;
     let nickname;
     let profile;
@@ -910,18 +921,23 @@ function filterStreams() {
         elements.forEach(function (userItem) {
             element = userItem.querySelector("a");
             if (element != undefined) {
-                nickname = element.title;
-                profile = element.href.replace(/.*\/user\//,'');
-                element_row = element.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
 
+                nickname = element.innerHTML.replace(/^\s+/,'').replace(/\s+$/,'');
+                profile = element.href.replace(/.*\/user\//,'');
+                //console.log(element);
                 for(let i = 0; i < ignorelist_stream.length; i++){
                     if (ignorelist_stream[i][0] == nickname || ignorelist_stream[i][1] == profile) {
-                        console.log(ignorelist_stream[i][0] + "|" + nickname + "|" + ignorelist_stream[i][1] + "|" + profile + ": stream of user hidden");
-                        element_row.remove();
+                        console.log(ignorelist_stream[i][0] + "|" + nickname + "|" + ignorelist_stream[i][1] + "|" + profile + ": stream of user is hidden");
+                        //userItem.remove();
+                        userItem.innerHTML = '';
                     }
                 }
+            } else {
+                //userItem.remove();
+                userItem.innerHTML = '';
             }
         });
+    }
 }
 
 window.addEventListener('beforeunload', function(event) {
@@ -988,7 +1004,8 @@ window.addEventListener('beforeunload', function(event) {
 
     filterStreams();
 
-    document.querySelector("div.chat-messages").addEventListener('DOMNodeRemoved', function (e) {
+    if ( url.indexOf('https://livacha.com/chat/') != -1 ) {
+      document.querySelector("div.chat-messages").addEventListener('DOMNodeRemoved', function (e) {
         var element = e.target;
 
         if (typeof element === 'object' && element !== null && 'getAttribute' in element) {
@@ -1019,7 +1036,8 @@ window.addEventListener('beforeunload', function(event) {
                 }
             }
         }
-    });
+      });
+    }
 
     Antiviblyadok.prototype.initialize = function () {
        // exportFunction(messageDispatcher, unsafeWindow, { defineAs: "messageDispatcher" });
@@ -1134,8 +1152,6 @@ textArea.addEventListener('input', () => {
                 }
             } else { return undefined }
         }
-
-        var url = window.location.href;
 /*
         if ( url.indexOf('https://livacha.com/post/') != -1 ) {
 
@@ -1248,44 +1264,6 @@ textArea.addEventListener('input', () => {
            });
 
         }
-
-
-/*
-
-//       $('.app-form-wrapper .submit').click(function(){
-//  var str = "ID:" + $(this).attr('id');
-//  var val = $(this).attr('data-param');
-//  str = str + " PARAM: " + val;
-//  val++;
-//  $(this).attr('data-param', val);
-//                alert('test');
-//        });
-
-        $('div.textarea-wrapper').on('input','textarea',function (e) {
-            const autocorrect_enabled = true; if (autocorrect_enabled == false) { return }
-
-            var element = e.target;
-
-            var arrayOfStrings = element.value.split(/(\.|!|\?)/); // Делим на предложения
-            //console.log(arrayOfStrings);
-
-			for(var c = 0; c < arrayOfStrings.length; c++){
-
-            let match_value = arrayOfStrings[c].match(/[^<>/\d\[\]\s:,;\.\-\!\?]+/);
-                //console.log(match_value);
-                if (match_value !== null) { // Делаем первую букву заглавной
-                    if (match_value[0] == '') { return }
-                    let str = match_value[0];
-                    //str = str.toLowerCase(); arrayOfStrings[c] = arrayOfStrings[c].toLowerCase(); // Полный антикапс
-                    str = str.replace(str[0], str[0].toUpperCase());
-                    //console.log(str);
-                    arrayOfStrings[c] = arrayOfStrings[c].replace(str.toLowerCase(),str);
-                }
-            }
-            element.value = arrayOfStrings.join(''); // Соединяем обратно
-            //console.log(arrayOfStrings);
-        });
-*/
 
 /*==================================================================================*/
         function antiCapsMat(m) {
@@ -1580,6 +1558,8 @@ textArea.addEventListener('input', () => {
         }
 
 /*==================================================================================*/
+        if ( url.indexOf('https://livacha.com/chat/') != -1 ) {
+
         const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
         $("div.chat-messages").bind('DOMNodeInserted', function (e) {
@@ -2180,6 +2160,7 @@ function CheckInIgnoreList(nickname,profile,uid,country) {
                                 ,(for_me ? 'background: LemonChiffon;' : '') + 'color: ' + color);
 
         });
+        }
     }
 
     var Antiviblyadok = new Antiviblyadok();
