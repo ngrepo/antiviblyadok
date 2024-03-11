@@ -180,6 +180,11 @@ var Scrpt = create("div",ScrptContent);
         const ignore_time = 86400000 * 1195 // время игнора в днях 1195 - 3 года, 86400000 - 1 день
 
         var ignorelist = new Array(); // '','',0,0,0
+
+        var ignorelist_nick = ['Поменяйте ник','Поменяйтe ник'];
+
+        var ignorelist_stream = [['Психея','m94794'],['KISS ME','KatyaLeto']];
+
         var author_user_id;
         var author_nickname;
         var author_profile;
@@ -478,9 +483,11 @@ const ignore_permanent = 4;
 
             document.querySelectorAll('.mess-row').forEach(function (userItem) { // снести все сообщения из чата заигноренного
                 useritem = msglist.get(userItem.getAttribute('data-id')).owner;
-                //console.log(useritem.nickname + "|" + nickname + ":" + useritem.info.profile + "|/user/" + profile + ":" + useritem.info.uid + "|" + uid );
-                if (useritem.nickname == nickname && useritem.info.profile == ("/user/" + profile) && useritem.info.uid == uid ) {
-                    userItem.remove();
+                //console.log(useritem.nickname + "|" + nickname + ":" + useritem.info.profile +"|/user/" + profile + ":" + useritem.info.uid + "|" + uid );
+                if (useritem != undefined) {
+                    if (useritem.nickname == nickname && useritem.info.profile == ("/user/" + profile) && useritem.info.uid == uid ) {
+                        userItem.remove();
+                    }
                 }
            });
 
@@ -519,12 +526,14 @@ function RemoveFromIgnore(nickname,profile,uid,savedata)
     function rem(array,index){
         array[index] = undefined;
         counter += 1;
+//        if ((nickname !== false && nickname != undefined) || (profile !== false && profile != undefined) ||
+//            (uid !== false && uid != undefined) || (savedata !== false && savedata != undefined)) save();
         if (savedata !== false) save();
     }
 
-    if (nickname != undefined && nickname != '') { args += 'n' }
-    if (profile != undefined  && profile != '')  { args += 'p' }
-    if (uid != undefined      && uid != '')      { args += 'u' }
+    if (nickname != undefined && nickname != '' && nickname !== false ) { args += 'n' }
+    if (profile != undefined  && profile != '' &&  profile !== false )  { args += 'p' }
+    if (uid != undefined      && uid != '' && uid !== false)      { args += 'u' }
 
     for(let i = 0; i < ignorelist.length; i++) {
         if (ignorelist[i] == undefined) { continue }
@@ -557,7 +566,7 @@ function RemoveFromIgnore(nickname,profile,uid,savedata)
                 if (ignorelist[i][8] == uid && ignorelist[i][8] != '') rem(ignorelist,i);
                 break;
             default:
-                console.log("Syntax: remove('nickname','profile','uid',false)");
+                console.log("Syntax: remove('nickname','profile','uid',savedata)");
                 console.log("Example: remove('nickname','profile','uid')");
                 console.log("Example: remove('nickname','profile')");
                 console.log("Example: remove('','','uid',false)");
@@ -685,8 +694,8 @@ function messageDispather(data) {
                     break;
                 }
                 case 'streamsUpdate': {
-//                    console.log('streamsUpdate =============================');
-//                    console.log(message);
+                    //console.log('streamsUpdate =============================');
+                    //console.log(message);
                     break;
                 }
                 case 'streamOff': {
@@ -695,7 +704,8 @@ function messageDispather(data) {
                     break;
                 }
                 case 'streamsListUpdate': {
-                    //console.log('streamsListUpdate =========================');
+                    console.log('streamsListUpdate =========================');
+                    console.log(message);
                     break;
                 }
                 case 'likeMe': {
@@ -890,6 +900,30 @@ function chatMessage(message) {
     //console.log('added to msglist');
 }
 
+function filterStreams() {
+    let element;
+    let nickname;
+    let profile;
+    let element_row;
+
+    let elements = document.querySelector("div.app-list, div.list-stream").querySelector("div.row").childNodes;
+        elements.forEach(function (userItem) {
+            element = userItem.querySelector("a");
+            if (element != undefined) {
+                nickname = element.title;
+                profile = element.href.replace(/.*\/user\//,'');
+                element_row = element.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode.parentNode;
+
+                for(let i = 0; i < ignorelist_stream.length; i++){
+                    if (ignorelist_stream[i][0] == nickname || ignorelist_stream[i][1] == profile) {
+                        console.log(ignorelist_stream[i][0] + "|" + nickname + "|" + ignorelist_stream[i][1] + "|" + profile + ": stream of user hidden");
+                        element_row.remove();
+                    }
+                }
+            }
+        });
+}
+
 window.addEventListener('beforeunload', function(event) {
                     // [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time [5] counter [6] comment [7] country
                     // [2] instruction: 0: блокировать по нику; 1: блокировать по логину; 2: блокировать по логину и нику;
@@ -939,7 +973,8 @@ window.addEventListener('beforeunload', function(event) {
         }
     }
 
-document.addEventListener("DOMContentLoaded", function(event) {
+    document.addEventListener("DOMContentLoaded", function(event) {
+
         function Antiviblyadok() {
             this.version = localStorage.getItem('tr-ver') != undefined ? localStorage.getItem('tr-ver') : "0.0.3";
 
@@ -948,7 +983,10 @@ document.addEventListener("DOMContentLoaded", function(event) {
                     ignorelist = JSON.parse(window.localStorage.getItem('ignorelist'));
                 }
             }
+
         }
+
+    filterStreams();
 
     document.querySelector("div.chat-messages").addEventListener('DOMNodeRemoved', function (e) {
         var element = e.target;
@@ -1248,9 +1286,6 @@ textArea.addEventListener('input', () => {
             //console.log(arrayOfStrings);
         });
 */
-        var ignorelist_nick = ['Поменяйте ник','Поменяйтe ник']
-//        var ignorelist_nick = []
-                               //,'panic..don&#039;t','don&amp;#039;t panic..','don&amp;#039;t worry..'];
 
 /*==================================================================================*/
         function antiCapsMat(m) {
@@ -1792,9 +1827,7 @@ textArea.addEventListener('input', () => {
                         }
                         if (ignorelist[i][1] != profile && ignorelist[i][2] == ignore_nick_uid_country) {
                             ignorelist[i][1] = profile;
-                            //ignorelist[i][0] = nickname;
                             ignorelist_match_n += ((ignorelist_match_n.length > 0) ? "|" : "") + 'p';
-                            //ignorelist_match_n += ((ignorelist_match_n.length > 0) ? "|" : "") + 'n';
                         }
                         if (ignorelist[i][7] != country_iso && (ignorelist[i][1] == profile ||
                             (ignorelist[i][8] == uid && ignorelist[i][8] != ''))) {
