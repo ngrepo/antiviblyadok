@@ -185,13 +185,14 @@ var Scrpt = create("div",ScrptContent);
 
         var ignorelist_nick = ['Поменяйте ник','Поменяйтe ник'];
 
-        var ignorelist_stream = [['Психея','m94794','наставил выблядков в модерасты'],
+        var ignorelist_stream = [['Психея','m94794','наставила выблядков в модерасты'],
                                  ['KISS ME','KatyaLeto','чмо, кидает в чёрный список'],
                                  ['TiVi','tivi','шлак'],
                                  ['✅ᗫoᏰᏒo','Nevskiy','шлак'],
                                  ['ВероНика','rfgecnf','шлак'],
                                  ['Брюня','jovtoblakitna','хохлопидорша, кидает в чёрный список'],
-                                 ['$$$ Капитан Америка $$$','vaso12345','пиндос']];
+                                 ['$$$ Капитан Америка $$$','vaso12345','пиндосское уг']
+                                ];
 
         var author_user_id;
         var author_nickname;
@@ -916,24 +917,30 @@ function filterStreams() {
     let nickname;
     let profile;
     let element_row;
+    let locked;
 
     let elements = document.querySelector("div.app-list, div.list-stream").querySelector("div.row").childNodes;
         elements.forEach(function (userItem) {
-            element = userItem.querySelector("a");
-            if (element != undefined) {
 
-                nickname = element.innerHTML.replace(/^\s+/,'').replace(/\s+$/,'');
+            locked = (userItem.querySelector("i.fa-lock, i.text-danger") != undefined); // скрыть запороленные шлюх и дрочил
+            if (locked == true) {
+                userItem.innerHTML = '';
+            } else {
+                element = userItem.querySelector("a");
+            }
+
+            if (element != undefined && locked == false) {
+
+                nickname = element.innerHTML.replace(/^\s+|\s+$/g,'');
                 profile = element.href.replace(/.*\/user\//,'');
                 //console.log(element);
                 for(let i = 0; i < ignorelist_stream.length; i++){
                     if (ignorelist_stream[i][0] == nickname || ignorelist_stream[i][1] == profile) {
                         console.log(ignorelist_stream[i][0] + "|" + nickname + "|" + ignorelist_stream[i][1] + "|" + profile + ": stream of user is hidden");
-                        //userItem.remove();
                         userItem.innerHTML = '';
                     }
                 }
             } else {
-                //userItem.remove();
                 userItem.innerHTML = '';
             }
         });
@@ -1170,7 +1177,7 @@ textArea.addEventListener('input', () => {
                             if ($(nickname).html() !== undefined ) {
                                 var n = $(nickname).html();
                                 var l = $(nickname).attr('href').replace(/\/user\//,'');
-                                var t = $(g).find("div.text").html().replace(/^\s+/,'').replace(/\s+$/,'');
+                                var t = $(g).find("div.text").html().replace(/^\s+|\s+$/g,'');;
 
                                 for(let i = 0; i < ignorelist_nick.length; i++){
 
@@ -1216,7 +1223,7 @@ textArea.addEventListener('input', () => {
                         }
 /*                                var n = $(nickname).html();
                                 var l = $(nickname).attr('href').replace(/\/user\//,'');
-                                var t = $(g).find("div.text").html().replace(/^\s+/,'').replace(/\s+$/,'');
+                                var t = $(g).find("div.text").html().replace(/^\s+|\s+$/g,'');;
                                 console.log(n); console.log(l); console.log(t);
 */
                         }
@@ -1225,7 +1232,7 @@ textArea.addEventListener('input', () => {
                             if ($(nickname).html() !== undefined ) {
                                 var n = $(nickname).html();
                                 var l = $(nickname).attr('href').replace(/\/user\//,'');
-                                var t = $(g).find("div.text").html().replace(/^\s+/,'').replace(/\s+$/,'');
+                                var t = $(g).find("div.text").html().replace(/^\s+|\s+$/g,'');;
 
                                 for(let i = 0; i < ignorelist_nick.length; i++){
 
@@ -1839,7 +1846,7 @@ textArea.addEventListener('input', () => {
 
                 if (ignorelist[i] !== null && ignorelist[i] !== undefined) {
                     if (ignorelist[i][2] !== undefined) if (hide_in_message == true && (ignorelist[i][2] != ignore_profile_uid_country)) {
-                        reg = new RegExp("<span[^<>]+>" + // .replace(/^\s+/,'').replace(/\s+$/,'')
+                        reg = new RegExp("<span[^<>]+>" + // .replace(/^\s+|\s+$/g,'');
                         escapeRegExp(escapeHtml(ignorelist[i][0])) + "</span>",'i'); // понаблюдать за определением кому пишут
 //console.log(escapeRegExp(escapeHtml(ignorelist[i][0])) + ':' + text);
                         if (text.search(reg) != -1) { message_to_ignored_nick = true };
@@ -1992,7 +1999,7 @@ function CheckInIgnoreList(nickname,profile,uid,country) {
                 for(let i = 0; i < ignorelist_nick.length; i++){
                     if (hide_in_message == true) {
                         reg = new RegExp("<span[^<>]+>" +
-                        //escapeRegExp(ignorelist_nick[i].replace(/^\s+/,'').replace(/\s+$/,'')) + // понаблюдать за определением кому пишут
+                        //escapeRegExp(ignorelist_nick[i].replace(/^\s+|\s+$/g,'');) + // понаблюдать за определением кому пишут
                         escapeRegExp(escapeHtml(ignorelist_nick[i])) + // понаблюдать за определением кому пишут
                         "</span>",'i');
 //console.log(escapeRegExp(escapeHtml(ignorelist_nick[i])) + "|" + text);
