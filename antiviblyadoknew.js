@@ -185,7 +185,8 @@ var Scrpt = create("div",ScrptContent);
 
         var ignorelist_nick = ['Поменяйте ник','Поменяйтe ник'];
 
-        var ignorelist_stream = [['Психея','m94794','наставила выблядков в модерасты'],
+        var ignorelist_stream = [
+                                 ['Психея','m94794','наставила выблядков в модерасты'],
                                  ['KISS ME','KatyaLeto','чмо, кидает в чёрный список'],
                                  ['TiVi','tivi','шлак'],
                                  ['✅ᗫoᏰᏒo','Nevskiy','шлак'],
@@ -194,15 +195,15 @@ var Scrpt = create("div",ScrptContent);
                                  ['$$$ Капитан Америка $$$','vaso12345','пиндосское уг'],
                                  ['Δημήτριος Ντουρμουσίδης','ivanov78','ебанутый грек'],
                                  ['БИЗНЕСВУМЕН','buzzazals','чушь'],
-                                 ['Зачот','svet260492','какой то ебанат'],
+                                 ['Зачот','svet260492','какой то ебанатунылый'],
                                  ['','filippk2555','пиндосский старый жид'],
-                                 ['','yourdirty_desire','свинья канадская'],
+                                 ['','yourdirty_desire','свинья канадская банит'],
                                  ['','umma','сукина'],
                                  ['','uma','сукина'],
                                  ['','ummm','сукина'],
                                  ['','vdamkah','жаба'],
                                  ['','vasily_alibabaich','изврот'],
-                                 ['','julia-S','from ublock'],
+                                 ['','julia-S','инвалка'],
                                  ['','damka','жаба'],
                                  ['','EDS','алкаш'],
                                  ['','Stepnyak','неприятный очкир'],
@@ -228,12 +229,20 @@ var Scrpt = create("div",ScrptContent);
                                  ['','Karina-kim20','проститка с бонги банит'],
                                  ['','mudila88855','инвал из кунсткамеры'],
                                  ['Рома','Mavkaa','кахтавая мгазь кидает в игнор'],
-                                 ['','Dillinger','чмо уфимское'],
+                                 ['','Dillinger','чмо уфимское, банит как крыса в других трансляциях'],
                                  ['*(Real) Ya- Bog (999)*','vladimir_gennad','урка, либераст'],
-                                 ['','nadin27nadin','интернет проститутка'],
-                                 ['Лакомый агнетц','karps','шлак']
+                                 ['','nadin27nadin','держит ублюдков модерастов и сама банит'],
+                                 ['Лакомый агнетц','karps','шлак'],
+                                 ['грешницы','sed_kid_kat','неприятно смотреть'],
+                                 ['Nadin21','nadin21"','держит ублюдков модерастов и сама банит'],
+                                 ['alice_noire','alicenoire','рестрим хуеты'],
+                                 ['⚡✪ У л Ё т ✪⚡','ulyot','чушь'],
+                                 ['DJ  ВОЛЬДЕМАР','VOIDEMAR','чушь'],
+                                 ['Анна','annaq123679','шаболда'],
+                                 ['Женя Жданов','zhenya_zhdanov','дрочила'],
+                                 ['Nublin157','stylo','уг какое то'],
+                                 ['D£√ȋȽ ȟ£ȽȽ','DevilHell','ещё одно непонятное']
                                 ];
-
         var author_user_id;
         var author_nickname;
         var author_profile;
@@ -267,6 +276,19 @@ var Scrpt = create("div",ScrptContent);
 
         //console.log(author_nick + '|' + author_login + '|' + nickname); // на данной стадии не пишет в консоль !
 
+function markDuplicate(array){
+    let countItems = {};
+
+    for(let i = 0; i < array.length; i++) {
+        if (countItems[array[i]] = countItems[array[i]]) {
+            countItems[array[i]] + 1;
+            array[i] = undefined;
+        } else { countItems[array[i]] = 1 }
+    }
+
+//    console.log(array);
+//    console.dir(Object.keys(countItems));
+}
 
 function SaveData() {
 //========================New==========================
@@ -294,12 +316,10 @@ function SaveData() {
 
     //entry.hasOwnProperty('nick');
 //=====================================================
-    let now = new Date();
-    let ticks = now.getTime();
     let ignorelist_loaded = new Array();
     let ignorelist_temp = new Array();
-    let array1 = new Array();
-    let array2 = new Array();
+    let a1 = new Array();
+    let a2 = new Array();
 
     if(typeof(localStorage) != 'undefined' ) {
         if(window.localStorage.getItem('ignorelist')){
@@ -310,104 +330,81 @@ function SaveData() {
 //console.log(ignorelist);
 
     if (ignorelist_loaded.length > ignorelist.length) {
-		array1 = ignorelist_loaded.slice(0);
-		array2 = ignorelist.slice(0);
+		a1 = ignorelist_loaded.slice(0);
+		a2 = ignorelist.slice(0);
         console.log("ignorelist_loaded.length:" + ignorelist_loaded.length + " + " + "ignorelist.length:" + ignorelist.length)
 	} else {
-		array1 = ignorelist.slice(0);
-		array2 = ignorelist_loaded.slice(0);
+		a1 = ignorelist.slice(0);
+		a2 = ignorelist_loaded.slice(0);
         console.log("ignorelist.length:" + ignorelist.length + " + " + "ignorelist_loaded.length:" + ignorelist_loaded.length)
 	}
 
     if (ignorelist_loaded !== undefined || ignorelist_loaded.length > 0) {
+    markDuplicate(a1);
+    markDuplicate(a2);
 
     let existsUID = false;
     let existsProfile = false;
     let existsNick = false;
+    let c = 0;
 
-    for(let i = 0; i < array1.length; i++) {
+    for(let i = 0; i < a1.length; i++) {
         existsUID = false;
         existsProfile = false;
         existsNick = false;
 
-        var c;
-
-        for(c = 0; c < array2.length; c++) {
-            if (array1[i] != undefined && array2[c] != undefined && array1[i] != '' && array2[c] != '') {
-                if ((array1[i][8] == array2[c][8] && array1[i][8] != '' || array1[i][8] != '')) { existsUID = true;}
-                if (array1[i][1] == array2[c][1]) { existsProfile = true;}
-                if (array1[i][0] == array2[c][0]) { existsNick = true;}
+        for(c = 0; c < a2.length; c++) {
+            if (a1[i] != undefined && a2[c] != undefined && a1[i] != '' && a2[c] != '') {
+                if ((a1[i][8] == a2[c][8] && (a1[i][8] != '' || a2[c][8] != ''))) { existsUID = true;}
+                if (a1[i][1] == a2[c][1]) { existsProfile = true;}
+                if (a1[i][0] == a2[c][0]) { existsNick = true;}
                 if (existsUID == true || existsProfile == true || existsNick == true) { break; }
             }
         }
 
-        if (existsUID == true || existsProfile == true || existsNick == true) {
-                if (array1[i][4] < array2[c][4]) { // 86400000
-                    if ( (((ticks - array2[c][3]) > 86400000) && (array2[c][2] == ignore_temp_profile) )
-                        ||
-                       (((ticks - array2[c][3]) > ignore_time) && (array2[c][2] == ignore_nick_uid_country ||
-                                                                array2[c][2] == ignore_profile_uid_country ||
-                                                                array2[c][2] == ignore_all_params ||
-                                                                array2[c][2] == ignore_permanent)) ) {
-                        console.log("%cantyviblyadok(" + ((now.getHours() < 10 && now.getHours() >= 0) ? "0" + now.getHours() : "") +
-                                    ":" + ((now.getMinutes() < 10 && now.getMinutes() >= 0) ? "0" + now.getMinutes() : "") + "): " +
-                                    "nick:" + array2[c][0] + "|login:" + array2[c][1] +
-                                    "|removed from ignorelist by timeoffset > " +
-                                    ((array2[c][2] == ignore_nick_uid_country) ? "ignore_nick_uid_country" : "") +
-                                    ((array2[c][2] == ignore_profile_uid_country) ? "ignore_profile_uid_country" : "") +
-                                    ((array2[c][2] == ignore_all_params) ? "ignore_all_params" : "") +
-                                    ((array2[c][2] == ignore_temp_profile) ? "ignore_temp_profile" : "") +
-                                    ((array2[c][2] == ignore_permanent) ? "ignore_permanent" : ""),
-                                    'background: LemonChiffon; color: red');
-                    } else { ignorelist_temp.push(array2[c]) }
-                } else {
-                    if ( (((ticks - array1[i][3]) > 86400000) && (array1[i][2] == ignore_temp_profile ) )
-                        ||
-                       (((ticks - array1[i][3]) > ignore_time) && (array1[i][2] == ignore_nick_uid_country ||
-                                                                array1[i][2] == ignore_profile_uid_country ||
-                                                                array1[i][2] == ignore_all_params ||
-                                                                array1[i][2] == ignore_permanent)) ) {
+       function checkForRemoveEntry(in_item,out_array) {
+           let now = new Date();
+           let ticks = now.getTime();
 
-                        console.log("%cantyviblyadok(" + ((now.getHours() < 10 && now.getHours() >= 0) ? "0" + now.getHours() : "") +
+           if ( (((ticks - in_item[3]) > 86400000) && (in_item[2] == ignore_temp_profile) )
+               ||
+               (((ticks - in_item[3]) > ignore_time) && (in_item[2] == ignore_nick_uid_country ||
+                                                       in_item[2] == ignore_profile_uid_country ||
+                                                       in_item[2] == ignore_all_params ||
+                                                       in_item[2] == ignore_permanent)) ) {
+               console.log("%cantyviblyadok(" + ((now.getHours() < 10 && now.getHours() >= 0) ? "0" + now.getHours() : "") +
                                     ":" + ((now.getMinutes() < 10 && now.getMinutes() >= 0) ? "0" + now.getMinutes() : "") + "): " +
-                                    "nick:" + array1[i][0] + "|login:" + array1[i][1] +
+                                    "nick:" + in_item[0] + "|login:" + in_item[1] +
                                     "|removed from ignorelist by timeoffset > " +
-                                    ((array1[i][2] == ignore_nick_uid_country) ? "ignore_nick_uid_country" : "") +
-                                    ((array1[i][2] == ignore_profile_uid_country) ? "ignore_profile_uid_country" : "") +
-                                    ((array1[i][2] == ignore_all_params) ? "ignore_all_params" : "") +
-                                    ((array1[i][2] == ignore_temp_profile) ? "ignore_temp_profile" : "") +
-                                    ((array1[i][2] == ignore_permanent) ? "ignore_permanent" : ""),
+                                    ((in_item[2] == ignore_nick_uid_country) ? "ignore_nick_uid_country" : "") +
+                                    ((in_item[2] == ignore_profile_uid_country) ? "ignore_profile_uid_country" : "") +
+                                    ((in_item[2] == ignore_all_params) ? "ignore_all_params" : "") +
+                                    ((in_item[2] == ignore_temp_profile) ? "ignore_temp_profile" : "") +
+                                    ((in_item[2] == ignore_permanent) ? "ignore_permanent" : ""),
                                     'background: LemonChiffon; color: red');
-                    } else { ignorelist_temp.push(array1[i]) }
+           } else { out_array.push(in_item) }
+       }
+
+        if (existsUID == true || existsProfile == true || existsNick == true) {
+                if (a1[i][4] < a2[c][4]) { // код удаления по timeoffset
+                    checkForRemoveEntry(a2[c],ignorelist_temp);
+                } else {
+                    checkForRemoveEntry(a1[i],ignorelist_temp);
                 }
-        } else {
-//                    console.log("===");
-//                    console.log(array1[i]);
-//                    console.log(array2[c]);
-            if (array1[i] !== null && array1[i] !== undefined && array1[i] != '') {
-//                    console.log("===array1[i]");
-//                    console.log(array1[i]);
-//                    console.log(array2[c]);
-            ignorelist_temp.push(array1[i]);
-//                console.log(array1[i]);
-//                console.log("array1 - i:" + i);
-//                console.log("array2 - c:" + c);
+        } else { // добавление элемента - если не присутствует в массиве
+            if (a1[i] != undefined && a1[i] != '') {
+                ignorelist_temp.push(a1[i]);
             }
-            if (array2[c] !== null && array2[c] !== undefined && array2[c] != '') {
-//                console.log("===array2[c]");
-//                console.log("array1 - i:" + i);
-//                console.log("array2 - c:" + c);
-            ignorelist_temp.push(array2[c]);
-//                console.log(array2[c]);
+            if (a2[c] != undefined && a2[c] != '') {
+                ignorelist_temp.push(a2[c]);
             }
         }
-        //console.log(array1[i][1] + "|" + typeof array1[i][1]);
     }
     } else (ignorelist_temp = ignorelist.slice(0))
 
 console.log("Func SaveData:");
 console.log(ignorelist_temp);
-      if((typeof(localStorage) != 'undefined') && (ignorelist.length > 0)) { localStorage.setItem('ignorelist', JSON.stringify(ignorelist_temp)) }
+      if((typeof(localStorage) != 'undefined') && (ignorelist_temp.length > 0)) { localStorage.setItem('ignorelist', JSON.stringify(ignorelist_temp)) }
 }
 
 //var MsgClickFunc = function MsgClick(e) {
@@ -565,17 +562,32 @@ function RemoveFromIgnore(nickname,profile,uid,savedata)
     let args = '';
     let counter = 0;
 
+    function markDuplicate(array){
+        let countItems = {};
+
+        for(let i = 0; i < array.length; i++) {
+            if (countItems[array[i]] = countItems[array[i]]) {
+                countItems[array[i]] + 1;
+                array[i] = undefined;
+            } else { countItems[array[i]] = 1 }
+        }
+
+//    console.log(array);
+//    console.dir(Object.keys(countItems));
+    }
+
     function rem(array,index){
         array[index] = undefined;
         counter += 1;
 //        if ((nickname !== false && nickname != undefined) || (profile !== false && profile != undefined) ||
 //            (uid !== false && uid != undefined) || (savedata !== false && savedata != undefined)) save();
-        if (savedata !== false) save();
     }
 
-    if (nickname != undefined && nickname != '' && nickname !== false ) { args += 'n' }
+    if (nickname != undefined && nickname != '' && isNaN(Number(nickname)) && nickname !== false ) { args += 'n' }
     if (profile != undefined  && profile != '' &&  profile !== false )  { args += 'p' }
     if (uid != undefined      && uid != '' && uid !== false)      { args += 'u' }
+    if (nickname != undefined && profile == undefined && uid == undefined && !isNaN(Number(nickname)) && nickname !== false )
+    { args += 'u'; uid = nickname; }
 
     for(let i = 0; i < ignorelist.length; i++) {
         if (ignorelist[i] == undefined) { continue }
@@ -583,26 +595,26 @@ function RemoveFromIgnore(nickname,profile,uid,savedata)
         switch (args) {
             case 'npu':
                 if ((ignorelist[i][8] == uid && ignorelist[i][8] != '') &&
-                    (ignorelist[i][1] == profile && ignorelist[i][1] != '')
-                    && (ignorelist[i][0] == nickname && ignorelist[i][0] != '')) rem(ignorelist,i);
+                    (ignorelist[i][1].toLowerCase() == profile.toLowerCase() && ignorelist[i][1] != '')
+                    && (ignorelist[i][0].toLowerCase() == nickname.toLowerCase() && ignorelist[i][0] != '')) rem(ignorelist,i);
                 break;
             case 'np':
-                if ((ignorelist[i][1] == profile && ignorelist[i][1] != '')
-                    && (ignorelist[i][0] == nickname && ignorelist[i][0] != '')) rem(ignorelist,i);
+                if ((ignorelist[i][1].toLowerCase() == profile.toLowerCase() && ignorelist[i][1] != '')
+                    && (ignorelist[i][0].toLowerCase() == nickname.toLowerCase() && ignorelist[i][0] != '')) rem(ignorelist,i);
                 break;
             case 'pu':
                 if ((ignorelist[i][8] == uid && ignorelist[i][8] != '') &&
-                    (ignorelist[i][1] == profile && ignorelist[i][1] != '')) rem(ignorelist,i);
+                    (ignorelist[i][1].toLowerCase() == profile.toLowerCase() && ignorelist[i][1] != '')) rem(ignorelist,i);
                 break;
             case 'nu':
                 if ((ignorelist[i][8] == uid && ignorelist[i][8] != '') &&
-                    (ignorelist[i][0] == nickname && ignorelist[i][0] != '')) rem(ignorelist,i);
+                    (ignorelist[i][0].toLowerCase() == nickname.toLowerCase() && ignorelist[i][0] != '')) rem(ignorelist,i);
                 break;
             case 'n':
-                if (ignorelist[i][0] == nickname && ignorelist[i][0] != '') rem(ignorelist,i);
+                if (ignorelist[i][0].toLowerCase() == nickname.toLowerCase() && ignorelist[i][0] != '') rem(ignorelist,i);
                 break;
             case 'p':
-                if (ignorelist[i][1] == profile && ignorelist[i][1] != '') rem(ignorelist,i);
+                if (ignorelist[i][1].toLowerCase() == profile.toLowerCase() && ignorelist[i][1] != '') rem(ignorelist,i);
                 break;
             case 'u':
                 if (ignorelist[i][8] == uid && ignorelist[i][8] != '') rem(ignorelist,i);
@@ -612,11 +624,16 @@ function RemoveFromIgnore(nickname,profile,uid,savedata)
                 console.log("Example: remove('nickname','profile','uid')");
                 console.log("Example: remove('nickname','profile')");
                 console.log("Example: remove('','','uid',false)");
+                console.log("Example: remove('uid')");
                 return 'No args found';
                 break;
         }
     }
-    if (counter > 0) { return counter + ' element' + (counter > 1 ? 's ' : ' ') + 'removed' } else { return 'Element(s) not found' }
+
+    if (counter > 0) {
+        if (savedata !== false) { save(); }
+        return counter + ' element' + (counter > 1 ? 's ' : ' ') + 'removed'
+    } else { return 'Element(s) not found' }
 }
 
 exportFunction(AddToIgnoreList, unsafeWindow, { defineAs: "AddToIgnoreList" });
@@ -948,8 +965,8 @@ function filterStreams() {
     let element;
     let nickname;
     let profile;
-    let element_row;
     let locked;
+    let result = '';
 
     let elements = document.querySelector("div.app-list, div.list-stream").querySelector("div.row").childNodes;
         elements.forEach(function (userItem) {
@@ -969,7 +986,8 @@ function filterStreams() {
                 for(let i = 0; i < ignorelist_stream.length; i++){
                     if ((ignorelist_stream[i][0] == nickname && ignorelist_stream[i][0] != '') ||
                         (ignorelist_stream[i][1] == profile && ignorelist_stream[i][1] !='')) {
-                        console.log(ignorelist_stream[i][0] + "|" + nickname + "|" + ignorelist_stream[i][1] + "|" + profile + ": stream of user is hidden");
+                        //console.log(ignorelist_stream[i][0] + "|" + nickname + "|" + ignorelist_stream[i][1] + "|" + profile + ": stream of user is hidden");
+                        result += ':(' + nickname + ',' + profile + ' (' + ignorelist_stream[i][2] + '))';
                         userItem.innerHTML = '';
                     }
                 }
@@ -977,6 +995,7 @@ function filterStreams() {
                 userItem.innerHTML = '';
             }
         });
+    if (result != '') { console.log('Streams hidden' + result + ';'); }
     //}
 }
 
@@ -1540,7 +1559,7 @@ window.addEventListener('beforeunload', function(event) {
                             }
 						}
 					}
-
+//console.log(levenshtein('Hello', 'HelA_1'));
 					if (exists) {
                         // [0] - spam count ; array of ([1][0] - nickname ; [1][1] - login ; [1][2] - SpamMatch);
                         let arr = '';
@@ -1849,6 +1868,7 @@ window.addEventListener('beforeunload', function(event) {
                             ignorelist[i][3] = date.getTime(); ignore_date = new Date(ignorelist[i][3]);
                             ignorelist[i][4] = date.getTime();
 
+                            console.log(ignorelist[i]);
                             console.log('%cignorelist entry updated for (' + nickname + ':' + profile + ':' +
                                         uid + ':' + country_iso + '):old:(' + ignorelist_match + '):new added:(' +
                                         ignorelist_match_n + ')','background: LemonChiffon;color:red');
@@ -1916,11 +1936,6 @@ window.addEventListener('beforeunload', function(event) {
                 }
 
                 }
-
-//console.log(levenshtein('Hello', 'HelA_1'));
-//console.log(ignorelist);
-//console.log(author_nickname);
-//console.log(author_profile);
 
                 var nick_to_tag_data = text.match(/<span[^<>]+>[^<>]+<\/span>/g);
                 var nick_to_tags = new Array();
