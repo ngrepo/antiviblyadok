@@ -241,7 +241,15 @@ var Scrpt = create("div",ScrptContent);
                                  ['Анна','annaq123679','шаболда'],
                                  ['Женя Жданов','zhenya_zhdanov','дрочила'],
                                  ['Nublin157','stylo','уг какое то'],
-                                 ['D£√ȋȽ ȟ£ȽȽ','DevilHell','ещё одно непонятное']
+                                 ['D£√ȋȽ ȟ£ȽȽ','DevilHell','ещё одно непонятное'],
+                                 ['чаkи','gfgf300','старая бандера банит'],
+                                 ['ＯｍｎｉＳｙｎｃ','OmniSync','чушь'],
+                                 ['Freddy Black','freddy_black','шиз'],
+                                 ['Бездна','vkontakte_189476012','жируська'],
+                                 ['METALHEAD','brutal','чушь'],
+                                 ['Julia S','julia_s','инвалка'],
+                                 ['Музяка','club','шлак'],
+                                 ['АЛКОТЕСТЕР','alkotester','шлак']
                                 ];
         var author_user_id;
         var author_nickname;
@@ -1040,6 +1048,13 @@ window.addEventListener('beforeunload', function(event) {
 
     filterStreams();
 
+    var f_timer = setInterval(FilterStreamsTimerFunc, 3000);
+
+    function FilterStreamsTimerFunc() {
+        filterStreams();
+        //console.log('FilterStreamsTimer');
+    }
+
     if ( url.indexOf('https://livacha.com/chat/') != -1 ) {
       document.querySelector("div.chat-messages").addEventListener('DOMNodeRemoved', function (e) {
         var element = e.target;
@@ -1525,7 +1540,7 @@ window.addEventListener('beforeunload', function(event) {
                 }
 
                 shortstr = img_tags_str + span_tags_inner.replace(/\s+/,'') + shortstr.substr(0,len);
-
+                let rawtext = shortstr.toLowerCase();
                 shortstr = shortstr.toLowerCase();
 
 //                console.log("(" + shortstr + "):" + shortstr.length + " ↓");
@@ -1559,7 +1574,7 @@ window.addEventListener('beforeunload', function(event) {
                             }
 						}
 					}
-//console.log(levenshtein('Hello', 'HelA_1'));
+
 					if (exists) {
                         // [0] - spam count ; array of ([1][0] - nickname ; [1][1] - login ; [1][2] - SpamMatch);
                         let arr = '';
@@ -1568,6 +1583,9 @@ window.addEventListener('beforeunload', function(event) {
                             arr += "[" + ResultArray[i][0] + "|" + ResultArray[i][1] + "]";
                         }
                         console.log("SpamMatch:" + arr); //SpamArray[c][0]
+                        console.log("Levenstain:" + levenshtein(rawtext, SpamArray[c][0]));
+                        console.log("shortstr:" + "(" + shortstr + "):" + shortstr.length + " ↓");
+                        console.log("rawtext:" + "(" + rawtext + "):" + rawtext.length + " ↓");
 					} else {
 						SpamArray.push([shortstr,nickname,login,tickcount,1]);
 //                        console.log(shortstr,nickname,login,tickcount,1);
@@ -1585,13 +1603,13 @@ window.addEventListener('beforeunload', function(event) {
              return result;
         }
 
-        var i_timer = setInterval(InitTimerFunc, 300);
+        var i_timer = setInterval(InitTimerFunc, 500);
 
         function InitTimerFunc() {
-            var element = document.querySelector('div.chat-messages');
+            var elements = document.getElementsByClassName('chat-messages');
 
-            if (element != undefined) {
-                element.addEventListener('DOMNodeInserted', function (e) { ChatElementInserted(e); });
+            if (elements.length > 0) if (elements[0] != undefined) {
+                elements[0].addEventListener('DOMNodeInserted', function (e) { ChatElementInserted(e); });
                 clearInterval(i_timer);
             }
         }
