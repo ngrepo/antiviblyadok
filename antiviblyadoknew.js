@@ -173,8 +173,6 @@ var Scrpt = create("div",ScrptContent);
 	document.getElementById('content').appendChild(Scrpt); */
         var AntiviblyadokEnabled = true;
 
-        var url = window.location.href;
-
         var userlist = new Map();
         var msglist = new Map();
         var users_max = 0;
@@ -195,12 +193,10 @@ var Scrpt = create("div",ScrptContent);
                                  ['$$$ Капитан Америка $$$','vaso12345','пиндосское уг'],
                                  ['Δημήτριος Ντουρμουσίδης','ivanov78','ебанутый грек'],
                                  ['БИЗНЕСВУМЕН','buzzazals','чушь'],
-                                 ['Зачот','svet260492','какой то ебанатунылый'],
+                                 ['Зачот','svet260492','какой то ебанат унылый'],
                                  ['','filippk2555','пиндосский старый жид'],
                                  ['','yourdirty_desire','свинья канадская банит'],
-                                 ['','umma','сукина'],
-                                 ['','uma','сукина'],
-                                 ['','ummm','сукина'],
+                                 ['sumkina','sumkina','сукина'],
                                  ['','vdamkah','жаба'],
                                  ['','vasily_alibabaich','изврот'],
                                  ['','julia-S','инвалка'],
@@ -229,7 +225,7 @@ var Scrpt = create("div",ScrptContent);
                                  ['','Karina-kim20','проститка с бонги банит'],
                                  ['','mudila88855','инвал из кунсткамеры'],
                                  ['Рома','Mavkaa','кахтавая мгазь кидает в игнор'],
-                                 ['','Dillinger','чмо уфимское, банит как крыса в других трансляциях'],
+                                 ['Шеф','Dillinger','чмо уфимское, банит как крыса в других трансляциях'],
                                  ['*(Real) Ya- Bog (999)*','vladimir_gennad','урка, либераст'],
                                  ['','nadin27nadin','держит ублюдков модерастов и сама банит'],
                                  ['Лакомый агнетц','karps','шлак'],
@@ -249,7 +245,9 @@ var Scrpt = create("div",ScrptContent);
                                  ['METALHEAD','brutal','чушь'],
                                  ['Julia S','julia_s','инвалка'],
                                  ['Музяка','club','шлак'],
-                                 ['АЛКОТЕСТЕР','alkotester','шлак']
+                                 ['АЛКОТЕСТЕР','alkotester','шлак'],
+                                 ['Harter','harter','отродье банит у шлюхеи'],
+                                 ['ADIDAS','gucci_kapitan','русофоб с еблом навального']
                                 ];
         var author_user_id;
         var author_nickname;
@@ -722,8 +720,8 @@ function messageDispather(data) {
                 }
                 case 'baned': { // модерастом или владельцем трансляции
                     console.log('banned =============================');
-                    console.log(message);
-                    console.log(userlist.get(message.response.clientId));
+                    //console.log(message);
+                    //console.log(userlist.get(message.response.clientId));
                     console.log('banned:(' + ((userlist.get(message.response.clientId) != undefined &&
                                 message.response.clientId != '') ? userlist.get(message.response.clientId).nickname + ':' +
                                 userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + ':' +
@@ -773,7 +771,7 @@ function messageDispather(data) {
                 case 'streamsListUpdate': {
                     //console.log('streamsListUpdate =========================');
                     //console.log(message);
-                    filterStreams();
+                    setTimeout(function(){filterStreams();},51);
                     break;
                 }
                 case 'likeMe': {
@@ -968,40 +966,53 @@ function chatMessage(message) {
 }
 
 function filterStreams() {
-    //if ( url == 'https://livacha.com/') {
+    //if ( window.location.href == 'https://livacha.com/') {
+    const hide_unpopular = false; // скрыть с низким рейтингом
+    const hide_locked = true;    // скрыть запороленные шлюх и дрочил
 
     let element;
     let nickname;
     let profile;
     let locked;
+    let rating;
     let result = '';
 
     let elements = document.querySelector("div.app-list, div.list-stream").querySelector("div.row").childNodes;
         elements.forEach(function (userItem) {
 
+        element = userItem.querySelector("a");
+
+        if (element != undefined) {
+
+            nickname = element.innerHTML.replace(/^\s+|\s+$/g,'');
+            profile = element.href.replace(/.*\/user\//,'');
+
             locked = (userItem.querySelector("i.fa-lock, i.text-danger") != undefined); // скрыть запороленные шлюх и дрочил
-            if (locked == true) {
+            if (locked == true && hide_locked == true) {
                 userItem.innerHTML = '';
-            } else {
-                element = userItem.querySelector("a");
             }
 
-            if (element != undefined && locked == false) {
+            rating = userItem.querySelector("span.text-white, span.badge"); // скрыть с низким рейтингом
+            if (rating != undefined && hide_unpopular == true) {
+                if (rating.innerHTML == 'Live') {
+                    userItem.innerHTML = '';
+                    result += ':(' + nickname + ',' + profile + ',' + rating.innerHTML + ')';
+                }
+            }
 
-                nickname = element.innerHTML.replace(/^\s+|\s+$/g,'');
-                profile = element.href.replace(/.*\/user\//,'');
-                //console.log(element);
+            if ((locked == true && hide_locked == true) == false && ((rating != undefined ? rating.innerHTML == 'Live' : false) && hide_unpopular == true) == false ) {
                 for(let i = 0; i < ignorelist_stream.length; i++){
                     if ((ignorelist_stream[i][0] == nickname && ignorelist_stream[i][0] != '') ||
                         (ignorelist_stream[i][1] == profile && ignorelist_stream[i][1] !='')) {
-                        //console.log(ignorelist_stream[i][0] + "|" + nickname + "|" + ignorelist_stream[i][1] + "|" + profile + ": stream of user is hidden");
-                        result += ':(' + nickname + ',' + profile + ' (' + ignorelist_stream[i][2] + '))';
+                        result += ':(' + nickname + ',' + profile + (rating != undefined ? ',' + rating.innerHTML : '') + ' (' + ignorelist_stream[i][2] + '))';
                         userItem.innerHTML = '';
                     }
                 }
-            } else {
-                userItem.innerHTML = '';
             }
+        } else {
+            userItem.innerHTML = '';
+        }
+
         });
     if (result != '') { console.log('Streams hidden' + result + ';'); }
     //}
@@ -1046,16 +1057,11 @@ window.addEventListener('beforeunload', function(event) {
 
         }
 
-    filterStreams();
+    setTimeout(function(){filterStreams();},51);
 
-    var f_timer = setInterval(FilterStreamsTimerFunc, 3000);
+    setInterval(function(){filterStreams();}, 3000);
 
-    function FilterStreamsTimerFunc() {
-        filterStreams();
-        //console.log('FilterStreamsTimer');
-    }
-
-    if ( url.indexOf('https://livacha.com/chat/') != -1 ) {
+    if ( window.location.href.indexOf('https://livacha.com/chat/') != -1 ) {
       document.querySelector("div.chat-messages").addEventListener('DOMNodeRemoved', function (e) {
         var element = e.target;
 
@@ -1196,7 +1202,7 @@ window.addEventListener('beforeunload', function(event) {
             } else { return undefined }
         }
 /*
-        if ( url.indexOf('https://livacha.com/post/') != -1 ) {
+        if ( window.location.href.indexOf('https://livacha.com/post/') != -1 ) {
 
             var waitPanel = setInterval(function () {
 
@@ -1229,7 +1235,7 @@ window.addEventListener('beforeunload', function(event) {
         }
 */
 
-        if ( url.indexOf('https://livacha.com/post/') != -1 ) {
+        if ( window.location.href.indexOf('https://livacha.com/post/') != -1 ) {
 
             var waitPanel = setInterval(function () {
 
@@ -1283,31 +1289,6 @@ window.addEventListener('beforeunload', function(event) {
             }, 10);
         }
 
-        if ( url.indexOf('https://livacha.com/chat/') != -1 ) {
-            if (AntiviblyadokEnabled == false) { return }
-
-            document.querySelector("textarea.form-control").addEventListener('keydown', (e) => {
-                if (e.key === 'Enter') {
-                    //console.log('%ctextarea.form-control','background: LemonChiffon;color: red');
-                    var element = e.target;
-                    element.value = TextCorrector(element.value,true,false,d_send);
-                    return
-                }
-
-            });
-
-           document.querySelector("div.chat-container").querySelectorAll("button.btn-secondary").forEach(function (userItem) {
-                if (userItem.innerText.indexOf("Послать") != -1 ) {
-                    userItem.addEventListener('click', (e) => {
-                        var element = document.querySelector("textarea.form-control");
-                        element.value = TextCorrector(element.value,true,false,d_send);
-                        return
-                    })
-                }
-           });
-
-        }
-
 /*==================================================================================*/
         function antiCapsMat(m) {
             if (m === undefined) {
@@ -1338,9 +1319,9 @@ window.addEventListener('beforeunload', function(event) {
             m = m.replace(/^.*<img.*126401.*/, "🤮"); // бриташка
             m = m.replace(/^.*<img.*126171.*/, "🤮"); // пиндошка
 
-            m = m.replace(/^.*<img.*Ei_aaBHZgb9tueQMUzemVxdDvDh38zvhtt5OsW2US4l.*/, "🤮"); // мерзость
+            m = m.replace(/^.*<img.*aaBHZgb9tueQMUzemVxdDvDh38zvhtt5OsW2US4l.*/, "🤮"); // мерзость
             m = m.replace(/^.*<img.*HQrqpmNxtC6HsUorlq5TaeUC2l8N8HoMcuZiJOu9.*/, "🤮"); // мерзость
-
+            m = m.replace(/^.*<img.*sJeEDWS4FiPeqdqJyUEOp0rcKxGXmrP91eI5QsXb.*/, "🥛"); // пивной смайл
             // не учитываем символы в никах:
             let no_span_tag = m.replace(/<span[^<>]+>[^<>]+<\/span>/i,''); let tm;
             tm = no_span_tag.replace(/^.*🇺🇦.*/, "🐖"); if (tm != no_span_tag) { m = tm }
@@ -1603,23 +1584,86 @@ window.addEventListener('beforeunload', function(event) {
              return result;
         }
 
-        var i_timer = setInterval(InitTimerFunc, 500);
+        var s_timer = setInterval( function () {
+            var element = document.querySelector('textarea.form-control');
 
-        function InitTimerFunc() {
-            var elements = document.getElementsByClassName('chat-messages');
+            if (element != undefined) {
+                if ( window.location.href.indexOf('https://livacha.com/chat/') != -1 ) {
+                    document.querySelector("textarea.form-control").addEventListener('keypress', (e) => {
 
-            if (elements.length > 0) if (elements[0] != undefined) {
-                elements[0].addEventListener('DOMNodeInserted', function (e) { ChatElementInserted(e); });
-                clearInterval(i_timer);
+                        if (e.key === 'Enter') {
+                            console.log('+4');
+                            var element = e.target;
+                            element.value = TextCorrector(element.value,true,false,d_send);
+                            return
+                        }
+
+                    },true);
+                    clearInterval(s_timer);
+                }
             }
-        }
+        }, 333);
 
+        var b_timer = setInterval( function () {
+            var element = document.querySelector('textarea.form-control');
+            if (element != undefined) {
+                if ( window.location.href.indexOf('https://livacha.com/chat/') != -1 ) {
+                   document.querySelector("div.chat-container").querySelectorAll("button.btn-secondary").forEach(function (userItem) {
+                        if (userItem.innerText.indexOf("Послать") != -1 ) {
+                            userItem.addEventListener('click', (e) => {
+                                //console.log('++4');
+                                console.log(e.target);
+                                let elem = document.querySelector("textarea.form-control");
+                                //console.log(getEventListeners(document.querySelector("textarea.form-control")));
+                                //console.log(elem);
+                                //console.log(elem.value);
+
+                                elem.value = TextCorrector(elem.value,true,false,d_send);
+                                //console.log(TextCorrector(elem.value,true,false,d_send));
+                                return
+                            },true)
+                        }
+                   })
+                    clearInterval(b_timer);
+                }
+            }
+        }, 333);
+
+        var scrollPosition = 0;
+
+        var r_timer = setInterval( function () {
+            let elements = document.getElementsByClassName('chat-messages');
+            if (elements.length > 0) if (elements[0] != undefined) {
+                elements[0].addEventListener('DOMNodeInserted', function (e) { DispatchChatMessage(e); },true);
+
+                elements[0].addEventListener('scroll', function () { // получаем позицию ползунка прокрутки
+                    scrollPosition = elements[0].scrollTop;
+                });
+
+                setInterval(function(){
+                    let elements = document.getElementsByClassName('chat-messages');  // фикс автопрокрутки рептилоидовича
+                    if (elements.length > 0) if (elements[0] != undefined) {
+                        if ((Math.abs(elements[0].offsetHeight - elements[0].scrollHeight) - scrollPosition) < 100) {
+                            //console.log('scrollPosition:' + scrollPosition);
+                            //console.log('clientHeight:' + elements[0].clientHeight);
+                            //console.log('scrollHeight:' + elements[0].scrollHeight);
+                            //console.log('offsetHeight:' + elements[0].offsetHeight);
+                            //console.log('elements[0].offsetHeight - elements[0].scrollHeight - scrollPosition:' +
+                            //(Math.abs(elements[0].offsetHeight - elements[0].scrollHeight) - scrollPosition));
+                            elements[0].scrollTo(0,elements[0].scrollHeight);
+                        }
+                    }
+                }, 1000);
+
+                clearInterval(r_timer);
+            }
+        }, 53);
 /*==================================================================================*/
-        //if ( url.indexOf('https://livacha.com/chat/') != -1 ) {
+        //if ( window.location.href.indexOf('https://livacha.com/chat/') != -1 ) {
 
         const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
-        function ChatElementInserted(e) {
+        function DispatchChatMessage(e) {
 //            if (AntiviblyadokEnabled == false) { return }
             //console.log('%c','background: LemonChiffon;color: red');
             var element = e.target;
@@ -1768,7 +1812,7 @@ window.addEventListener('beforeunload', function(event) {
 
                 if (text.search("🐖") != -1) { is_hohloflag = true };
                 if (text.search("🐷") != -1) { is_ukropitek = true };
-                if (text.search('🥛') != -1) { is_amoral = true }
+                //if (text.search('🥛') != -1) { is_amoral = true }
                 if ((text.search("🤮") != -1 || text.search("😭") != -1 || text.search('😫') != -1) &&
                     is_me == false) { is_amoral = true } // || text.search('🥛') != -1
 
