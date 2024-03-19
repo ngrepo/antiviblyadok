@@ -249,6 +249,13 @@ var Scrpt = create("div",ScrptContent);
                                  ['Harter','harter','отродье банит у шлюхеи'],
                                  ['ADIDAS','gucci_kapitan','русофоб с еблом навального']
                                 ];
+
+        var whitelist_stream = [
+                                ['Дѻктѻр','flus'],
+                                ['☆Серж ROCK☆','SergRock'],
+                                ['⚡️Эстонец⚡️','esstonec']
+                               ];
+
         var author_user_id;
         var author_nickname;
         var author_profile;
@@ -771,7 +778,7 @@ function messageDispather(data) {
                 case 'streamsListUpdate': {
                     //console.log('streamsListUpdate =========================');
                     //console.log(message);
-                    setTimeout(function(){filterStreams();},51);
+                    setTimeout(function(){filterStreams(false);},51);
                     break;
                 }
                 case 'likeMe': {
@@ -965,17 +972,18 @@ function chatMessage(message) {
     //console.log('added to msglist');
 }
 
-function filterStreams() {
-    //if ( window.location.href == 'https://livacha.com/') {
-    const hide_unpopular = false; // скрыть с низким рейтингом
-    const hide_locked = true;    // скрыть запороленные шлюх и дрочил
+function filterStreams(log_whitelisted) {
+    const hide_unpopular = true; // скрыть с низким рейтингом
+    const hide_locked = true; // скрыть запороленные шлюх и дрочил
 
     let element;
     let nickname;
     let profile;
     let locked;
     let rating;
-    let result = '';
+    let ignored = '';
+    let whitelisted = '';
+    let in_whitelist = false;
 
     let elements = document.querySelector("div.app-list, div.list-stream").querySelector("div.row").childNodes;
         elements.forEach(function (userItem) {
@@ -983,39 +991,50 @@ function filterStreams() {
         element = userItem.querySelector("a");
 
         if (element != undefined) {
-
             nickname = element.innerHTML.replace(/^\s+|\s+$/g,'');
             profile = element.href.replace(/.*\/user\//,'');
+            rating = userItem.querySelector("span.text-white, span.badge"); // счётчик посетителей
+            locked = (userItem.querySelector("i.fa-lock, i.text-danger") != undefined); // признак запароленной трансляции
+            in_whitelist = false;
 
-            locked = (userItem.querySelector("i.fa-lock, i.text-danger") != undefined); // скрыть запороленные шлюх и дрочил
-            if (locked == true && hide_locked == true) {
+            for(let i = 0; i < whitelist_stream.length; i++){
+                    if ((whitelist_stream[i][0] == nickname && whitelist_stream[i][0] != '') ||
+                        (whitelist_stream[i][1] == profile && whitelist_stream[i][1] != '')) {
+                        in_whitelist = true;
+                    }
+            }
+
+            if (locked == true && hide_locked == true && in_whitelist == false) {  // скрыть запороленные шлюх и дрочил
                 userItem.innerHTML = '';
             }
 
-            rating = userItem.querySelector("span.text-white, span.badge"); // скрыть с низким рейтингом
-            if (rating != undefined && hide_unpopular == true) {
+            if (rating != undefined && hide_unpopular == true && in_whitelist == false) { // скрыть с низким рейтингом
                 if (rating.innerHTML == 'Live') {
                     userItem.innerHTML = '';
-                    result += ':(' + nickname + ',' + profile + ',' + rating.innerHTML + ')';
+                    ignored += ':(' + nickname + ',' + profile + ',' + rating.innerHTML + ')';
                 }
             }
 
-            if ((locked == true && hide_locked == true) == false && ((rating != undefined ? rating.innerHTML == 'Live' : false) && hide_unpopular == true) == false ) {
-                for(let i = 0; i < ignorelist_stream.length; i++){
-                    if ((ignorelist_stream[i][0] == nickname && ignorelist_stream[i][0] != '') ||
-                        (ignorelist_stream[i][1] == profile && ignorelist_stream[i][1] !='')) {
-                        result += ':(' + nickname + ',' + profile + (rating != undefined ? ',' + rating.innerHTML : '') + ' (' + ignorelist_stream[i][2] + '))';
-                        userItem.innerHTML = '';
+            if (in_whitelist == false) {
+                if ((locked == true && hide_locked == true) == false && ((rating != undefined ? rating.innerHTML == 'Live' : false) && hide_unpopular == true) == false ) {
+                    for(let i = 0; i < ignorelist_stream.length; i++){
+                        if ((ignorelist_stream[i][0] == nickname && ignorelist_stream[i][0] != '') ||
+                            (ignorelist_stream[i][1] == profile && ignorelist_stream[i][1] !='')) {
+                            ignored += ':(' + nickname + ',' + profile + (rating != undefined ? ',' + rating.innerHTML : '') + ' (' + ignorelist_stream[i][2] + '))';
+                            userItem.innerHTML = '';
+                        }
                     }
                 }
+            } else {
+                whitelisted += ':(' + nickname + ',' + profile + (rating != undefined ? ',' + rating.innerHTML : '') + ')';
             }
         } else {
             userItem.innerHTML = '';
         }
 
         });
-    if (result != '') { console.log('Streams hidden' + result + ';'); }
-    //}
+    if (ignored != '') { console.log('Streams hidden' + ignored + ';'); }
+    if (whitelisted != '' && log_whitelisted == true) { console.log('Streams whitelisted' + whitelisted + ';'); }
 }
 
 window.addEventListener('beforeunload', function(event) {
@@ -1057,9 +1076,9 @@ window.addEventListener('beforeunload', function(event) {
 
         }
 
-    setTimeout(function(){filterStreams();},51);
+    setTimeout(function(){filterStreams(true);},51);
 
-    setInterval(function(){filterStreams();}, 3000);
+    setInterval(function(){filterStreams(false);}, 3000);
 
     if ( window.location.href.indexOf('https://livacha.com/chat/') != -1 ) {
       document.querySelector("div.chat-messages").addEventListener('DOMNodeRemoved', function (e) {
@@ -1201,6 +1220,7 @@ window.addEventListener('beforeunload', function(event) {
                 }
             } else { return undefined }
         }
+/*==================================================================================*/
 /*
         if ( window.location.href.indexOf('https://livacha.com/post/') != -1 ) {
 
@@ -1583,7 +1603,7 @@ window.addEventListener('beforeunload', function(event) {
 
              return result;
         }
-
+/*==================================================================================*/
         var s_timer = setInterval( function () {
             var element = document.querySelector('textarea.form-control');
 
@@ -1592,7 +1612,7 @@ window.addEventListener('beforeunload', function(event) {
                     document.querySelector("textarea.form-control").addEventListener('keypress', (e) => {
 
                         if (e.key === 'Enter') {
-                            console.log('+4');
+                            //console.log('+4');
                             var element = e.target;
                             element.value = TextCorrector(element.value,true,false,d_send);
                             return
@@ -1611,15 +1631,9 @@ window.addEventListener('beforeunload', function(event) {
                    document.querySelector("div.chat-container").querySelectorAll("button.btn-secondary").forEach(function (userItem) {
                         if (userItem.innerText.indexOf("Послать") != -1 ) {
                             userItem.addEventListener('click', (e) => {
-                                //console.log('++4');
                                 console.log(e.target);
                                 let elem = document.querySelector("textarea.form-control");
-                                //console.log(getEventListeners(document.querySelector("textarea.form-control")));
-                                //console.log(elem);
-                                //console.log(elem.value);
-
                                 elem.value = TextCorrector(elem.value,true,false,d_send);
-                                //console.log(TextCorrector(elem.value,true,false,d_send));
                                 return
                             },true)
                         }
@@ -1644,12 +1658,6 @@ window.addEventListener('beforeunload', function(event) {
                     let elements = document.getElementsByClassName('chat-messages');  // фикс автопрокрутки рептилоидовича
                     if (elements.length > 0) if (elements[0] != undefined) {
                         if ((Math.abs(elements[0].offsetHeight - elements[0].scrollHeight) - scrollPosition) < 100) {
-                            //console.log('scrollPosition:' + scrollPosition);
-                            //console.log('clientHeight:' + elements[0].clientHeight);
-                            //console.log('scrollHeight:' + elements[0].scrollHeight);
-                            //console.log('offsetHeight:' + elements[0].offsetHeight);
-                            //console.log('elements[0].offsetHeight - elements[0].scrollHeight - scrollPosition:' +
-                            //(Math.abs(elements[0].offsetHeight - elements[0].scrollHeight) - scrollPosition));
                             elements[0].scrollTo(0,elements[0].scrollHeight);
                         }
                     }
@@ -1659,8 +1667,6 @@ window.addEventListener('beforeunload', function(event) {
             }
         }, 53);
 /*==================================================================================*/
-        //if ( window.location.href.indexOf('https://livacha.com/chat/') != -1 ) {
-
         const monthNames = ["Январь", "Февраль", "Март", "Апрель", "Май", "Июнь", "Июль", "Август", "Сентябрь", "Октябрь", "Ноябрь", "Декабрь"];
 
         function DispatchChatMessage(e) {
@@ -1731,7 +1737,6 @@ window.addEventListener('beforeunload', function(event) {
             ['MD',false],['DE',false],['GE',true],['AT',false],['BA',false],['NO',false]
             //,['ES',true],['HU',true],['DZ',false],['DK',false]
             );
-
 
             const autoban_ukropitek = true;
             const autoban_ukropitek_treshold_msg = 2;
@@ -2268,7 +2273,6 @@ function CheckInIgnoreList(nickname,profile,uid,country) {
                                 ,(for_me ? 'background: LemonChiffon;' : '') + 'color: ' + color);
 
         }
-        //}
     }
 
     var Antiviblyadok = new Antiviblyadok();
