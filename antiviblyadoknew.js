@@ -2,7 +2,9 @@
 // @name        AntiviblyadokNew
 // @description Script - Antiviblyadok
 // @author      AntiviblyadokNew
-// @version     0.5
+// @version     0.5.3
+// @updateURL   https://raw.githubusercontent.com/Nachtgast/antiviblyadok/main/antiviblyadoknew.js
+// @downloadURL https://raw.githubusercontent.com/Nachtgast/antiviblyadok/main/antiviblyadoknew.js
 // @namespace   https://livacha.com/
 // @match       https://livacha.com/*
 // @match       https://smiles.su/dist/*
@@ -223,8 +225,8 @@ var Scrpt = create("div",ScrptContent);
                                  ['','stepdaddy','унылое'],
                                  ['','agrippa_perturbaciya','шиз какой то'],
                                  ['','kris_top','интернет проститутка, банит'],
-                                 ['','Clay','пездна банит'],
-                                 ['','Karina-kim20','проститка с бонги банит'],
+                                 ['','Clay','пездна банит неоднократно'],
+                                 ['','Karina-kim20','проститутка с бонги банит'],
                                  ['','mudila88855','инвал из кунсткамеры'],
                                  ['Рома','Mavkaa','кахтавая мгазь кидает в чс'],
                                  ['Шеф','Dillinger','чмо уфимское, банит как крыса в других трансляциях'],
@@ -251,18 +253,21 @@ var Scrpt = create("div",ScrptContent);
                                  ['Harter','harter','отродье банит у шлюхеи'],
                                  ['ADIDAS','gucci_kapitan','русофоб с еблом навального'],
                                  ['*KАТЁНОК*','apr12820','ебанутая дура'],
-                                 ['Луна 2010','luna_2010','два акка забанила сучара'],
+                                 ['ВАСЯ  ГРАДУС','Fgk6eju','пиндос'],
+                                 //['⚡️Эстонец⚡️','esstonec','эстонский мутант'],
+                                 ['Луна 2010','luna_2010','два акка забанила сучара']
                                 ];
         var whitelist_stream = [
                                 ['Дѻктѻр','flus'],
+//                                ['⚡️Эстонец⚡️','esstonec'],
                                 ['☆Серж ROCK☆','SergRock'],
-                                //['⚡️Эстонец⚡️','esstonec'],
                                 ['vodka0404','vodka0404'],
                                 ['Православный Кулак','r177688730m2'],
                                 ['Алька-кексик','alka_keksik'],
                                 ['Милка Попова','milka_popova1'],
                                 ['Vadik_Crypto','vadim_zolotko'],
-                                ['Crazy Fox','crazyfox']
+//                                ['Crazy Fox','crazyfox'],
+                                ['Вязальный Пепелац','sailorleviafan']
                                ];
 
         var author_user_id;
@@ -1213,14 +1218,12 @@ window.addEventListener('beforeunload', function(event) {
                         //console.log(arrayOfStrings[c] + "|" + /:[^:]+:/.test(arrayOfStrings[c]));
                         if (/:[^:]+:|#[^#:]+:/.test(arrayOfStrings[c]) == false) {
                             if (anticaps == true) {
+                                //console.log(arrayOfStrings);
                                 arrayOfStrings[c] = arrayOfStrings[c].toLowerCase(); // Полный антикапс
                                 str = str.toLowerCase();
+                                str = str.replace(str[0], str[0].toUpperCase());
+                                arrayOfStrings[c] = arrayOfStrings[c].replace(str.toLowerCase(),str);
                             }
-                            //console.log(arrayOfStrings[c]);
-
-                            str = str.replace(str[0], str[0].toUpperCase());
-                            //console.log(str);
-                            arrayOfStrings[c] = arrayOfStrings[c].replace(str.toLowerCase(),str);
                         }
                     }
 			    }
@@ -1446,6 +1449,9 @@ window.addEventListener('beforeunload', function(event) {
                 '.*( |^)вин(ца|цо|цу|е|о).*': '🥛',
                 '.*( |^)конья(к|ч).*': '🥛',
                 '.*( |^)конин(а|о|у|е).*': '🥛',
+                '.*( |^)проп(ём|ил|ют|ит).*': '🥛',
+                '.*( |^)нап(ютс|ётс|етс|ейс|ейтьс).*': '🥛',
+                '.*( |^)бух(ат|ает|нут).*': '🥛',
 /*=================================================================*/
                 '.*(мать|мамку) (ипу|еб.+)? (св|тв)о(ю|я).*': '😫',
                 '.*(тво|сво)\W{1,2} (мам\W|мат\W|бат\W).*': '😫',
@@ -1496,7 +1502,7 @@ window.addEventListener('beforeunload', function(event) {
             };
 
             if (shit_found == false) {
-                m = TextCorrector(m,true,true,d_recv); // Исправление на первую заглавную и добавление точки в конце
+                m = TextCorrector(m,true,false,d_recv); // Исправление на первую заглавную и добавление точки в конце
             }
 
             o.map(function (h, i) {
@@ -1608,10 +1614,15 @@ window.addEventListener('beforeunload', function(event) {
                         for(let i = 0; i < ResultArray.length; i++){
                             arr += "[" + ResultArray[i][0] + "|" + ResultArray[i][1] + "]";
                         }
-                        console.log("SpamMatch:" + arr); //SpamArray[c][0]
-                        console.log("Levenstain:" + levenshtein(rawtext, SpamArray[c][0]));
-                        console.log("shortstr:" + "(" + shortstr + "):" + shortstr.length + " ↓");
-                        console.log("rawtext:" + "(" + rawtext + "):" + rawtext.length + " ↓");
+                        let dist = levenshtein(rawtext, SpamArray[c][0]);
+                        if (SpamArray[c][4] == 2) {
+                            console.log("SpamMatch:" + arr); //SpamArray[c][0]
+                        }
+                        if (dist > 0) {
+                            console.log("Levenstain:" + dist);
+                            console.log("shortstr:" + "(" + shortstr + "):" + shortstr.length + " ↓");
+                            console.log("rawtext:" + "(" + rawtext + "):" + rawtext.length + " ↓");
+                        }
 					} else {
 						SpamArray.push([shortstr,nickname,login,tickcount,1]);
 //                        console.log(shortstr,nickname,login,tickcount,1);
@@ -1621,7 +1632,7 @@ window.addEventListener('beforeunload', function(event) {
             if (SpamArray.length >= 500) {
                 console.log('spamArray array length:' + SpamArray.length);
                 //console.log(SpamArray);
-                SpamArray = SpamArray.slice(200,SpamArray.length - 1);
+                SpamArray = SpamArray.slice(50,SpamArray.length - 1);
                 console.log('spamArray array spliced, lenght:' + SpamArray.length);
                 //console.log(SpamArray);
             }
@@ -1639,7 +1650,7 @@ window.addEventListener('beforeunload', function(event) {
                         if (e.key === 'Enter') {
                             //console.log('+4');
                             var element = e.target;
-                            element.value = TextCorrector(element.value,true,false,d_send);
+                            element.value = TextCorrector(element.value,false,false,d_send);
                             return
                         }
 
@@ -1657,7 +1668,7 @@ window.addEventListener('beforeunload', function(event) {
                         if (userItem.innerText.indexOf("Послать") != -1 ) {
                             userItem.addEventListener('click', (e) => {
                                 let elem = document.querySelector("textarea.form-control");
-                                elem.value = TextCorrector(elem.value,true,false,d_send);
+                                elem.value = TextCorrector(elem.value,false,false,d_send);
                                 return
                             },true)
                         }
@@ -1740,7 +1751,7 @@ window.addEventListener('beforeunload', function(event) {
             const hide_temp_not_ru_country = true;
 
             const restrictedCountries = Array ( // boolean true - скрывать так же у зарегеных
-            ['UA',false],['NL',false],['VN',false],['GB',false],['EE',false],['FR',false],['PL',false],
+            ['UA',false],['NL',false],['VN',false],['GB',false],['EE',false],['FR',false],['PL',true],
                 //['US',false],
             ['MD',false],['DE',false],['GE',true],['AT',false],['BA',false],['NO',false]
             //,['ES',true],['HU',true],['DZ',false],['DK',false]
@@ -1752,12 +1763,12 @@ window.addEventListener('beforeunload', function(event) {
             const autoremove_from_ignorlist_time = 0; // 3 months
 
             var nickname = message.owner.nickname;
-            var profile = (message.owner.info.profile != undefined && message.owner.info.profile != '' ? profile = message.owner.info.profile.replace(/\/user\//,'') : profile = '');
-            var mobile = (message.owner.info.mobile != undefined ? mobile = message.owner.info.mobile : mobile = ''); // с мобильного или нет
-            var country = (message.owner.info.country != undefined ? country = message.owner.info.country : country = ''); // название страны
-            var country_iso = (message.owner.info.country_iso != undefined ? country_iso = message.owner.info.country_iso : country_iso = ''); // код страны
-            var city = (message.owner.info.city != undefined ? city = message.owner.info.city : city = ''); // город
-            var uid = (message.owner.info.uid != undefined ? uid = message.owner.info.uid : uid = 0); // внутренний постоянный идентификатор профиля на блеваче
+            var profile = (message.owner.info.profile != undefined && message.owner.info.profile != '' ? message.owner.info.profile.replace(/\/user\//,'') : '');
+            var mobile = (message.owner.info.mobile != undefined ? message.owner.info.mobile : ''); // с мобильного или нет
+            var country = (message.owner.info.country != undefined ? message.owner.info.country : ''); // название страны
+            var country_iso = (message.owner.info.country_iso != undefined ? message.owner.info.country_iso : ''); // код страны
+            var city = (message.owner.info.city != undefined ? message.owner.info.city : ''); // город
+            var uid = (message.owner.info.uid != undefined ? message.owner.info.uid : 0); // внутренний постоянный идентификатор профиля на блеваче
             var sid = message.owner.sid; // хз что за идентификатор
             var user_id = message.owner_id; // в массиве с юзерами
             var is_moder = message.owner.moder; // смотрящий
@@ -1771,7 +1782,8 @@ window.addEventListener('beforeunload', function(event) {
             var attached = message.attached; // прикреплённое что то ... проверить
             var is_author = message.owner.owner;
             var joinAt = message.owner.joinAt; // дата регистрации
-            var is_me = (message.owner.self !== true ? is_me = false : is_me = true);
+            var is_me = (message.owner.self !== true ? false : true);
+            var is_city_changed = (city !== undefined && city != '' ? true : false);
 
             if (profile == '' && uid == '0' ) { is_temp = true }
 
@@ -1799,7 +1811,7 @@ window.addEventListener('beforeunload', function(event) {
                 if (text.search("🐖") != -1) { is_hohloflag = true };
                 if (text.search("🐷") != -1) { is_ukropitek = true };
                 //if (text.search('🥛') != -1) { is_amoral = true }
-                if ((text.search("🤮") != -1 || text.search("😭") != -1 || text.search('😫') != -1) &&
+                if ((text.search("🤮") != -1 || text.search("😭") != -1 || text.search('😫') != -1 || text.search('🥛') != -1) &&
                     is_me == false) { is_amoral = true } // || text.search('🥛') != -1
 
                 var now = new Date();
@@ -2176,20 +2188,22 @@ window.addEventListener('beforeunload', function(event) {
 
                     let color;
                     let background_color;
-
+// https://colorscheme.ru/html-colors.html
+// IndianRed
                     if (red == true && is_ukropitek != true && is_hohloflag != true) {
                         color = "red";
                     } else if (is_me == true) {
                         color = "green";
                     } else if (for_me == true) {
                         color = "DarkRed";
-                        background_color = "LemonChiffon"
+                        background_color = "LemonChiffon";
                     } else if (is_spam == true) {
                         color = "orange";
                     } else if (is_author == true) {
                         color = "purple";
+                        background_color = "LemonChiffon";
                     } else if (is_spam != true && (is_ukropitek == true || is_hohloflag == true)) {
-                        background_color = "Yellow"
+                        background_color = "LightYellow";
                         color = "red";
                     } else if (is_amoral == true) {
                         color = "Grey";
@@ -2197,6 +2211,7 @@ window.addEventListener('beforeunload', function(event) {
                         color = "Pink";
                     } else {
                         color = "blue";
+                        if (is_city_changed == true) background_color = 'LightGray';
                     }
 
                     const formatDate = (date) => {
@@ -2209,7 +2224,7 @@ window.addEventListener('beforeunload', function(event) {
                     console.log('%cchat(' + (date.getHours() < 10 ? '0' : '') + date.getHours() + ':' +
                                 (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() +
                                 '):' + nickname + ':' + profile + ':' + country_iso +
-                                (city !== undefined && city != '' ? '(' + city + ')' : '') + ':' +
+                                (is_city_changed ? '(' + city + ')' : '') + ':' +
                                 //(joinAt !== undefined ? 'joined(' + formatDate(new Date(joinAt)) + ')' : '') + ':' +
                                 'uid=' + uid + ':' +
                                 //'sid=' + sid + ':' +
@@ -2225,7 +2240,7 @@ window.addEventListener('beforeunload', function(event) {
                                 (for_author ? 'for_author:' : '') +
                                 (is_spam ? 'spam_found(' + antiSpamResult[0] + ')msg:' : '') + (is_amoral ? 'is_amoral:' : '') +
                                 (is_hohloflag ? 'is_hohloflag:' : '') +
-                                (is_ukropitek && SpamResult[2] != undefined ? 'is_ukropitek:(/' + SpamResult[2] + '/i:(' +
+                                (is_ukropitek == true && SpamResult[2] != undefined && is_spam == false ? 'is_ukropitek:(/' + SpamResult[2] + '/i:(' +
                                  SpamResult[1].replace(/<[^>]*>/g,'|') + '))' : '') +
                                 (is_restricted_country ? 'country_bl:' : '') +
                                 (is_in_ignorelist && !is_temp && !is_me && !is_author && !is_in_ignorelist_nick ? 'IGNORED(' + (
