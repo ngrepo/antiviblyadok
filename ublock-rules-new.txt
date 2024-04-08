@@ -1,0 +1,5 @@
+livacha.com/i/beeps/money.ogg
+livacha.com/i/beeps/ban.ogg
+livacha.com/upload/chat_room/donate_voice/*
+livacha.com/i/beeps/stop.ogg
+//livacha.com##a[href*="/chat/m94794"]

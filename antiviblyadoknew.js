@@ -2,7 +2,7 @@
 // @name        AntiviblyadokNew
 // @description Script - Antiviblyadok
 // @author      AntiviblyadokNew
-// @version     0.5.3
+// @version     0.5.4
 // @updateURL   https://raw.githubusercontent.com/Nachtgast/antiviblyadok/main/antiviblyadoknew.js
 // @downloadURL https://raw.githubusercontent.com/Nachtgast/antiviblyadok/main/antiviblyadoknew.js
 // @namespace   https://livacha.com/
@@ -2233,6 +2233,7 @@ window.addEventListener('beforeunload', function(event) {
                                 'cm' + '=' + div_chat_mess_count + ':' +
                                 'il' + '=' + ignorelist.length + ':' + 'sa=' + SpamArray.length + ':' +
                                 (mobile ? 'phone:' : '') +
+                                (is_city_changed ? 'city_changed:' : '') +
                                 (is_temp ? 'is_temp:' : '') + (is_author ? 'is_author:' : '') +
                                 (is_moder ? 'is_room_moder:' : '') + (is_moderator ? 'is_site_moder:' : '') +
                                 (is_admin ? 'is_site_admin:' : '') +
