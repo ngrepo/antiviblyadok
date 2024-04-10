@@ -7,7 +7,6 @@
 // @downloadURL https://raw.githubusercontent.com/Nachtgast/antiviblyadok/main/antiviblyadoknew.js
 // @namespace   https://livacha.com/
 // @match       https://livacha.com/*
-// @match       https://smiles.su/dist/*
 // @connect     livacha.com
 // @run-at      document-start
 // @noframes
@@ -254,8 +253,9 @@ var Scrpt = create("div",ScrptContent);
                                  ['ADIDAS','gucci_kapitan','русофоб с еблом навального'],
                                  ['*KАТЁНОК*','apr12820','ебанутая дура'],
                                  ['ВАСЯ  ГРАДУС','Fgk6eju','пиндос'],
-                                 //['⚡️Эстонец⚡️','esstonec','эстонский мутант'],
-                                 ['Луна 2010','luna_2010','два акка забанила сучара']
+                                 ['Нана','Nana1610','свинья с самомнением'],
+                                 ['Луна 2010','luna_2010','два акка забанила сучара'],
+                                 ['Реалка','yuliya1237','свидомое отродье с днепропетровска банит']
                                 ];
         var whitelist_stream = [
                                 ['Дѻктѻр','flus'],
@@ -289,6 +289,7 @@ var Scrpt = create("div",ScrptContent);
         const ignore_all_params = 2;
         const ignore_temp_profile = 3;
         const ignore_permanent = 4;
+        const ignore_pending = 5;
 
         const d_send = 0;
         const d_recv = 1;
@@ -322,12 +323,12 @@ function SaveData() {
 // [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time [5] counter
 // [6] comment [7] country [8] uid [9] reserved [10] reserved
 //=======================================================
-// [2] instruction: 0: - блокировать по нику + uid + по стране с разбаном по значению константы в днях в коде
-// [2] instruction: 1: - блокировать по логину + uid + по стране с разбаном по значению константы в днях в коде
+// [2] instruction: 0: - блокировать по нику + uid с разбаном по значению константы в днях в коде
+// [2] instruction: 1: - блокировать по логину + uid с разбаном по значению константы в днях в коде
 // [2] instruction: 2: - блокировка по всем параметрам с разбаном по значению константы в днях в коде
 // [2] instruction: 3: - игнор на день по нику и стране для временных профилей
 // [2] instruction: 4: - перманентный игнор по всем параметрам
-// [2] instruction: 5: - reserved
+// [2] instruction: 5: - добавлено в счётчик, в ожидании игнора
 // [2] instruction: 6: - reserved
 // [2] instruction: 7: - reserved
 //const ignore_nick_uid_country = 0;
@@ -335,6 +336,8 @@ function SaveData() {
 //const ignore_all_params = 2;
 //const ignore_temp_profile = 3;
 //const ignore_permanent = 4;
+//const ignore_pending = 5;
+//=====================================================
     //var myentry = {nick: '', login: '', instruction: 0, time_offset: 0, mod_time: 0, comment: '', country: '', uid: 0};
 
     //let entry = new Object();
@@ -1201,6 +1204,7 @@ window.addEventListener('beforeunload', function(event) {
                 s = s.replace(/тчо/gi,'вроде');
                 s = s.replace(/из за/gi,'из-за');
                 s = s.replace(/корчое/gi,'короче');
+                s = s.replace(/хохлопид(и|о)?р(х|г)?/gi,'хохол');
 
                 if (direction == d_send) {
 //                    s = s.replace(/\) ?$|\\ ?$/gi,' :smile: ');
@@ -1730,7 +1734,7 @@ window.addEventListener('beforeunload', function(event) {
             var div_chat_mess_count = 0;
             var SpamResult;
 
-            var is_ukropitek = false;
+            var is_rusofob = false;
             var is_hohloflag = false;
             var is_amoral = false;
             var is_spam = false;
@@ -1749,6 +1753,7 @@ window.addEventListener('beforeunload', function(event) {
             const hide_temp_profile = false;
             const hide_countries = true;
             const hide_temp_not_ru_country = true;
+            const hide_all_not_ru_country = false; // доделать !?
 
             const restrictedCountries = Array ( // boolean true - скрывать так же у зарегеных
             ['UA',false],['NL',false],['VN',false],['GB',false],['EE',false],['FR',false],['PL',true],
@@ -1757,10 +1762,9 @@ window.addEventListener('beforeunload', function(event) {
             //,['ES',true],['HU',true],['DZ',false],['DK',false]
             );
 
-            const autoban_ukropitek = true;
-            const autoban_ukropitek_treshold_msg = 2;
+            const autoban = true;
+            const autoban_treshold_msg = 3;
             const autoremove_from_ignorlist = false;
-            const autoremove_from_ignorlist_time = 0; // 3 months
 
             var nickname = message.owner.nickname;
             var profile = (message.owner.info.profile != undefined && message.owner.info.profile != '' ? message.owner.info.profile.replace(/\/user\//,'') : '');
@@ -1809,7 +1813,7 @@ window.addEventListener('beforeunload', function(event) {
                 //text = antiCapsMat(text); // обрабатывать сообщения от себя
 
                 if (text.search("🐖") != -1) { is_hohloflag = true };
-                if (text.search("🐷") != -1) { is_ukropitek = true };
+                if (text.search("🐷") != -1) { is_rusofob = true };
                 //if (text.search('🥛') != -1) { is_amoral = true }
                 if ((text.search("🤮") != -1 || text.search("😭") != -1 || text.search('😫') != -1 || text.search('🥛') != -1) &&
                     is_me == false) { is_amoral = true } // || text.search('🥛') != -1
@@ -1850,7 +1854,7 @@ window.addEventListener('beforeunload', function(event) {
 // [2] instruction: 2: - блокировка по всем параметрам с разбаном по значению константы в днях в коде
 // [2] instruction: 3: - игнор на день по нику и стране для временных профилей
 // [2] instruction: 4: - перманентный игнор по всем параметрам
-// [2] instruction: 5: - reserved
+// [2] instruction: 5: - добавлено в счётчик, в ожидании игнора
 // [2] instruction: 6: - reserved
 // [2] instruction: 7: - reserved
 //const ignore_nick_uid_country = 0;
@@ -1858,6 +1862,7 @@ window.addEventListener('beforeunload', function(event) {
 //const ignore_all_params = 2;
 //const ignore_temp_profile = 3;
 //const ignore_permanent = 4;
+//const ignore_pending = 5;
 //=====================================================
 
                 function SetVars (i) {
@@ -2105,8 +2110,11 @@ window.addEventListener('beforeunload', function(event) {
 
                 is_restricted_country = isRestrictedCountry(country_iso,is_temp);
 
-                if (is_spam == true && is_me == false && is_author == false) { // автобан пидоров
+                if ((is_spam == true || is_hohloflag == true || is_rusofob == true) &&
+                    (is_in_ignorelist == false && is_in_ignorelist_nick == false && added_to_ignore == false) &&
+                    is_me == false && is_author == false && autoban == true) { // автобан пидоров
                     let exists = false;
+                    let index;
 
                     for(let i = 0; i < ignorelist.length; i++) {
 //========================New==========================
@@ -2118,7 +2126,7 @@ window.addEventListener('beforeunload', function(event) {
 // [2] instruction: 2: - блокировка по всем параметрам с разбаном по значению константы в днях в коде
 // [2] instruction: 3: - игнор на день по нику и стране для временных профилей
 // [2] instruction: 4: - перманентный игнор по всем параметрам
-// [2] instruction: 5: - reserved
+// [2] instruction: 5: - добавлено в счётчик, в ожидании игнора
 // [2] instruction: 6: - reserved
 // [2] instruction: 7: - reserved
 //const ignore_nick_uid_country = 0;
@@ -2126,13 +2134,14 @@ window.addEventListener('beforeunload', function(event) {
 //const ignore_all_params = 2;
 //const ignore_temp_profile = 3;
 //const ignore_permanent = 4;
+//const ignore_pending = 5;
 //=====================================================
 
                         if (ignorelist[i] != undefined) {
                             if (ignorelist[i][1] != '') {
-                                if (ignorelist[i][0] == nickname && ignorelist[i][1] == profile) { exists = true }
+                                if (ignorelist[i][0] == nickname && ignorelist[i][1] == profile && ignorelist[i][8] == uid) { exists = true; index = i; break; }
                             } else {
-                                if (ignorelist[i][0] == nickname && ignorelist[i][1] == '') { exists = true }
+                                if (ignorelist[i][0] == nickname && ignorelist[i][1] == '' && ignorelist[i][8] == 0) { exists = true; index = i; break; }
                             }
                         }
                     }
@@ -2140,29 +2149,57 @@ window.addEventListener('beforeunload', function(event) {
 //console.log("profile: " + profile);
 
                     if (exists == false) {
-                        if ( (is_spam == true && antiSpamResult[0] > 3 && (is_ukropitek == true || is_hohloflag == true) ) && is_temp == false ){
-                            ignorelist.push([nickname,profile,ignore_profile_uid_country,date.getTime(),date.getTime(),0,
-                            (is_spam ? 'is_spam(' + antiSpamResult[0] + ")" : '') +
-                            (is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') +
-                            (is_hohloflag ? 'is_hohloflag(' + antiSpamResult[0] + ")" : '') +
+                        if ((is_spam == true && antiSpamResult[0] > 10) && is_temp == false ){
+                            ignorelist.push([nickname,profile,ignore_profile_uid_country,date.getTime(),date.getTime(),10,
+                            (is_spam ? 'спамер (' + antiSpamResult[0] + " повторов)" : '') +
                             " - автобан на " +
                             ignore_time / 86400000 + " дней",country_iso,uid,0,0]);
                             added_to_ignore == true;
                             console.log("added to ignore: " + nickname + "|" + profile + "|" + uid + ": на " +
                             ignore_time / 86400000 + " дней по логину");
-                            //SaveData();
-                            //console.log(ignorelist);
+                            SaveData();
+                            console.log(ignorelist);
+                        }
+
+                        if ((is_hohloflag == true || is_rusofob == true) && is_temp == false){
+                            ignorelist.push([nickname,profile,ignore_pending,date.getTime(),date.getTime(),1,'',country_iso,uid,0,0]);
+                            console.log("added to pending: " + nickname + "|" + profile + "|" + uid);
+                            SaveData();
+                            console.log(ignorelist);
                         }
 
                         if ( (is_spam == true && antiSpamResult[0] > 4) && is_temp == true ){
                             //ignorelist.push([nickname,profile,ignore_temp_profile,date.getTime(),date.getTime(),0,
                             //(is_spam ? 'is_spam(' + antiSpamResult[0] + ")" : '') +
-                            //(is_ukropitek ? 'is_ukropitek(' + antiSpamResult[0] + ")" : '') + ' - автобан на 1 день',country_iso,uid,0,0]);
+                            //(is_rusofob ? 'is_rusofob(' + antiSpamResult[0] + ")" : '') + ' - автобан на 1 день',country_iso,uid,0,0]);
                             //added_to_ignore == true;
                             //console.log("added to ignore: " + nickname + "|" + profile + "|" + uid + ": на 1 день по логину и нику");
                             //SaveData();
                             //console.log(ignorelist);
                         }
+                    } else {
+                        if (ignorelist[index][5] < autoban_treshold_msg && ignorelist[index][2] == ignore_pending) {
+                            ignorelist[index][5] = ignorelist[index][5];
+                            console.log(ignorelist);
+                            //console.log('exists < 3 ignorelist[index][5]:' + ignorelist[index][5]);
+                            //console.log('exists < 3 ignorelist[index][2]:' + ignorelist[index][2]);
+                        }
+
+                        if ((is_hohloflag == true || is_rusofob == true) && is_temp == false && ignorelist[index][2] == ignore_pending){
+                            if (ignorelist[index][5] >= autoban_treshold_msg) {
+                                ignorelist[index][2] = ignore_profile_uid_country;
+                                ignorelist[index][6] = (is_rusofob ? 'русофоб' : '') + (is_hohloflag ? 'хохлофлаг' : '') + " (" +
+                                (Number(ignorelist[index][5])) + " раза) - автобан на " + ignore_time / 86400000 + " дней";
+                                //console.log('exists >= 3 ignorelist[index][5]:' + ignorelist[index][5]);
+                                //console.log('exists >= 3 ignorelist[index][2]:' + ignorelist[index][2]);
+                                added_to_ignore == true;
+                                console.log("added to ignore: " + nickname + "|" + profile + "|" + uid + ": на " +
+                                ignore_time / 86400000 + " дней по логину");
+                                SaveData();
+                                console.log(ignorelist);
+                            }
+                       }
+
                     }
                 }
 
@@ -2172,7 +2209,7 @@ window.addEventListener('beforeunload', function(event) {
                    (message_to_ignored_nick == true && for_author == false && for_me == false) ||
                    (is_temp == true && hide_temp_profile == true) ||
                    (is_restricted_country == true && hide_countries == true) ||
-                   ((is_ukropitek == true || is_hohloflag == true) && hide_ukropitek == true)){
+                   ((is_rusofob == true || is_hohloflag == true) && hide_ukropitek == true)){
                     if(is_me == false && is_author == false) {
 
                       red = true;
@@ -2188,9 +2225,10 @@ window.addEventListener('beforeunload', function(event) {
 
                     let color;
                     let background_color;
+
 // https://colorscheme.ru/html-colors.html
-// IndianRed
-                    if (red == true && is_ukropitek != true && is_hohloflag != true) {
+
+                    if (red == true && is_rusofob != true && is_hohloflag != true) {
                         color = "red";
                     } else if (is_me == true) {
                         color = "green";
@@ -2202,7 +2240,7 @@ window.addEventListener('beforeunload', function(event) {
                     } else if (is_author == true) {
                         color = "purple";
                         background_color = "LemonChiffon";
-                    } else if (is_spam != true && (is_ukropitek == true || is_hohloflag == true)) {
+                    } else if (is_spam != true && (is_rusofob == true || is_hohloflag == true)) {
                         background_color = "LightYellow";
                         color = "red";
                     } else if (is_amoral == true) {
@@ -2241,7 +2279,7 @@ window.addEventListener('beforeunload', function(event) {
                                 (for_author ? 'for_author:' : '') +
                                 (is_spam ? 'spam_found(' + antiSpamResult[0] + ')msg:' : '') + (is_amoral ? 'is_amoral:' : '') +
                                 (is_hohloflag ? 'is_hohloflag:' : '') +
-                                (is_ukropitek == true && SpamResult[2] != undefined && is_spam == false ? 'is_ukropitek:(/' + SpamResult[2] + '/i:(' +
+                                (is_rusofob == true && SpamResult[2] != undefined && is_spam == false ? 'is_rusofob:(/' + SpamResult[2] + '/i:(' +
                                  SpamResult[1].replace(/<[^>]*>/g,'|') + '))' : '') +
                                 (is_restricted_country ? 'country_bl:' : '') +
                                 (is_in_ignorelist && !is_temp && !is_me && !is_author && !is_in_ignorelist_nick ? 'IGNORED(' + (
