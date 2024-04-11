@@ -2,9 +2,9 @@
 // @name        AntiviblyadokNew
 // @description Script - Antiviblyadok
 // @author      AntiviblyadokNew
-// @version     0.5.4
-// @updateURL   https://raw.githubusercontent.com/Nachtgast/antiviblyadok/main/antiviblyadoknew.js
-// @downloadURL https://raw.githubusercontent.com/Nachtgast/antiviblyadok/main/antiviblyadoknew.js
+// @version     0.5.5
+// @updateURL   https://raw.githubusercontent.com/ngrepo/antiviblyadok/main/antiviblyadoknew.js
+// @downloadURL https://raw.githubusercontent.com/ngrepo/antiviblyadok/main/antiviblyadoknew.js
 // @namespace   https://livacha.com/
 // @match       https://livacha.com/*
 // @connect     livacha.com
@@ -318,7 +318,7 @@ function markDuplicate(array){
 //    console.dir(Object.keys(countItems));
 }
 
-function SaveData() {
+function SaveData(autoremove) {
 //========================New==========================
 // [0] nick [1] login [2] instruction [3] ignore time offset [4] modification time [5] counter
 // [6] comment [7] country [8] uid [9] reserved [10] reserved
@@ -396,12 +396,12 @@ function SaveData() {
            let now = new Date();
            let ticks = now.getTime();
 
-           if ( (((ticks - in_item[3]) > 86400000) && (in_item[2] == ignore_temp_profile) )
+           if ( autoremove == true && ((((ticks - in_item[3]) > 86400000) && (in_item[2] == ignore_temp_profile) )
                ||
                (((ticks - in_item[3]) > ignore_time) && (in_item[2] == ignore_nick_uid_country ||
                                                        in_item[2] == ignore_profile_uid_country ||
                                                        in_item[2] == ignore_all_params ||
-                                                       in_item[2] == ignore_permanent)) ) {
+                                                       in_item[2] == ignore_permanent))) ) {
                console.log("%cantyviblyadok(" + ((now.getHours() < 10 && now.getHours() >= 0) ? "0" + now.getHours() : "") +
                                     ":" + ((now.getMinutes() < 10 && now.getMinutes() >= 0) ? "0" + now.getMinutes() : "") + "): " +
                                     "nick:" + in_item[0] + "|login:" + in_item[1] +
@@ -415,7 +415,7 @@ function SaveData() {
            } else { out_array.push(in_item) }
        }
 
-        if (existsUID == true || existsProfile == true || existsNick == true) {
+        if (existsUID == true || existsProfile == true || existsNick == true ) {
                 if (a1[i][4] < a2[c][4]) { // код удаления по timeoffset
                     checkForRemoveEntry(a2[c],ignorelist_temp);
                 } else {
@@ -536,7 +536,7 @@ const ignore_permanent = 4;
                             ignorelist.push([nickname,profile,ignore_temp_profile,date.getTime(),date.getTime(),0,comment,country,uid,0,0]);
                             console.log("added to ignore using button: " + nickname + ": на 1 день по нику для временного профиля");
                             //console.log(ignorelist);
-                            SaveData();
+                            SaveData(true);
                         }
                         if (profile != '' && nickname != '' && uid != 0) {
                             ignorelist.push([nickname,profile,ignore_all_params,date.getTime(),date.getTime(),0,comment,country,uid,0,0]);
@@ -544,7 +544,7 @@ const ignore_permanent = 4;
                                         ignore_time / 86400000 + " дней по логину");
                             //console.log(nickname);
                             //console.log(ignorelist);
-                            SaveData();
+                            SaveData(true);
                         }
                     }
 
@@ -1764,7 +1764,8 @@ window.addEventListener('beforeunload', function(event) {
 
             const autoban = true;
             const autoban_treshold_msg = 3;
-            const autoremove_from_ignorlist = false;
+            const autoban_spam_treshold_msg = 10;
+            const autoremove_from_ignorlist = true;
 
             var nickname = message.owner.nickname;
             var profile = (message.owner.info.profile != undefined && message.owner.info.profile != '' ? message.owner.info.profile.replace(/\/user\//,'') : '');
@@ -1932,7 +1933,7 @@ window.addEventListener('beforeunload', function(event) {
                             console.log('%cignorelist entry updated for (' + nickname + ':' + profile + ':' +
                                         uid + ':' + country_iso + '):old:(' + ignorelist_match + '):new added:(' +
                                         ignorelist_match_n + ')','background: LemonChiffon;color:red');
-                            SaveData();
+                            SaveData(autoremove_from_ignorlist);
                             ignorelist_match += ((ignorelist_match.length > 0) ? "|" + ignorelist_match_n : ignorelist_match_n);
                         }
                     }
@@ -2149,42 +2150,50 @@ window.addEventListener('beforeunload', function(event) {
 //console.log("profile: " + profile);
 
                     if (exists == false) {
-                        if ((is_spam == true && antiSpamResult[0] >= 5) && is_temp == false ){
-                            ignorelist.push([nickname,profile,ignore_profile_uid_country,date.getTime(),date.getTime(),antiSpamResult[0],
-                            (is_spam ? 'спамер (' + antiSpamResult[0] + " повторов)" : '') +
+                        if ((is_spam == true && antiSpamResult[0] >= autoban_spam_treshold_msg) && is_temp == false ){
+                            let reason = 'Причина: ' + (is_spam ? 'спамер (' + antiSpamResult[0] + " повторов)" : '') +
                             " - автобан на " +
-                            ignore_time / 86400000 + " дней",country_iso,uid,0,0]);
+                            ignore_time / 86400000 + " дней";
+                            ignorelist.push([nickname,profile,ignore_profile_uid_country,date.getTime(),date.getTime(),antiSpamResult[0],
+                            reason,country_iso,uid,0,0]);
                             added_to_ignore == true;
                             console.log("added to ignore: " + nickname + "|" + profile + "|" + uid + ": на " +
                             ignore_time / 86400000 + " дней по логину");
-                            SaveData();
+                            console.log(reason);
+                            SaveData(autoremove_from_ignorlist);
                             console.log(ignorelist);
                         }
 
                         if ((is_hohloflag == true || is_rusofob == true) && is_temp == false){
-                            ignorelist.push([nickname,profile,ignore_pending,date.getTime(),date.getTime(),1,'',country_iso,uid,0,0]);
+                            let reason = 'Причина: ' + (is_rusofob ? 'русофоб' : '') + (is_hohloflag ? 'хохлофлаг' : '');
+                            ignorelist.push([nickname,profile,ignore_pending,date.getTime(),date.getTime(),1,reason,country_iso,uid,0,0]);
                             console.log("added to pending: " + nickname + "|" + profile + "|" + uid);
-                            SaveData();
+                            console.log(reason);
+                            SaveData(autoremove_from_ignorlist);
                             console.log(ignorelist);
                         }
 
                         if ((is_hohloflag == true || is_rusofob == true) && is_temp == true ){
+                            let reason = 'Причина: ' + (is_rusofob ? 'русофоб' : '') + (is_hohloflag ? 'хохлофлаг' : '') + " (1 раз) - автобан на 1 день";
                             ignorelist.push([nickname,profile,ignore_temp_profile,date.getTime(),date.getTime(),1,
-                            (is_rusofob ? 'русофоб' : '') + (is_hohloflag ? 'хохлофлаг' : '') + " (1 раз) - автобан на 1 день",country_iso,uid,0,0]);
+                            reason,country_iso,uid,0,0]);
                             added_to_ignore == true;
                             console.log("added to ignore: " + nickname + "|" + profile + "|" + uid + ": на 1 день по логину и нику");
-                            SaveData();
+                            console.log(reason);
+                            SaveData(autoremove_from_ignorlist);
                             console.log(ignorelist);
                         }
 
-                        if ( (is_spam == true && antiSpamResult[0] >= 5) && is_temp == true ){
-                            ignorelist.push([nickname,profile,ignore_temp_profile,date.getTime(),date.getTime(),antiSpamResult[0],
-                            (is_spam ? 'is_spam' : '') +
+                        if ( (is_spam == true && antiSpamResult[0] >= autoban_spam_treshold_msg) && is_temp == true ){
+                            let reason = 'Причина: ' + (is_spam ? 'спамер' : '') +
                             (is_rusofob ? 'русофоб' : '') + (is_hohloflag ? 'хохлофлаг' : '') + " (" +
-                            antiSpamResult[0] + " раза) - автобан на 1 день",country_iso,uid,0,0]);
+                            antiSpamResult[0] + " раза) - автобан на 1 день";
+                            ignorelist.push([nickname,profile,ignore_temp_profile,date.getTime(),date.getTime(),antiSpamResult[0],
+                            reason,country_iso,uid,0,0]);
                             added_to_ignore == true;
                             console.log("added to ignore: " + nickname + "|" + profile + "|" + uid + ": на 1 день по логину и нику");
-                            SaveData();
+                            console.log(reason);
+                            SaveData(autoremove_from_ignorlist);
                             console.log(ignorelist);
                         }
                     } else {
@@ -2205,7 +2214,7 @@ window.addEventListener('beforeunload', function(event) {
                                 added_to_ignore == true;
                                 console.log("added to ignore: " + nickname + "|" + profile + "|" + uid + ": на " +
                                 ignore_time / 86400000 + " дней по логину");
-                                SaveData();
+                                SaveData(autoremove_from_ignorlist);
                                 console.log(ignorelist);
                             }
                        }
