@@ -2,7 +2,7 @@
 // @name        AntiviblyadokNew
 // @description Script - Antiviblyadok
 // @author      AntiviblyadokNew
-// @version     0.5.6
+// @version     0.5.5
 // @updateURL   https://raw.githubusercontent.com/ngrepo/antiviblyadok/main/antiviblyadoknew.js
 // @downloadURL https://raw.githubusercontent.com/ngrepo/antiviblyadok/main/antiviblyadoknew.js
 // @namespace   https://livacha.com/
@@ -1196,7 +1196,7 @@ window.addEventListener('beforeunload', function(event) {
     }
 
     document.addEventListener("DOMContentLoaded", function(event) {
-
+        console.log('EventListenerAdded:DOMContentLoaded');
         function Antiviblyadok() {
             this.version = localStorage.getItem('tr-ver') != undefined ? localStorage.getItem('tr-ver') : "0.0.3";
 
@@ -1762,15 +1762,14 @@ window.addEventListener('beforeunload', function(event) {
             if (element != undefined) {
                 if ( window.location.href.indexOf('https://livacha.com/chat/') != -1 ) {
                     document.querySelector("textarea.form-control").addEventListener('keypress', (e) => {
-
                         if (e.key === 'Enter') {
                             //console.log('+4');
                             var element = e.target;
                             element.value = TextCorrector(element.value,true,false,d_send);
                             return
                         }
-
                     },true);
+                    console.log('EventListenerAdded:textarea.form-control:keypress');
                     clearInterval(s_timer);
                 }
             }
@@ -1787,6 +1786,7 @@ window.addEventListener('beforeunload', function(event) {
                                 elem.value = TextCorrector(elem.value,true,false,d_send);
                                 return
                             },true)
+                            console.log('EventListenerAdded:div.chat-container.button.btn-secondary:click');
                         }
                    })
                     clearInterval(b_timer);
@@ -1816,6 +1816,7 @@ window.addEventListener('beforeunload', function(event) {
                     DispatchChatMessage(e);
                 },true);
 
+                console.log('EventListenerAdded:DOMNodeInserted:chat-messages:scroll');
                 elements[0].addEventListener('scroll', function () { // получаем позицию ползунка прокрутки
                     scrollPosition = elements[0].scrollTop;
                 });
@@ -1935,7 +1936,6 @@ window.addEventListener('beforeunload', function(event) {
 
                     if (!is_rus_flag && msglist_loaded == true) { // не проверять на спам сообщения с русским флагом
                                                                   // и пока не загружены все сообщения при входе в трансу.
-                        console.log(1);
                         antiSpamResult = antiSpam(nickname,profile,text);
                     }
 
@@ -2406,7 +2406,7 @@ window.addEventListener('beforeunload', function(event) {
                    (is_temp == true && hide_temp_profile == true) ||
                    (is_restricted_country == true && hide_countries == true) ||
                    ((is_rusofob == true || is_hohloflag == true) && hide_ukropitek == true)){
-                    if(is_me == false && is_author == false) {
+                    if(is_me == false && is_author == false && is_rus_flag == false) {
 
                       red = true;
                       element.remove();
