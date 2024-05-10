@@ -294,7 +294,7 @@ var Scrpt = create("div",ScrptContent);
                                  ['Нана','Nana1610','свинья с самомнением'],
 //                                 ['Луна 2010','luna_2010','два акка забанила сучара'],
                                  ['Мультик©™','Daryna','остоебавший хихикающий рахит'],
-                                 ['Алинка Сергеевна','Alinka_Sergeevna','забанила низачто ёбнутая'],
+//                                 ['Алинка Сергеевна','Alinka_Sergeevna','забанила низачто ёбнутая'],
 //                                 ['Милка Попова','milka_popova1','забанила из-за минетки'],
                                  ['Вероника Сергеевна','sdfdghj','у ёбнутой чат всегда для друзей'],
                                  ['Реалка','yuliya1237','свидомое отродье с днепропетровска банит']
@@ -310,7 +310,8 @@ var Scrpt = create("div",ScrptContent);
                                 ['Vadik_Crypto','vadim_zolotko'],
                                 ['Crazy Fox','crazyfox'],
                                 ['Вязальный Пепелац','sailorleviafan'],
-                                ['artem623111','artem623111']
+                                ['artem623111','artem623111'],
+                                ['estonec666','⚡️ЭСТОНЕЦ⚡️']
                                ];
 
         var author_user_id;
@@ -854,10 +855,15 @@ function messageDispather(data) {
                 case 'ban': { // модерастом или владельцем трансляции
                     console.log('ban =============================');
                     console.log(message);
-                    console.log('ban: ('+ userlist.get(message.response.clientId).nickname + ':' +
+                    console.log('ban: ('+ ((userlist.get(message.response.clientId) != undefined &&
+                                message.response.clientId != '') ? userlist.get(message.response.clientId).nickname + ':' +
                                 userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + ':' +
-                                userlist.get(message.response.clientId).info.uid + '):text:(' +
+                                userlist.get(message.response.clientId).info.uid : '"хз"' ) + '):text:(' +
                                 message.response.text + ')');
+                                //userlist.get(message.response.clientId).nickname + ':' +
+                                //userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + ':' +
+                                //userlist.get(message.response.clientId).info.uid + '):text:(' +
+                                //message.response.text + ')');
                     break;
                 }
                 case 'ignor': { // хз кем, возможно автором, непонятно что за чмо
@@ -1294,10 +1300,10 @@ window.addEventListener('beforeunload', function(event) {
         	.replace(/&#039;/g, "'");
         }
 
-        function TextCorrector (s,anticaps,auto_dot,direction) {
-            if (typeof s === 'string' && typeof anticaps === 'boolean' &&  typeof auto_dot === 'boolean' ) {
+        function TextCorrector (s,anticaps,dot,direction) {
+            if (typeof s === 'string' && typeof anticaps === 'boolean' &&  typeof dot === 'boolean' ) {
                 const autocorrect_enabled = true; if (autocorrect_enabled == false) { return }
-
+                var arrayOfStrings = [];
                 s = s.replace(/наврен/gi,'наверн');
                 s = s.replace(/чтоли/gi,'что ли');
                 s = s.replace(/врядли/gi,'вряд ли');
@@ -1308,47 +1314,81 @@ window.addEventListener('beforeunload', function(event) {
                 s = s.replace(/корчое/gi,'короче');
                 s = s.replace(/никогад/gi,'никогда');
                 s = s.replace(/(хохлопид(и|о)?р(х|г)?)|хохол/gi,'хохлер');
+                s = s.replace(/\:\?$/gi,'?');
 
                 if (direction == d_send) {
 //                    s = s.replace(/\) ?$|\\ ?$/gi,' :smile: ');
                 }
 
-                var arrayOfStrings = s.split(/(#[^#:]+:|:[^:]+:|\. |\!|\?|\)|\()/); // Делим на предложения, ники, смайлы
-                //console.log(arrayOfStrings);
-			    for(var c = 0; c < arrayOfStrings.length; c++){
+                //console.log('s:' + s);
 
-                let match_value = arrayOfStrings[c].match(/[^<>/\d\[\]\s:,;\.\-\!\?]+/);
-                    //console.log(match_value);
-                    if (match_value !== null) { // Делаем первую букву заглавной
-                       if (match_value[0] == '') { return s }
-                       let str = match_value[0];
-                        //console.log(arrayOfStrings[c] + "|" + /:[^:]+:/.test(arrayOfStrings[c]));
-                        if (/:[^:]+:|#[^#:]+:/.test(arrayOfStrings[c]) == false) {
-                            if (anticaps == true) {
-                                //console.log(arrayOfStrings);
-                                arrayOfStrings[c] = arrayOfStrings[c].toLowerCase(); // Полный антикапс
-                                str = str.toLowerCase();
-                                str = str.replace(str[0], str[0].toUpperCase());
-                                arrayOfStrings[c] = arrayOfStrings[c].replace(str.toLowerCase(),str);
-                            }
+                let value = 0;
+                let TextBeginningIndex = -1;
+                let str_arr = [];
+                let sentence_found = false;
+                //console.log(s.replace(/\s+$|^\s+/,'').split(/\s+/));
+                s.replace(/\s+$|^\s+/,'').split(/\s+/).forEach(function (currentValue, index, array) { // делит пробелами
+                    value = 0;
+                    if (currentValue != '') {
+                        if (currentValue.search(/#[^#:]+:/) != -1) {
+                            value = 1;         // находит ники
+                        } else if (currentValue.search(/:[^:]+:/) != -1) {
+                            value = 2;          // находит смайлы
+                        } else if (currentValue.search(/https?:\/\/(www\.)?\S/) != -1) {
+                            value = 4;      // находит url
+                        } else if (currentValue.search(/[a-zA-ZА-Яа-я]+[.?!()]+/) != -1) {
+                            value = 5;    // находит конец предложения
+                        } else if (currentValue.search(/^[A-ZА-Я]+$/) != -1) {
+                            value = 6;         // находит полностью верхний регистр
+                        } else if (currentValue.search(/[A-ZА-Я]+[a-zа-я]+/) != -1) {
+                            value = 7; // находит начинающийся с верхнего и далее нижний
+                        } else if (currentValue.search(/[A-ZА-Яa-zа-я]+/) != -1) {
+                            value = 8; // находит любой регистр
+                            TextBeginningIndex = currentValue.search(/[A-ZА-Яa-zа-я]+/);
+                        //} else if (currentValue.search(/\.|\!|\?|\)|\(/) != -1) {
+                        //    value = 3;   // находит символы
                         }
+//звезда ёбаного эсТон вуда. ЁБаНый гуль. хуйЛонец
+                        if (sentence_found == false) {
+                            //TextBeginningIndex = currentValue.search(/[^<>/\d\[\]\s:,;\.\-\!\?\+\-]+/);
+                            if (TextBeginningIndex != -1) {
+                                str_arr = currentValue.split('');
+                                str_arr[TextBeginningIndex] = currentValue[TextBeginningIndex].toUpperCase();
+                                currentValue = str_arr.join('');
+                                sentence_found = true;
+                                TextBeginningIndex = -1;
+                            }
+                        } else {
+                            if (value == 5) sentence_found = false;
+                            if (value == 8 || value == 6) currentValue = currentValue.toLowerCase();
+                        }
+
+                        if (value == 7) {
+                            currentValue = currentValue.toLowerCase();
+                            //console.log(currentValue);
+                            str_arr = currentValue.split('');
+                            //console.log(str_arr);
+                            str_arr[0] = currentValue[0].toUpperCase();
+                            //console.log(str_arr);
+                            currentValue = str_arr.join('');
+                        }
+
+                        arrayOfStrings.push([currentValue,value]);
+                        //console.log(currentValue);
                     }
-			    }
+                });
+
+                //console.log("arrayOfStrings:");
                 //console.log(arrayOfStrings);
-                let result = arrayOfStrings.join(''); // Соединяем обратно
 
-                //console.log(result);
-                if (auto_dot == true) {
-                    //console.log(result);
-                    //console.log(result.replace(/(.*[^<>\.\(\)\!\?\:\[\]]+)(\[\[\d+\]\])?$/,'$1.$2'));
-                    //console.log(result.match(/(.*[^<>\.\(\)\!\?\:\[\]]+)(\[\[\d+\]\])?$/));
-                    //console.log(result.search(/.*\[\[\d+\]\]$/));
+                let result = arrayOfStrings.map((x) => x[0]).join(' '); // Соединяем обратно
+                //console.log('join:' + result)
 
-                    if (result.search(/.*\[\[\d+\]\]$/) == -1 && result.length > 2) { // твик из-за старого кода в antiCapsMat
-                        return result.replace(/(.*[^<>\.\(\)\!\?\:\s\+]+)$/,'$1.'); // Подстановка точки в конце
-                    } else { return result } // твик из-за старого кода
+                if (dot == true) {
+                    //if (result.search(/.*\[\[\d+\]\]$/) == -1 && result.length > 2) { // твик из-за старого кода в antiCapsMat
+                    return result.replace(/([A-ZА-Яa-zа-я]+)(\s*\[\[\d\]\])?$/,'$1.$2'); // Подстановка точки в конце
                 } else {
-                    return result; //.replace(/\s+$/)
+                    return result;
                 }
             } else { return undefined }
         }
@@ -1617,7 +1657,7 @@ window.addEventListener('beforeunload', function(event) {
             };
 
             if (shit_found == false) {
-                m = TextCorrector(m,true,false,d_recv); // Исправление на первую заглавную и добавление точки в конце
+                m = TextCorrector(m,true,true,d_recv); // Исправление на первую заглавную и добавление точки в конце
             }
 
             o.map(function (h, i) {
@@ -1765,7 +1805,7 @@ window.addEventListener('beforeunload', function(event) {
                         if (e.key === 'Enter') {
                             //console.log('+4');
                             var element = e.target;
-                            element.value = TextCorrector(element.value,true,false,d_send);
+                            element.value = TextCorrector(element.value,true,true,d_send);
                             return
                         }
                     },true);
@@ -1783,7 +1823,7 @@ window.addEventListener('beforeunload', function(event) {
                         if (userItem.innerText.indexOf("Послать") != -1 ) {
                             userItem.addEventListener('click', (e) => {
                                 let elem = document.querySelector("textarea.form-control");
-                                elem.value = TextCorrector(elem.value,true,false,d_send);
+                                elem.value = TextCorrector(elem.value,true,true,d_send);
                                 return
                             },true)
                             console.log('EventListenerAdded:div.chat-container.button.btn-secondary:click');
