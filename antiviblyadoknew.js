@@ -294,14 +294,14 @@ var Scrpt = create("div",ScrptContent);
                                  ['Нана','Nana1610','свинья с самомнением'],
 //                                 ['Луна 2010','luna_2010','два акка забанила сучара'],
                                  ['Мультик©™','Daryna','остоебавший хихикающий рахит'],
-//                                 ['Алинка Сергеевна','Alinka_Sergeevna','забанила низачто ёбнутая'],
+                                 ['Алинка Сергеевна','Alinka_Sergeevna','забанила низачто ёбнутая, при чём ни раз.'],
 //                                 ['Милка Попова','milka_popova1','забанила из-за минетки'],
                                  ['Вероника Сергеевна','sdfdghj','у ёбнутой чат всегда для друзей'],
                                  ['Реалка','yuliya1237','свидомое отродье с днепропетровска банит']
                                 ];
         var whitelist_stream = [
                                 ['Дѻктѻр','flus'],
-//                                ['⚡️Эстонец⚡️','esstonec'],
+                                //['⚡️Эстонец⚡️','esstonec'],
                                 ['☆Серж ROCK☆','SergRock'],
                                 ['vodka0404','vodka0404'],
                                 ['Православный Кулак','r177688730m2'],
@@ -311,7 +311,7 @@ var Scrpt = create("div",ScrptContent);
                                 ['Crazy Fox','crazyfox'],
                                 ['Вязальный Пепелац','sailorleviafan'],
                                 ['artem623111','artem623111'],
-                                ['estonec666','⚡️ЭСТОНЕЦ⚡️']
+                                ['⚡️ЭСТОНЕЦ⚡️','estonec666']
                                ];
 
         var author_user_id;
@@ -335,8 +335,8 @@ var Scrpt = create("div",ScrptContent);
         const ignore_permanent = 4;
         const ignore_pending = 5;
 
-        const d_send = 0;
-        const d_recv = 1;
+        const send = 0;
+        const recv = 1;
 //        let e_app_nickname = document.getElementsByClassName("app-nickanme")[0]; // old
       //  let e_app_nickname = document.getElementsByClassName("nickname text-truncate")[0].getElementsByTagName("strong")[0].getElementsByTagName("a")[0];;
       //  var author_id = '';                                              // id
@@ -444,7 +444,7 @@ function SaveData(autoremove) {
                console.log("%cantyviblyadok(" + ((now.getHours() < 10 && now.getHours() >= 0) ? "0" + now.getHours() : "") +
                                     ":" + ((now.getMinutes() < 10 && now.getMinutes() >= 0) ? "0" + now.getMinutes() : "") + "): " +
                                     "nick:" + in_item[0] + "|login:" + in_item[1] +
-                                    "|removed from ignorelist by timeoffset > " +
+                                    "|erased from ignorelist by timeoffset > " +
                                     ((in_item[2] == ignore_nick_uid_country) ? "ignore_nick_uid_country" : "") +
                                     ((in_item[2] == ignore_profile_uid_country) ? "ignore_profile_uid_country" : "") +
                                     ((in_item[2] == ignore_all_params) ? "ignore_all_params" : "") +
@@ -598,7 +598,7 @@ function AddToIgnoreList(e) {
                             ignorelist[index][9] = ignore_time;
                             console.log("Добавлен в игнор кнопкой в чате: " + nickname + "|" + profile + "|" + uid + ": на " +
                                         ignore_time / 86400000 + " дней по логину");
-                            console.log("Добавлен в игнор кнопкой в чате: " + nickname + ": на 1 день по нику для временного профиля");
+                            //console.log("Добавлен в игнор кнопкой в чате: " + nickname + ": на 1 день по нику для временного профиля");
                             console.log(ignorelist);
                             SaveData(true);
                         } else {
@@ -722,7 +722,7 @@ function RemoveFromIgnore(nickname,profile,uid,savedata)
 
     if (counter > 0) {
         if (savedata !== false) { save(); }
-        return counter + ' element' + (counter > 1 ? 's ' : ' ') + 'removed'
+        return counter + ' element' + (counter > 1 ? 's ' : ' ') + 'erased'
     } else { return 'Element(s) not found' }
 }
 
@@ -809,7 +809,7 @@ function messageDispather(data) {
                     let msg = msglist.get(message.response.mid);
 
                     console.log(msg);
-                    console.log('removed by moderast (' + (message.response.hasOwnProperty('client') == true ? message.response.client.nickname + ':' +
+                    console.log('erased by moderast (' + (message.response.hasOwnProperty('client') == true ? message.response.client.nickname + ':' +
                                 message.response.client.info.profile.replace(/\/user\//,'') + ':' +
                                 message.response.client.info.uid : userlist.get(message.response.clientId).nickname + ':' +
                                 userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + ':' +
@@ -826,7 +826,7 @@ function messageDispather(data) {
 //                    let msg = msglist.get(message.response.mid);
                     let usr = userlist.get(message.response.clientId);
                     //console.log(usr);
-                    console.log('all messages of user (' + usr.nickname + ':' + usr.info.profile.replace(/\/user\//,'') + ':' + usr.info.uid + ') removed');
+                    console.log('all messages of user (' + usr.nickname + ':' + usr.info.profile.replace(/\/user\//,'') + ':' + usr.info.uid + ') erased');
                     break;
                 }
                 case 'moderated': {
@@ -837,7 +837,7 @@ function messageDispather(data) {
                 }
                 case 'moderatedremove': {
                     console.log('moderatedremove =============================');
-                    console.log('removed from mederasts');
+                    console.log('erased from mederasts');
                     console.log(message);
                     break;
                 }
@@ -1227,12 +1227,12 @@ window.addEventListener('beforeunload', function(event) {
 
             if (id != undefined) {
 
-                //console.log("%celement removed from div.chat-messages mid: " + id,'background: LemonChiffon;color: red');
+                //console.log("%celement erased from div.chat-messages mid: " + id,'background: LemonChiffon;color: red');
                 //console.log(element);
 
                 //if (id.length > 0) {
                     //msglist.delete(id);
-                    //console.log('removed from msglist');
+                    //console.log('erased from msglist');
                     //console.log(msglist);
                 //}
                 let div_chat_mess_count = document.querySelectorAll('.mess-row').length;
@@ -1316,7 +1316,7 @@ window.addEventListener('beforeunload', function(event) {
                 s = s.replace(/(хохлопид(и|о)?р(х|г)?)|хохол/gi,'хохлер');
                 s = s.replace(/\:\?$/gi,'?');
 
-                if (direction == d_send) {
+                if (direction == send) {
 //                    s = s.replace(/\) ?$|\\ ?$/gi,' :smile: ');
                 }
 
@@ -1482,7 +1482,7 @@ window.addEventListener('beforeunload', function(event) {
         }
 
 /*==================================================================================*/
-        function antiCapsMat(m) {
+        function antiCapsMat(m,anticaps) {
             if (m === undefined) {
                 return undefined;
             }
@@ -1635,19 +1635,23 @@ window.addEventListener('beforeunload', function(event) {
                 i++
             })
 
-            m = $(m).html().toLowerCase(); // Перевод в нижний регистр.
+            if (anticaps === true) {
+                m = $(m).html().toLowerCase(); // Перевод в нижний регистр.
+            } else {
+                m = $(m).html();
+            }
 
             let shit_found = false;
 
             for (var key in dict) { // Проверка на список нехороших слов
-                let match = m.match(key);
+                let match = m.toLowerCase().match(key);
 
                 if (match != null) {
                     //console.log('spam reg match:');
                     reg_match = match;
                 }
                 //var reg = new RegExp(key,'i');
-                if (m.search(key) != -1) { // тег для показа скрытого сообщения
+                if (m.toLowerCase().search(key) != -1) { // тег для показа скрытого сообщения
                     m = '<div class="text service-tag" style="display: inline;" ondblclick=MsgClick(this);>'
                         + dict[key] + '</div><div class="text text-body" style="display: none">' + m + '</div>';
                     shit_found = true;
@@ -1657,7 +1661,7 @@ window.addEventListener('beforeunload', function(event) {
             };
 
             if (shit_found == false) {
-                m = TextCorrector(m,true,true,d_recv); // Исправление на первую заглавную и добавление точки в конце
+                m = TextCorrector(m,true,false,recv); // Исправление на первую заглавную и добавление точки в конце
             }
 
             o.map(function (h, i) {
@@ -1805,7 +1809,7 @@ window.addEventListener('beforeunload', function(event) {
                         if (e.key === 'Enter') {
                             //console.log('+4');
                             var element = e.target;
-                            element.value = TextCorrector(element.value,true,true,d_send);
+                            //element.value = TextCorrector(element.value,false,false,send);
                             return
                         }
                     },true);
@@ -1823,7 +1827,7 @@ window.addEventListener('beforeunload', function(event) {
                         if (userItem.innerText.indexOf("Послать") != -1 ) {
                             userItem.addEventListener('click', (e) => {
                                 let elem = document.querySelector("textarea.form-control");
-                                elem.value = TextCorrector(elem.value,true,true,d_send);
+                                //elem.value = TextCorrector(elem.value,false,false,send);
                                 return
                             },true)
                             console.log('EventListenerAdded:div.chat-container.button.btn-secondary:click');
@@ -1981,13 +1985,13 @@ window.addEventListener('beforeunload', function(event) {
 
                     if (antiSpamResult[0] > 0) { is_spam = true }
 
-                    SpamResult = antiCapsMat(text);
+                    SpamResult = antiCapsMat(text,true);
 
                     text = SpamResult[0];
                     element.querySelector('span.text').innerHTML = text;
                     //console.log('%cantiCapsMat:' + text,'background: LemonChiffon;color: red');
                     //console.log(SpamResult[1]); // данные сообщения для более глубокого разбора
-                }
+                } else { element.style.backgroundColor = "LemonChiffon" } // WhiteSmoke Azure Honeydew
 
                 //text = antiCapsMat(text); // обрабатывать сообщения от себя
 
@@ -2054,14 +2058,14 @@ window.addEventListener('beforeunload', function(event) {
                         ignorelist.splice(i, 1);
                         is_in_ignorelist = false;
                         console.log('date_diff >= ignore_time');
-                        console.log(nickname + "|" + profile + " removed from ignore list by timeoffset");
+                        console.log(nickname + "|" + profile + " erased from ignore list by timeoffset");
                         console.log(ignorelist);
                         return;
                     } else if (ignorelist[i][2] == 3 && date_diff >= 86400000) {
                         console.log('date_diff >= 86400000');
                         ignorelist.splice(i, 1);
                         is_in_ignorelist = false;
-                        console.log(nickname + "|" + profile + " removed from ignore list by timeoffset");
+                        console.log(nickname + "|" + profile + " erased from ignore list by timeoffset");
                         console.log(ignorelist);
                         return;
                     }
@@ -2233,7 +2237,10 @@ window.addEventListener('beforeunload', function(event) {
                                 //}
 
                                 if ( message_to[c][1] == nickname_self && message_to[c][0] == key &&
-                                    (data.self !== true ? false : true)) { for_me = true }
+                                    (data.self !== true ? false : true)) {
+                                    for_me = true;
+                                    element.style.backgroundColor = "LightGrey";
+                                }
                                     //console.log(author_nickname + ':' + data.info.nickname + ':' + author_profile + ':' + data.info.profile + ':' + data.owner);
                                     //console.log(data);
                                 if (author_nickname == escapeHtml(data.nickname) && author_profile == data.info.profile) {
@@ -2463,7 +2470,7 @@ window.addEventListener('beforeunload', function(event) {
                     let background_color;
 
 // https://colorscheme.ru/html-colors.html
-
+// для бекграунда лайтовые WhiteSmoke Azure Honeydew
                     if (red == true && is_rusofob != true && is_hohloflag != true) {
                         color = "red";
                     } else if (is_me == true) {
