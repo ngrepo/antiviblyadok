@@ -221,6 +221,7 @@ var Scrpt = create("div",ScrptContent);
         const remove_from_pending_time = 86400000 * 3 // время игнора в днях               //86400000 - 1 день
 
         var ignorelist = new Array();
+        var SpamArray = new Array();
 
         var ignorelist_nick = ['Поменяйте ник','Поменяйтe ник'];
 
@@ -764,7 +765,12 @@ exportFunction(OnOffFilter, unsafeWindow, { defineAs: "OnOffFilter" });
 exportFunction(RemoveFromIgnore, unsafeWindow, { defineAs: "remove" });
 exportFunction(SaveData, unsafeWindow, { defineAs: "save" });
 exportFunction(last, unsafeWindow, { defineAs: "last" });
+//exportFunction(DispatchChatMessage, unsafeWindow, { defineAs: "DispatchChatMessage" });
+exportFunction(stub_old, unsafeWindow, { defineAs: "stub" });
 
+function stub_old(){
+    console.log('func stub');
+}
 //const JS123 = `
 //`;
 
@@ -987,6 +993,97 @@ function userAthorized (message) {
 
 function roomJoin (message) {
     console.log('joined =============================');
+    console.log('location: ' + window.location.href);
+//===============
+
+    if ( window.location.href.indexOf('https://livacha.com/chat/') != -1 ) {
+
+    var target = document.querySelector("div.chat-messages");
+
+// Конфигурация observer (за какими изменениями наблюдать)
+    const config = {
+        attributes: true,
+        childList: true,
+        subtree: true,
+    };
+
+// Колбэк-функция при срабатывании мутации
+    const callback = function (mutationsList, observer) {
+        for (let mutation of mutationsList) {
+            if (mutation.type === "childList") {
+                if (mutation.target && [...mutation.addedNodes].length) {
+                    for (let node of mutation.addedNodes) {
+                        if (node.className == 'mess-row') {
+                            //console.log(`A child node has been added!`, node);
+                            let TimeNowMs = new Date();
+
+                            if (ml_timer == 0) {
+                                ml_timer = TimeNowMs.getTime();
+                            } else if (ml_timer > 0) {
+                                if ((TimeNowMs.getTime() - ml_timer) >= 333) {
+                                    msglist_loaded = true;
+                                }
+                            }
+    //                        console.log(ml_timer);
+    //                        console.log(TimeNowMs.getTime());
+    //                        console.log(msglist_loaded);
+                            DispatchChatMessage(node);
+                        }
+                    }
+                }
+
+                if (mutation.target && [...mutation.removedNodes].length) {
+                    for (let node of mutation.removedNodes) {
+                        if (node.className == 'mess-row') {
+                            //console.log(`A child node has been removed!`, node);
+
+                            var element = document.querySelector("div.chat-messages");
+
+                            if (typeof element === 'object' && element != undefined && typeof element.getAttribute == 'function') {
+                                var id = element.getAttribute('data-id');
+
+                                if (id != undefined) {
+
+                                //console.log("%cэлемент удалён из div.chat-messages mid: " + id,'background: LemonChiffon;color: red');
+                                //console.log(element);
+
+                                //if (id.length > 0) {
+                                    //msglist.delete(id);
+                                    //console.log('удалён  из msglist');
+                                    //console.log(msglist);
+                                //}
+                                    let div_chat_mess_count = document.querySelectorAll('.mess-row').length;
+                                    if (div_chat_mess_count == 0) div_chat_mess_count = 111;
+
+                                    if (msglist.size >= div_chat_mess_count + 25) {
+                                        console.log('msglist size:' + msglist.size);
+                                        //console.log(msglist);
+                                        let i = 0;
+                                        for (let key of msglist.keys()) {
+                                            if (i <= 15) msglist.delete(key);
+                                            i++;
+                                        }
+                                        console.log('msglist reduced, size:' + msglist.size);
+                                        //console.log(msglist);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    };
+
+// Создаём экземпляр наблюдателя с указанной функцией колбэка
+    const observer = new MutationObserver(callback);
+
+// Начинаем наблюдение за настроенными изменениями целевого элемента
+    observer.observe(target, config);
+}
+//======================
+    userlist.clear; console.log('userlist cleared, size:' + userlist.size);
+    msglist.clear; console.log('msglist cleared, size:' + msglist.size);
     console.log(message);
     console.log(userlist);
 
@@ -1020,8 +1117,9 @@ function roomJoin (message) {
 }
 
 function addToUserList (message) {
-//     console.log('users ==============================');
-//     console.log(message);
+    console.log('users ==============================');
+    userlist.clear; console.log('userlist cleared, size:' + userlist.size);
+    console.log(message);
 
      message.response.list.forEach(function(item, i, arr) {
          userlist.set(item.id,item);
@@ -1182,9 +1280,6 @@ function filterStreams() {
 window.addEventListener('beforeunload', function(event) {
 });
 
-(function () {
-    'use strict';
-
     var w = window.unsafeWindow || window;
 
     if (w.self != w.top) {
@@ -1205,9 +1300,6 @@ window.addEventListener('beforeunload', function(event) {
         }
     }
 
-    document.addEventListener("DOMContentLoaded", function(event) {
-        console.log('EventListenerAdded:DOMContentLoaded');
-        function Antiviblyadok() {
             this.version = localStorage.getItem('tr-ver') != undefined ? localStorage.getItem('tr-ver') : "0.0.3";
 
             if(typeof(localStorage) != 'undefined' ) {
@@ -1216,53 +1308,9 @@ window.addEventListener('beforeunload', function(event) {
                 }
             }
 
-        }
-
     setTimeout(function(){filterStreams();},51);
 
     setInterval(function(){filterStreams();}, 3000);
-
-    if ( window.location.href.indexOf('https://livacha.com/chat/') != -1 ) {
-      document.querySelector("div.chat-messages").addEventListener('DOMNodeRemoved', function (e) {
-        var element = e.target;
-
-        if (typeof element === 'object' && element != undefined && typeof element.getAttribute == 'function') {
-            var id = element.getAttribute('data-id');
-
-            if (id != undefined) {
-
-                //console.log("%cэлемент удалён из div.chat-messages mid: " + id,'background: LemonChiffon;color: red');
-                //console.log(element);
-
-                //if (id.length > 0) {
-                    //msglist.delete(id);
-                    //console.log('удалён  из msglist');
-                    //console.log(msglist);
-                //}
-                let div_chat_mess_count = document.querySelectorAll('.mess-row').length;
-                if (div_chat_mess_count == 0) div_chat_mess_count = 111;
-
-                if (msglist.size >= div_chat_mess_count + 25) {
-                    console.log('msglist size:' + msglist.size);
-                    //console.log(msglist);
-                    let i = 0;
-                    for (let key of msglist.keys()) {
-                        if (i <= 15) msglist.delete(key);
-                        i++;
-                    }
-                    console.log('msglist reduced, size:' + msglist.size);
-                    //console.log(msglist);
-                }
-            }
-        }
-      });
-    }
-
-    Antiviblyadok.prototype.initialize = function () {
-       // exportFunction(messageDispatcher, unsafeWindow, { defineAs: "messageDispatcher" });
-    }
-
-    Antiviblyadok.prototype.chat = function () {
 
 		var elements = document.getElementsByClassName("textarea-wrapper");
 			//alert(elements.length);
@@ -1324,6 +1372,7 @@ window.addEventListener('beforeunload', function(event) {
                     s = s.replace(/бошк/gi,'башк');
                     s = s.replace(/рводе/gi,'вроде');
                     s = s.replace(/вонбчка/gi,'вонючка');
+                    s = s.replace(/чгео/gi,'чего');
                 }
 
                 let result = s;
@@ -1694,8 +1743,6 @@ window.addEventListener('beforeunload', function(event) {
             return fm;
         }
 
-        var SpamArray = new Array();
-
         function antiSpam(nickname,login,m) {
             if (nickname === undefined || login === undefined || m === undefined) {
                 return undefined;
@@ -1862,27 +1909,12 @@ window.addEventListener('beforeunload', function(event) {
         var r_timer = setInterval( function () {
             let elements = document.getElementsByClassName('chat-messages');
             if (elements.length > 0) if (elements[0] != undefined) {
-                console.log('EventListenerAdded:DOMNodeInserted:chat-messages');
-                elements[0].addEventListener('DOMNodeInserted', function (e) {
-                    let TimeNowMs = new Date();
 
-                    if (ml_timer == 0) {
-                        ml_timer = TimeNowMs.getTime();
-                    } else if (ml_timer > 0) {
-                        if ((TimeNowMs.getTime() - ml_timer) >= 333) {
-                            msglist_loaded = true;
-                        }
-                    }
-//                    console.log(ml_timer);
-//                    console.log(TimeNowMs.getTime());
-//                    console.log(msglist_loaded);
-                    DispatchChatMessage(e);
-                },true);
-
-                console.log('EventListenerAdded:DOMNodeInserted:chat-messages:scroll');
                 elements[0].addEventListener('scroll', function () { // получаем позицию ползунка прокрутки
                     scrollPosition = elements[0].scrollTop;
                 });
+
+                console.log('EventListenerAdded:DOMNodeInserted:chat-messages:scroll');
 
                 setInterval(function(){
                     let elements = document.getElementsByClassName('chat-messages');  // фикс автопрокрутки рептилоидовича
@@ -1899,12 +1931,12 @@ window.addEventListener('beforeunload', function(event) {
 /*==================================================================================*/
         function DispatchChatMessage(e) {
 //            if (AntiviblyadokEnabled == false) { return }
-            var element = e.target;
+
+            var element = e;
 
             if (typeof element !== 'object' || element === null || typeof element.getAttribute != 'function') {
                 return;
             }
-
             var id = element.getAttribute('data-id'); // id
 
             if (id == undefined) {
@@ -2558,12 +2590,4 @@ window.addEventListener('beforeunload', function(event) {
                                 ,'background: ' + background_color + ';color: ' + color);
 
         }
-    }
 
-    var Antiviblyadok = new Antiviblyadok();
-    Antiviblyadok.initialize();
-    Antiviblyadok.chat();
-
-})
-
-})();
