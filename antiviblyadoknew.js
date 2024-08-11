@@ -224,13 +224,17 @@ var Scrpt = create("div",ScrptContent);
 
         var ignorelist_nick = ['Поменяйте ник','Поменяйтe ник'];
 
+        const filtering_enabled = true; // фильтрация стримов включена
+        const hide_unpopular = false; // скрыть с низким рейтингом
+        const hide_locked = true; // скрыть запороленные шлюх и дрочил
+
         var ignorelist_stream = [
                                  ['Психея','m94794','наставила выблядков в модерасты'],
                                  ['KISS ME','KatyaLeto','чмо, кидает в чс'],
                                  ['TiVi','tivi','шлак'],
                                  ['✅ᗫoᏰᏒo','Nevskiy','шлак'],
                                  ['ВероНика','rfgecnf','шлак'],
-//                                 ['Брюня','jovtoblakitna','хохлопидорша, кидает в чс'],
+                                 ['Брюня','jovtoblakitna','хохлопидорша, кидает в чс'],
                                  ['$$$ Капитан Америка $$$','vaso12345','пиндосское уг'],
                                  ['Δημήτριος Ντουρμουσίδης','ivanov78','ебанутый грек'],
                                  ['БИЗНЕСВУМЕН','buzzazals','чушь'],
@@ -240,7 +244,7 @@ var Scrpt = create("div",ScrptContent);
                                  ['sumkina','sumkina','сукина'],
                                  ['','vdamkah','жаба'],
                                  ['','vasily_alibabaich','изврот'],
-                                 ['','julia-S','инвалка'],
+                                 ['','julia-S','инвалид'],
                                  ['','damka','жаба'],
                                  ['','EDS','алкаш'],
                                  ['','Stepnyak','неприятный очкир'],
@@ -255,8 +259,8 @@ var Scrpt = create("div",ScrptContent);
                                  ['','LaS_WeGas','грузинское чмо русофобское'],
                                  ['','White_Zoombie','грузинское чмо русофобское'],
                                  ['','Los_Vladus','грузинское чмо русофобское'],
-                                 ['','filanda','инвал'],
-                                 ['','Filanday','инвал'],
+                                 ['','filanda','инвалид'],
+                                 ['','Filanday','инвалид'],
                                  ['','PIZDANCE','шлак'],
                                  ['','Budkin','пиндос'],
                                  ['','stepdaddy','унылое'],
@@ -284,7 +288,7 @@ var Scrpt = create("div",ScrptContent);
                                  ['Freddy Black','freddy_black','шиз'],
                                  ['Бездна','vkontakte_189476012','жируська'],
                                  ['METALHEAD','brutal','чушь'],
-                                 ['Julia S','julia_s','инвалка'],
+                                 ['Julia S','julia_s','инвалид'],
                                  ['Музяка','club','шлак'],
                                  ['АЛКОТЕСТЕР','alkotester','шлак'],
                                  ['Harter','harter','отродье банит у шлюхеи'],
@@ -292,16 +296,18 @@ var Scrpt = create("div",ScrptContent);
                                  ['*KАТЁНОК*','apr12820','ебанутая дура'],
                                  ['ВАСЯ  ГРАДУС','Fgk6eju','пиндос'],
                                  ['Нана','Nana1610','свинья с самомнением'],
-//                                 ['Луна 2010','luna_2010','два акка забанила сучара'],
-                                 ['Мультик©™','Daryna','остоебавший хихикающий рахит'],
+                                 ['Луна 2010','luna_2010','два акка забанила сучара'],
+                                 ['Мультик©™','Daryna','остоебавший хихикающий уебан'],
                                  ['Алинка Сергеевна','Alinka_Sergeevna','забанила низачто ёбнутая, при чём ни раз.'],
 //                                 ['Милка Попова','milka_popova1','забанила из-за минетки'],
                                  ['Вероника Сергеевна','sdfdghj','у ёбнутой чат всегда для друзей'],
+                                 ['ღ_Лялька_ღ✔','Lyalka','уёбищный транс, у которого для друзей'],
+                                 ['vI.NADIN21','vl_nadin21','мразота с банщями модерастами'],
                                  ['Реалка','yuliya1237','свидомое отродье с днепропетровска банит']
                                 ];
         var whitelist_stream = [
                                 ['Дѻктѻр','flus'],
-                                //['⚡️Эстонец⚡️','esstonec'],
+                                ['⚡️Эстонец⚡️','esstonec'],
                                 ['☆Серж ROCK☆','SergRock'],
                                 ['vodka0404','vodka0404'],
                                 ['Православный Кулак','r177688730m2'],
@@ -444,7 +450,7 @@ function SaveData(autoremove) {
                console.log("%cantyviblyadok(" + ((now.getHours() < 10 && now.getHours() >= 0) ? "0" + now.getHours() : "") +
                                     ":" + ((now.getMinutes() < 10 && now.getMinutes() >= 0) ? "0" + now.getMinutes() : "") + "): " +
                                     "nick:" + in_item[0] + "|login:" + in_item[1] +
-                                    "|erased from ignorelist by timeoffset > " +
+                                    "|удалён из игнорлиста по истечению времени > " +
                                     ((in_item[2] == ignore_nick_uid_country) ? "ignore_nick_uid_country" : "") +
                                     ((in_item[2] == ignore_profile_uid_country) ? "ignore_profile_uid_country" : "") +
                                     ((in_item[2] == ignore_all_params) ? "ignore_all_params" : "") +
@@ -722,8 +728,8 @@ function RemoveFromIgnore(nickname,profile,uid,savedata)
 
     if (counter > 0) {
         if (savedata !== false) { save(); }
-        return counter + ' element' + (counter > 1 ? 's ' : ' ') + 'erased'
-    } else { return 'Element(s) not found' }
+        return counter + ' элемент' + (counter > 1 ? 's ' : ' ') + 'удалён'
+    } else { return 'Элемент(ы) не найден' }
 }
 
 function last(count)
@@ -809,13 +815,13 @@ function messageDispather(data) {
                     let msg = msglist.get(message.response.mid);
 
                     console.log(msg);
-                    console.log('erased by moderast (' + (message.response.hasOwnProperty('client') == true ? message.response.client.nickname + ':' +
+                    console.log('удалено модерастом (' + (message.response.hasOwnProperty('client') == true ? message.response.client.nickname + ':' +
                                 message.response.client.info.profile.replace(/\/user\//,'') + ':' +
                                 message.response.client.info.uid : userlist.get(message.response.clientId).nickname + ':' +
                                 userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + ':' +
                                 userlist.get(message.response.clientId).info.uid + '):text:(' +
                                 message.response.text + ')') +
-                                (msg != undefined ? '):msg of user(' + msg.owner.nickname + ':' +
+                                (msg != undefined ? '):сообщение пользователя(' + msg.owner.nickname + ':' +
                                  msg.owner.info.profile.replace(/\/user\//,'') + ':' + msg.owner.info.uid +
                                  '):text:' + msg.text : '')); // '):text:' + msg.textRaw
                     break;
@@ -826,18 +832,18 @@ function messageDispather(data) {
 //                    let msg = msglist.get(message.response.mid);
                     let usr = userlist.get(message.response.clientId);
                     //console.log(usr);
-                    console.log('all messages of user (' + usr.nickname + ':' + usr.info.profile.replace(/\/user\//,'') + ':' + usr.info.uid + ') erased');
+                    console.log('все сообщения пользователя(' + usr.nickname + ':' + usr.info.profile.replace(/\/user\//,'') + ':' + usr.info.uid + ') удалены');
                     break;
                 }
                 case 'moderated': {
                     console.log('moderated =============================');
-                    console.log('added to mederasts');
+                    console.log('добавлен в модерасты');
                     console.log(message);
                     break;
                 }
                 case 'moderatedremove': {
                     console.log('moderatedremove =============================');
-                    console.log('erased from mederasts');
+                    console.log('удалён из модерастов');
                     console.log(message);
                     break;
                 }
@@ -845,7 +851,7 @@ function messageDispather(data) {
                     console.log('banned =============================');
                     //console.log(message);
                     //console.log(userlist.get(message.response.clientId));
-                    console.log('banned:(' + ((userlist.get(message.response.clientId) != undefined &&
+                    console.log('забанен:(' + ((userlist.get(message.response.clientId) != undefined &&
                                 message.response.clientId != '') ? userlist.get(message.response.clientId).nickname + ':' +
                                 userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + ':' +
                                 userlist.get(message.response.clientId).info.uid : '"хз"' ) + '):text:(' +
@@ -855,7 +861,7 @@ function messageDispather(data) {
                 case 'ban': { // модерастом или владельцем трансляции
                     console.log('ban =============================');
                     console.log(message);
-                    console.log('ban: ('+ ((userlist.get(message.response.clientId) != undefined &&
+                    console.log('бан: ('+ ((userlist.get(message.response.clientId) != undefined &&
                                 message.response.clientId != '') ? userlist.get(message.response.clientId).nickname + ':' +
                                 userlist.get(message.response.clientId).info.profile.replace(/\/user\//,'') + ':' +
                                 userlist.get(message.response.clientId).info.uid : '"хз"' ) + '):text:(' +
@@ -1108,9 +1114,7 @@ function chatMessage(message) {
 }
 
 function filterStreams() {
-    const hide_unpopular = true; // скрыть с низким рейтингом
-    const hide_locked = true; // скрыть запороленные шлюх и дрочил
-
+    if (filtering_enabled == false) return;
     let element;
     let nickname;
     let profile;
@@ -1227,12 +1231,12 @@ window.addEventListener('beforeunload', function(event) {
 
             if (id != undefined) {
 
-                //console.log("%celement erased from div.chat-messages mid: " + id,'background: LemonChiffon;color: red');
+                //console.log("%cэлемент удалён из div.chat-messages mid: " + id,'background: LemonChiffon;color: red');
                 //console.log(element);
 
                 //if (id.length > 0) {
                     //msglist.delete(id);
-                    //console.log('erased from msglist');
+                    //console.log('удалён  из msglist');
                     //console.log(msglist);
                 //}
                 let div_chat_mess_count = document.querySelectorAll('.mess-row').length;
@@ -1302,90 +1306,109 @@ window.addEventListener('beforeunload', function(event) {
 
         function TextCorrector (s,anticaps,dot,direction) {
             if (typeof s === 'string' && typeof anticaps === 'boolean' &&  typeof dot === 'boolean' ) {
-                const autocorrect_enabled = true; if (autocorrect_enabled == false) { return }
-                var arrayOfStrings = [];
-                s = s.replace(/наврен/gi,'наверн');
-                s = s.replace(/чтоли/gi,'что ли');
-                s = s.replace(/врядли/gi,'вряд ли');
-                s = s.replace(/вроед/gi,'вроде');
-                s = s.replace(/вроед/gi,'вроде');
-                s = s.replace(/тчо/gi,'вроде');
-                s = s.replace(/из за/gi,'из-за');
-                s = s.replace(/корчое/gi,'короче');
-                s = s.replace(/никогад/gi,'никогда');
-                s = s.replace(/(хохлопид(и|о)?р(х|г)?)|хохол/gi,'хохлер');
-                s = s.replace(/\:\?$/gi,'?');
 
                 if (direction == send) {
-//                    s = s.replace(/\) ?$|\\ ?$/gi,' :smile: ');
+                    s = s.replace(/наврен/gi,'наверн');
+                    s = s.replace(/чтоли/gi,'что ли');
+                    s = s.replace(/врядли/gi,'вряд ли');
+                    s = s.replace(/вроед/gi,'вроде');
+                    s = s.replace(/вроед/gi,'вроде');
+                    s = s.replace(/тчо/gi,'вроде');
+                    s = s.replace(/из за/gi,'из-за');
+                    s = s.replace(/корчое/gi,'короче');
+                    s = s.replace(/никогад/gi,'никогда');
+                    s = s.replace(/(хохлопид(и|о)?р(х|г)?)|хохол/gi,'хохлован');
+                    s = s.replace(/\:\?$/gi,'?');
+                    s = s.replace(/\s*\.{2,}$/gi,'..');
+//                    s = s.replace(/\)+\s*$/gi,' :D');
+                    s = s.replace(/бошк/gi,'башк');
+                    s = s.replace(/рводе/gi,'вроде');
+                    s = s.replace(/вонбчка/gi,'вонючка');
                 }
 
-                //console.log('s:' + s);
+                let result = s;
 
-                let value = 0;
-                let TextBeginningIndex = -1;
-                let str_arr = [];
-                let sentence_found = false;
-                //console.log(s.replace(/\s+$|^\s+/,'').split(/\s+/));
-                s.replace(/\s+$|^\s+/,'').split(/\s+/).forEach(function (currentValue, index, array) { // делит пробелами
-                    value = 0;
-                    if (currentValue != '') {
-                        if (currentValue.search(/#[^#:]+:/) != -1) {
-                            value = 1;         // находит ники
-                        } else if (currentValue.search(/:[^:]+:/) != -1) {
-                            value = 2;          // находит смайлы
-                        } else if (currentValue.search(/https?:\/\/(www\.)?\S/) != -1) {
-                            value = 4;      // находит url
-                        } else if (currentValue.search(/[a-zA-ZА-Яа-я]+[.?!()]+/) != -1) {
-                            value = 5;    // находит конец предложения
-                        } else if (currentValue.search(/^[A-ZА-Я]+$/) != -1) {
-                            value = 6;         // находит полностью верхний регистр
-                        } else if (currentValue.search(/[A-ZА-Я]+[a-zа-я]+/) != -1) {
-                            value = 7; // находит начинающийся с верхнего и далее нижний
-                        } else if (currentValue.search(/[A-ZА-Яa-zа-я]+/) != -1) {
-                            value = 8; // находит любой регистр
-                            TextBeginningIndex = currentValue.search(/[A-ZА-Яa-zа-я]+/);
-                        //} else if (currentValue.search(/\.|\!|\?|\)|\(/) != -1) {
-                        //    value = 3;   // находит символы
-                        }
-//звезда ёбаного эсТон вуда. ЁБаНый гуль. хуйЛонец
-                        if (sentence_found == false) {
-                            //TextBeginningIndex = currentValue.search(/[^<>/\d\[\]\s:,;\.\-\!\?\+\-]+/);
-                            if (TextBeginningIndex != -1) {
-                                str_arr = currentValue.split('');
-                                str_arr[TextBeginningIndex] = currentValue[TextBeginningIndex].toUpperCase();
-                                currentValue = str_arr.join('');
-                                sentence_found = true;
-                                TextBeginningIndex = -1;
+                if (anticaps == true) {
+                    console.log('s:' + s);
+
+                    let value = 0;
+                    let value_pre = 0;
+                    let arrayOfStrings = [];
+                    let TextBeginningIndex = -1;
+                    let str_arr = [];
+                    let sentence_found = false;
+
+                    var split_reg = /\s+/;
+                    //console.log(s.replace(/\s+$|^\s+/,'').split(split_reg));
+
+                    s.replace(/\s+$|^\s+/,'').split(split_reg).forEach(function (currentValue, index, array) { // делит пробелами
+                        value = 0;
+                        if (currentValue != '') {
+                            if (currentValue.search(/#[^#:]+/) != -1) {
+                                value = 9;         // находит ника перед пробелом
+                            } else if (currentValue.search(/[^#:]+:/) != -1 && value_pre == 9) {
+                                value = 10;         // находит ника после пробела
+                            } else if (value_pre == 9) {
+                                value = 9;         // поиск много пробельных ников
+                            } else if (currentValue.search(/#[^#:]+:/) != -1) {
+                                value = 1;         // находит целый ник
+                            } else if (currentValue.search(/(:[^:]+:|:\w)/) != -1) {
+                                value = 2;          // находит смайлы
+                            } else if (currentValue.search(/(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?/) != -1) {
+                                value = 4;      // находит url
+                            } else if (currentValue.search(/[a-zA-ZА-Яа-я]+[.?!()]+/) != -1) {
+                                value = 5;    // находит конец предложения
+                            } else if (currentValue.search(/^[A-ZА-Я]+$/) != -1) {
+                                value = 6;         // находит полностью верхний регистр
+                            } else if (currentValue.search(/[A-ZА-Я]+[a-zа-я]+/) != -1) {
+                                value = 7; // находит начинающийся с верхнего и далее нижний
+                            } else if (currentValue.search(/[A-ZА-Яa-zа-я]+/) != -1) {
+                                value = 8; // находит любой регистр
+                                TextBeginningIndex = currentValue.search(/[A-ZА-Яa-zа-я]+/);
+                            //} else if (currentValue.search(/\.|\!|\?|\)|\(/) != -1) {
+                            //    value = 3;   // находит символы
                             }
-                        } else {
-                            if (value == 5) sentence_found = false;
-                            if (value == 8 || value == 6) currentValue = currentValue.toLowerCase();
-                        }
 
-                        if (value == 7) {
-                            currentValue = currentValue.toLowerCase();
+                            value_pre = value;
+//звезда ёбаного эсТон вуда. ЁБаНый гуль. хуйЛонец
+                            if (sentence_found == false) {
+                                //TextBeginningIndex = currentValue.search(/[^<>/\d\[\]\s:,;\.\-\!\?\+\-]+/);
+                                if (TextBeginningIndex != -1) {
+                                        str_arr = currentValue.split('');
+                                        str_arr[TextBeginningIndex] = currentValue[TextBeginningIndex].toUpperCase();
+                                        currentValue = str_arr.join('');
+                                        sentence_found = true;
+                                        TextBeginningIndex = -1;
+                                }
+                            } else {
+                                if (value == 5) sentence_found = false;
+                                if (value == 8 || value == 6) currentValue = currentValue.toLowerCase();
+                            }
+
+                            if (value == 7) {
+                                currentValue = currentValue.toLowerCase();
+                                //console.log(currentValue);
+                                str_arr = currentValue.split('');
+                                //console.log(str_arr);
+                                str_arr[0] = currentValue[0].toUpperCase();
+                                //console.log(str_arr);
+                                currentValue = str_arr.join('');
+                            }
+
+                            arrayOfStrings.push([currentValue,value]);
                             //console.log(currentValue);
-                            str_arr = currentValue.split('');
-                            //console.log(str_arr);
-                            str_arr[0] = currentValue[0].toUpperCase();
-                            //console.log(str_arr);
-                            currentValue = str_arr.join('');
                         }
+                    });
 
-                        arrayOfStrings.push([currentValue,value]);
-                        //console.log(currentValue);
-                    }
-                });
+                    //console.log("arrayOfStrings:");
+                    console.log(arrayOfStrings);
 
-                //console.log("arrayOfStrings:");
-                //console.log(arrayOfStrings);
-
-                let result = arrayOfStrings.map((x) => x[0]).join(' '); // Соединяем обратно
-                //console.log('join:' + result)
+                    result = arrayOfStrings.map((x) => x[0]).join(' '); // Соединяем обратно
+                    //console.log('join:' + result)
+                };
 
                 if (dot == true) {
-                    //if (result.search(/.*\[\[\d+\]\]$/) == -1 && result.length > 2) { // твик из-за старого кода в antiCapsMat
+                    //if (result.search(/.*\[\[\d+\]\]$/) == -1 && result.length > 2) { // твик из-за старого кода в antiShit
                     return result.replace(/([A-ZА-Яa-zа-я]+)(\s*\[\[\d\]\])?$/,'$1.$2'); // Подстановка точки в конце
                 } else {
                     return result;
@@ -1482,7 +1505,7 @@ window.addEventListener('beforeunload', function(event) {
         }
 
 /*==================================================================================*/
-        function antiCapsMat(m,anticaps) {
+        function antiShit(m,anticaps,dot) {
             if (m === undefined) {
                 return undefined;
             }
@@ -1553,7 +1576,7 @@ window.addEventListener('beforeunload', function(event) {
                 '.*лапотн.*': '🐷',
                 '.*параш.* раб.*': '🐷',
                 '.*быдловата.*': '🐷',
-                '.*р(((у|ю)з)|(ю(с|з))){1,2}ь?к(е|ие).*': '🐷',
+                '.*р(((у|ю)з)|(ю(с|з))){1,5}ь?к(е|ие).*': '🐷',
                 '.*русо ?(пидор|чмо|свин).*': '🐷',
                 '.*( |^)р(у|ю)(с|з){1,2}иш.*': '🐷',
                 '.*( |^)р(у|ю)(с|з){1,2}к(ей|ая|ий|ое) (свинья|хуесос|чмо).*': '🐷',
@@ -1584,6 +1607,7 @@ window.addEventListener('beforeunload', function(event) {
                 '.*я тебя лично найду.*': '🐷',
                 '.*скрепоноzн.*': '🐷',
                 '.*раис(и|я).*': '🐷',
+                '.*русн(и|я|е|ю|ёй).*': '🐷',
 /*======================хохлопидор спамер==========================*/
                 '.*кидайте жалобы.*': '🐷',
 /*=================================================================*/
@@ -1635,11 +1659,7 @@ window.addEventListener('beforeunload', function(event) {
                 i++
             })
 
-            if (anticaps === true) {
-                m = $(m).html().toLowerCase(); // Перевод в нижний регистр.
-            } else {
-                m = $(m).html();
-            }
+            m = $(m).html();
 
             let shit_found = false;
 
@@ -1661,7 +1681,7 @@ window.addEventListener('beforeunload', function(event) {
             };
 
             if (shit_found == false) {
-                m = TextCorrector(m,true,false,recv); // Исправление на первую заглавную и добавление точки в конце
+                m = TextCorrector(m,anticaps,dot,recv);
             }
 
             o.map(function (h, i) {
@@ -1807,9 +1827,8 @@ window.addEventListener('beforeunload', function(event) {
                 if ( window.location.href.indexOf('https://livacha.com/chat/') != -1 ) {
                     document.querySelector("textarea.form-control").addEventListener('keypress', (e) => {
                         if (e.key === 'Enter') {
-                            //console.log('+4');
                             var element = e.target;
-                            //element.value = TextCorrector(element.value,false,false,send);
+                            element.value = TextCorrector(element.value,false,false,send);
                             return
                         }
                     },true);
@@ -1827,7 +1846,7 @@ window.addEventListener('beforeunload', function(event) {
                         if (userItem.innerText.indexOf("Послать") != -1 ) {
                             userItem.addEventListener('click', (e) => {
                                 let elem = document.querySelector("textarea.form-control");
-                                //elem.value = TextCorrector(elem.value,false,false,send);
+                                elem.value = TextCorrector(elem.value,false,false,send);
                                 return
                             },true)
                             console.log('EventListenerAdded:div.chat-container.button.btn-secondary:click');
@@ -1975,7 +1994,7 @@ window.addEventListener('beforeunload', function(event) {
                                    "</i></button>" +
                                    "</div>" );
 
-                if(!is_me) { // не обрабатывать antiCapsMat и antiSpam сообщения от себя
+                if(!is_me) { // не обрабатывать antiShit и antiSpam сообщения от себя
                     var antiSpamResult = [];
 
                     if (!is_rus_flag && msglist_loaded == true) { // не проверять на спам сообщения с русским флагом
@@ -1985,21 +2004,20 @@ window.addEventListener('beforeunload', function(event) {
 
                     if (antiSpamResult[0] > 0) { is_spam = true }
 
-                    SpamResult = antiCapsMat(text,true);
+                    SpamResult = antiShit(text,false,false);
 
                     text = SpamResult[0];
                     element.querySelector('span.text').innerHTML = text;
-                    //console.log('%cantiCapsMat:' + text,'background: LemonChiffon;color: red');
+                    //console.log('%antiShit:' + text,'background: LemonChiffon;color: red');
                     //console.log(SpamResult[1]); // данные сообщения для более глубокого разбора
                 } else { element.style.backgroundColor = "LemonChiffon" } // WhiteSmoke Azure Honeydew
 
-                //text = antiCapsMat(text); // обрабатывать сообщения от себя
+                //text = antiShit(text,true,false); // обрабатывать сообщения от себя
 
                 if (text.search("🐖") != -1) { is_hohloflag = true };
                 if (text.search("🐷") != -1) { is_rusofob = true };
-                //if (text.search('🥛') != -1) { is_amoral = true }
                 if ((text.search("🤮") != -1 || text.search("😭") != -1 || text.search('😫') != -1 || text.search('🥛') != -1) &&
-                    is_me == false) { is_amoral = true } // || text.search('🥛') != -1
+                    is_me == false) { is_amoral = true }
 
                 var now = new Date();
                 var ticks = now.getTime();
@@ -2058,14 +2076,14 @@ window.addEventListener('beforeunload', function(event) {
                         ignorelist.splice(i, 1);
                         is_in_ignorelist = false;
                         console.log('date_diff >= ignore_time');
-                        console.log(nickname + "|" + profile + " erased from ignore list by timeoffset");
+                        console.log(nickname + "|" + profile + " удалён из игнорлиста по истечению времени");
                         console.log(ignorelist);
                         return;
                     } else if (ignorelist[i][2] == 3 && date_diff >= 86400000) {
                         console.log('date_diff >= 86400000');
                         ignorelist.splice(i, 1);
                         is_in_ignorelist = false;
-                        console.log(nickname + "|" + profile + " erased from ignore list by timeoffset");
+                        console.log(nickname + "|" + profile + " удалён из игнорлиста по истечению времени");
                         console.log(ignorelist);
                         return;
                     }
@@ -2239,7 +2257,7 @@ window.addEventListener('beforeunload', function(event) {
                                 if ( message_to[c][1] == nickname_self && message_to[c][0] == key &&
                                     (data.self !== true ? false : true)) {
                                     for_me = true;
-                                    element.style.backgroundColor = "LightGrey";
+                                    element.style.backgroundColor = "PeachPuff";
                                 }
                                     //console.log(author_nickname + ':' + data.info.nickname + ':' + author_profile + ':' + data.info.profile + ':' + data.owner);
                                     //console.log(data);
@@ -2350,7 +2368,7 @@ window.addEventListener('beforeunload', function(event) {
                         }
 
                         if ((is_hohloflag == true || is_rusofob == true) && is_temp == false){
-                            reason = 'Причина:' + (is_rusofob ? ' is_hohloflag' : '') + (is_hohloflag ? ' хохлофлаг' : '');
+                            reason = 'Причина:' + (is_rusofob ? ' русофоб' : '') + (is_hohloflag ? ' хохлофлаг' : '');
                             let counter_array = [0,0,0];
                             if (is_hohloflag == true) counter_array[0]++;
                             if (is_rusofob == true) counter_array[1]++;
@@ -2363,7 +2381,7 @@ window.addEventListener('beforeunload', function(event) {
 
 
                         if ((is_hohloflag == true || is_rusofob == true) && is_temp == true ){
-                            reason = 'Причина: ' + (is_rusofob ? 'русофоб' : '') + (is_hohloflag ? 'хохлофлаг' : '') + " (1 раз) - автобан на 1 день";
+                            reason = 'Причина: ' + (is_rusofob ? ' русофоб' : '') + (is_hohloflag ? ' хохлофлаг' : '') + " (1 раз) - автобан на 1 день";
                             let counter_array = [0,0,0];
                             if (is_hohloflag == true) counter_array[0]++;
                             if (is_rusofob == true) counter_array[1]++;
@@ -2413,7 +2431,7 @@ window.addEventListener('beforeunload', function(event) {
                                 }
 
                                 SaveData(autoremove_from_ignorlist);
-                                console.log("счётчик обновлён (hohloflag): (" + nickname + "|" + profile + "|" + uid + "): " + ignorelist[index][5][0] + " раз, порог: " +
+                                console.log("счётчик обновлён (хохлофлаг): (" + nickname + "|" + profile + "|" + uid + "): " + ignorelist[index][5][0] + " раз, порог: " +
                                 autoban_hohloflag_treshold_msg + " раз");
                             }
                        }
@@ -2439,7 +2457,7 @@ window.addEventListener('beforeunload', function(event) {
                                 }
 
                                 SaveData(autoremove_from_ignorlist);
-                                console.log("счётчик обновлён (rusofob): (" + nickname + "|" + profile + "|" + uid + "): " + ignorelist[index][5][1] + " раз, порог: " +
+                                console.log("счётчик обновлён (русофоб): (" + nickname + "|" + profile + "|" + uid + "): " + ignorelist[index][5][1] + " раз, порог: " +
                                 autoban_rusofob_treshold_msg + " раз");
                             }
                        }
