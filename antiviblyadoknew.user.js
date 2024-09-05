@@ -2,16 +2,15 @@
 // @name        AntiviblyadokNew
 // @description Script - Antiviblyadok
 // @author      AntiviblyadokNew
-// @version     0.5.5
-// @updateURL   https://raw.githubusercontent.com/ngrepo/antiviblyadok/main/antiviblyadoknew.js
-// @downloadURL https://raw.githubusercontent.com/ngrepo/antiviblyadok/main/antiviblyadoknew.js
+// @version     0.5.9
+// @updateURL   https://raw.githubusercontent.com/ngrepo/antiviblyadok/main/antiviblyadoknew.meta.js
+// @downloadURL https://raw.githubusercontent.com/ngrepo/antiviblyadok/main/antiviblyadoknew.user.js
 // @namespace   https://livacha.com/
 // @match       https://livacha.com/*
 // @connect     livacha.com
 // @run-at      document-start
 // @noframes
 // ==/UserScript==
-// @unwrap
 
     const WebSocketProxy = new Proxy(window.unsafeWindow.WebSocket, {
         construct(target, args) {
@@ -164,15 +163,7 @@ var DocStile = create( "style",{type: "text/css"},css_block);
 
     document.getElementsByTagName('head')[0].appendChild(DocStile);
 
-/*const ScrptContent = `
-<div class="test" z-index:99999999;  >test</div>
-
-`
-;
-
-var Scrpt = create("div",ScrptContent);
-	document.getElementById('content').appendChild(Scrpt); */
-        const countries_map = new Map([
+const countries_map = new Map([
         ["AD","🇦🇩"],["AE","🇦🇪"],["AF","🇦🇫"],["AG","🇦🇬"],["AI","🇦🇮"],["AL","🇦🇱"],["AM","🇦🇲"],["AO","🇦🇴"],
             ["AQ","🇦🇶"],["AR","🇦🇷"],["AS","🇦🇸"],["AT","🇦🇹"],["AU","🇦🇺"],["AW","🇦🇼"],["AX","🇦🇽"],["AZ","🇦🇿"],
             ["BA","🇧🇦"],["BB","🇧🇧"],["BD","🇧🇩"],["BE","🇧🇪"],["BF","🇧🇫"],["BG","🇧🇬"],["BH","🇧🇭"],["BI","🇧🇮"],
@@ -297,14 +288,15 @@ var Scrpt = create("div",ScrptContent);
                                  ['*KАТЁНОК*','apr12820','ебанутая дура'],
                                  ['ВАСЯ  ГРАДУС','Fgk6eju','пиндос'],
                                  ['Нана','Nana1610','свинья с самомнением'],
-                                 ['Луна 2010','luna_2010','два акка забанила сучара'],
+//                                 ['Луна 2010','luna_2010','два акка забанила сучара'],
                                  ['Мультик©™','Daryna','остоебавший хихикающий уебан'],
                                  ['Алинка Сергеевна','Alinka_Sergeevna','забанила низачто ёбнутая, при чём ни раз.'],
 //                                 ['Милка Попова','milka_popova1','забанила из-за минетки'],
                                  ['Вероника Сергеевна','sdfdghj','у ёбнутой чат всегда для друзей'],
                                  ['ღ_Лялька_ღ✔','Lyalka','уёбищный транс, у которого для друзей'],
                                  ['vI.NADIN21','vl_nadin21','мразота с банщями модерастами'],
-                                 ['Реалка','yuliya1237','свидомое отродье с днепропетровска банит']
+                                 ['Реалка','yuliya1237','свидомое отродье с днепропетровска банит'],
+                                 ['ponterka..','ponterka1986','животное банит часто, лживая пизда'],
                                 ];
         var whitelist_stream = [
                                 ['Дѻктѻр','flus'],
@@ -329,11 +321,6 @@ var Scrpt = create("div",ScrptContent);
         var user_id_self;
 
         var msglist_loaded = false;
-//console.log(document.getElementsByClassName('d-inline-block app-text-overflow text-white')[0].getElementsByTagName("strong"));
-      //  var nickname = document.getElementsByClassName('d-inline-block app-text-overflow text-white')[0].getElementsByTagName("strong")[0].innerHTML;
-
-     //   console.log(nickname);
-     //   if (typeof nickname === 'undefined') { nickname = "" };
 
         const ignore_nick_uid_country = 0;
         const ignore_profile_uid_country = 1;
@@ -345,15 +332,7 @@ var Scrpt = create("div",ScrptContent);
         const send = 0;
         const recv = 1;
 //        let e_app_nickname = document.getElementsByClassName("app-nickanme")[0]; // old
-      //  let e_app_nickname = document.getElementsByClassName("nickname text-truncate")[0].getElementsByTagName("strong")[0].getElementsByTagName("a")[0];;
-      //  var author_id = '';                                              // id
-//        console.log(e_app_nickname);
-      //  var author_nick = e_app_nickname.innerHTML;                      // nick
-      //  console.log(author_nick);
-      //  var author_login = e_app_nickname.href.replace(/.*\/user\//,''); // login
-      //  console.log(author_login);
-
-        //console.log(author_nick + '|' + author_login + '|' + nickname); // на данной стадии не пишет в консоль !
+//        let e_app_nickname = document.getElementsByClassName("nickname text-truncate")[0].getElementsByTagName("strong")[0].getElementsByTagName("a")[0];;
 
 function markDuplicate(array){
     let countItems = {};
@@ -388,14 +367,6 @@ function SaveData(autoremove) {
 //const ignore_temp_profile = 3;
 //const ignore_permanent = 4;
 //const ignore_pending = 5;
-//=====================================================
-    //var myentry = {nick: '', login: '', instruction: 0, time_offset: 0, mod_time: 0, comment: '', country: '', uid: 0};
-
-    //let entry = new Object();
-    //entry.nick = 'nick';
-    //entry.login = 'login';
-
-    //entry.hasOwnProperty('nick');
 //=====================================================
     let ignorelist_loaded = new Array();
     let ignorelist_temp = new Array();
@@ -484,7 +455,6 @@ console.log(ignorelist_temp);
       if((typeof(localStorage) != 'undefined') && (ignorelist_temp.length > 0)) { localStorage.setItem('ignorelist', JSON.stringify(ignorelist_temp)) }
 }
 
-//var MsgClickFunc = function MsgClick(e) {
 function MsgClick(e) {
     var element = e.parentElement;
     if (element == undefined) return;
@@ -765,26 +735,11 @@ exportFunction(OnOffFilter, unsafeWindow, { defineAs: "OnOffFilter" });
 exportFunction(RemoveFromIgnore, unsafeWindow, { defineAs: "remove" });
 exportFunction(SaveData, unsafeWindow, { defineAs: "save" });
 exportFunction(last, unsafeWindow, { defineAs: "last" });
-//exportFunction(DispatchChatMessage, unsafeWindow, { defineAs: "DispatchChatMessage" });
-exportFunction(stub_old, unsafeWindow, { defineAs: "stub" });
+exportFunction(stub, unsafeWindow, { defineAs: "stub" });
 
-function stub_old(){
+function stub(){
     console.log('func stub');
 }
-//const JS123 = `
-//`;
-
-//let JS = create("script",{type: "text/javascript"},JS123);
-//let JS1 = create("script",{type: "text/javascript"},AddToIgnoreListFunc.toString());
-
-//document.getElementsByTagName('head')[0].appendChild(JS);
-//document.getElementsByTagName('head')[0].appendChild(JS1);
-/*
-Событие storage
-Если у вас есть потребность, или желание прослушивать изменение в localStorage, то можно просто добавить слушатель событий на 'storage':
-
-window.addEventListener('storage', (event) => console.log(event));
-*/
 
 function messageDispather(data) {
     if (data !== undefined ) {
@@ -1158,23 +1113,6 @@ function updateUserList (message) {
             //console.log(userlist);
         if (message.response.type == 'remove') {
             if (typeof message.response.client.id === 'string') {
-                //userlist.delete(message.response.client.id);
-                //console.log('message.response.count=' + message.response.count + ':users_max=' +
-                //users_max + ':users_max*2=' + users_max * 2);
-
-//                let users_to_del = (users_max >= 150 ? 300 : 100);
-/*                if (userlist.size >= 111) {
-                    console.log('userlist size:' + userlist.size);
-                    console.log(userlist);
-                    let i = 0;
-                    for (let key of userlist.keys()) {
-                        if (i <= 15) userlist.delete(key);
-                        i++;
-                    }
-                    console.log('userlist reduced, size:' + userlist.size);
-                    console.log(userlist);
-                }
-*/
                 if (userlist.size >= users_max * 5) {
                     console.log('userlist size:' + userlist.size);
                     //console.log(userlist);
@@ -1186,7 +1124,6 @@ function updateUserList (message) {
                     console.log('userlist reduced, size:' + userlist.size);
                     //console.log(userlist);
                 }
-
             }
         }
     }
@@ -1285,12 +1222,7 @@ window.addEventListener('beforeunload', function(event) {
     if (w.self != w.top) {
         return;
     }
-/*
-    if (/http:\/\/userscripts.org/.test(w.location.href)) {
-        //Ниже идёт непосредственно код скрипта
-        alert("Userscripts приветствует вас навязчивым окном.");
-    }
-*/
+
     function getHostName(url) {
         var match = url.match(/:\/\/(www[0-9]?\.)?(.[^/:]+)/i);
         if (match != null && match.length > 2 && typeof match[2] === 'string' && match[2].length > 0) {
@@ -1365,7 +1297,7 @@ window.addEventListener('beforeunload', function(event) {
                     s = s.replace(/из за/gi,'из-за');
                     s = s.replace(/корчое/gi,'короче');
                     s = s.replace(/никогад/gi,'никогда');
-                    s = s.replace(/(хохлопид(и|о)?р(х|г)?)|хохол/gi,'хохлован');
+//                    s = s.replace(/(хохлопид(и|о)?р(х|г)?)|хохол/gi,'хохлован');
                     s = s.replace(/\:\?$/gi,'?');
                     s = s.replace(/\s*\.{2,}$/gi,'..');
 //                    s = s.replace(/\)+\s*$/gi,' :D');
@@ -1373,88 +1305,33 @@ window.addEventListener('beforeunload', function(event) {
                     s = s.replace(/рводе/gi,'вроде');
                     s = s.replace(/вонбчка/gi,'вонючка');
                     s = s.replace(/чгео/gi,'чего');
+                    s = s.replace(/всегад/gi,'всегда');
+                    s = s.replace(/тогад/gi,'тогда');
                 }
 
-                let result = s;
+                var arrayOfStrings = s.split(/(#[^#:]+:|:[^:]+:|\. |\!|\?|\)|\()/); // Делим на предложения, ники, смайлы
+                //console.log(arrayOfStrings);
+			    for(var c = 0; c < arrayOfStrings.length; c++){
 
-                if (anticaps == true) {
-                    console.log('s:' + s);
-
-                    let value = 0;
-                    let value_pre = 0;
-                    let arrayOfStrings = [];
-                    let TextBeginningIndex = -1;
-                    let str_arr = [];
-                    let sentence_found = false;
-
-                    var split_reg = /\s+/;
-                    //console.log(s.replace(/\s+$|^\s+/,'').split(split_reg));
-
-                    s.replace(/\s+$|^\s+/,'').split(split_reg).forEach(function (currentValue, index, array) { // делит пробелами
-                        value = 0;
-                        if (currentValue != '') {
-                            if (currentValue.search(/#[^#:]+/) != -1) {
-                                value = 9;         // находит ника перед пробелом
-                            } else if (currentValue.search(/[^#:]+:/) != -1 && value_pre == 9) {
-                                value = 10;         // находит ника после пробела
-                            } else if (value_pre == 9) {
-                                value = 9;         // поиск много пробельных ников
-                            } else if (currentValue.search(/#[^#:]+:/) != -1) {
-                                value = 1;         // находит целый ник
-                            } else if (currentValue.search(/(:[^:]+:|:\w)/) != -1) {
-                                value = 2;          // находит смайлы
-                            } else if (currentValue.search(/(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?/) != -1) {
-                                value = 4;      // находит url
-                            } else if (currentValue.search(/[a-zA-ZА-Яа-я]+[.?!()]+/) != -1) {
-                                value = 5;    // находит конец предложения
-                            } else if (currentValue.search(/^[A-ZА-Я]+$/) != -1) {
-                                value = 6;         // находит полностью верхний регистр
-                            } else if (currentValue.search(/[A-ZА-Я]+[a-zа-я]+/) != -1) {
-                                value = 7; // находит начинающийся с верхнего и далее нижний
-                            } else if (currentValue.search(/[A-ZА-Яa-zа-я]+/) != -1) {
-                                value = 8; // находит любой регистр
-                                TextBeginningIndex = currentValue.search(/[A-ZА-Яa-zа-я]+/);
-                            //} else if (currentValue.search(/\.|\!|\?|\)|\(/) != -1) {
-                            //    value = 3;   // находит символы
+                let match_value = arrayOfStrings[c].match(/[^<>/\d\[\]\s:,;\.\-\!\?]+/);
+                    //console.log(match_value);
+                    if (match_value !== null) { // Делаем первую букву заглавной
+                       if (match_value[0] == '') { return s }
+                       let str = match_value[0];
+                        //console.log(arrayOfStrings[c] + "|" + /:[^:]+:/.test(arrayOfStrings[c]));
+                        if (/:[^:]+:|#[^#:]+:/.test(arrayOfStrings[c]) == false) {
+                            if (anticaps == true) {
+                                //console.log(arrayOfStrings);
+                                arrayOfStrings[c] = arrayOfStrings[c].toLowerCase(); // Полный антикапс
+                                str = str.toLowerCase();
+                                str = str.replace(str[0], str[0].toUpperCase());
+                                arrayOfStrings[c] = arrayOfStrings[c].replace(str.toLowerCase(),str);
                             }
-
-                            value_pre = value;
-//звезда ёбаного эсТон вуда. ЁБаНый гуль. хуйЛонец
-                            if (sentence_found == false) {
-                                //TextBeginningIndex = currentValue.search(/[^<>/\d\[\]\s:,;\.\-\!\?\+\-]+/);
-                                if (TextBeginningIndex != -1) {
-                                        str_arr = currentValue.split('');
-                                        str_arr[TextBeginningIndex] = currentValue[TextBeginningIndex].toUpperCase();
-                                        currentValue = str_arr.join('');
-                                        sentence_found = true;
-                                        TextBeginningIndex = -1;
-                                }
-                            } else {
-                                if (value == 5) sentence_found = false;
-                                if (value == 8 || value == 6) currentValue = currentValue.toLowerCase();
-                            }
-
-                            if (value == 7) {
-                                currentValue = currentValue.toLowerCase();
-                                //console.log(currentValue);
-                                str_arr = currentValue.split('');
-                                //console.log(str_arr);
-                                str_arr[0] = currentValue[0].toUpperCase();
-                                //console.log(str_arr);
-                                currentValue = str_arr.join('');
-                            }
-
-                            arrayOfStrings.push([currentValue,value]);
-                            //console.log(currentValue);
                         }
-                    });
-
-                    //console.log("arrayOfStrings:");
-                    console.log(arrayOfStrings);
-
-                    result = arrayOfStrings.map((x) => x[0]).join(' '); // Соединяем обратно
-                    //console.log('join:' + result)
-                };
+                    }
+			    }
+                //console.log(arrayOfStrings);
+                let result = arrayOfStrings.join(''); // Соединяем обратно
 
                 if (dot == true) {
                     //if (result.search(/.*\[\[\d+\]\]$/) == -1 && result.length > 2) { // твик из-за старого кода в antiShit
@@ -1875,7 +1752,7 @@ window.addEventListener('beforeunload', function(event) {
                     document.querySelector("textarea.form-control").addEventListener('keypress', (e) => {
                         if (e.key === 'Enter') {
                             var element = e.target;
-                            element.value = TextCorrector(element.value,false,false,send);
+                            element.value = TextCorrector(element.value,true,false,send);
                             return
                         }
                     },true);
@@ -1893,7 +1770,7 @@ window.addEventListener('beforeunload', function(event) {
                         if (userItem.innerText.indexOf("Послать") != -1 ) {
                             userItem.addEventListener('click', (e) => {
                                 let elem = document.querySelector("textarea.form-control");
-                                elem.value = TextCorrector(elem.value,false,false,send);
+                                elem.value = TextCorrector(elem.value,true,false,send);
                                 return
                             },true)
                             console.log('EventListenerAdded:div.chat-container.button.btn-secondary:click');
@@ -2036,7 +1913,7 @@ window.addEventListener('beforeunload', function(event) {
 
                     if (antiSpamResult[0] > 0) { is_spam = true }
 
-                    SpamResult = antiShit(text,false,false);
+                    SpamResult = antiShit(text,true,false);
 
                     text = SpamResult[0];
                     element.querySelector('span.text').innerHTML = text;
@@ -2510,8 +2387,9 @@ window.addEventListener('beforeunload', function(event) {
                     }
                 }
 
-                if((is_spam == true && is_me == false && is_author == false && hide_spam == true) ||
-                   (is_amoral == true && is_me == false && for_author == false && is_author == false && hide_amoral == true)){
+                if((is_spam == true && is_me == false && is_author == false && hide_spam == true && is_rus_flag == false) ||
+                   (is_amoral == true && is_me == false && for_author == false && is_author == false && hide_amoral == true &&
+                    is_rus_flag == false)){
                       if (hide_amoral == true && is_amoral == true) red = true;
                       element.remove();
                 }
@@ -2552,9 +2430,12 @@ window.addEventListener('beforeunload', function(event) {
                         + '-' + ((tmp = (date.getFullYear())) < 10 ? '0' + tmp : tmp);
                     }
 
+                    let country_symbol = countries_map.get(country_iso);
+                    country_symbol = (country_symbol == undefined ? '' : country_symbol);
+
                     console.log('%cchat(' + (date.getHours() < 10 ? '0' : '') + date.getHours() + ':' +
                                 (date.getMinutes() < 10 ? '0' : '') + date.getMinutes() +
-                                '):' + nickname + ':' + profile + ':' + countries_map.get(country_iso) + "(" + country_iso + ")" +
+                                '):' + nickname + ':' + profile + ':' + (country_symbol != '' ? country_symbol + "(" + country_iso + ")" : 'unknown' ) +
                                 (is_city_changed ? '(' + city + ')' : '') + ':' +
                                 //(joinAt !== undefined ? 'joined(' + formatDate(new Date(joinAt)) + ')' : '') + ':' +
                                 'uid=' + uid + ':' +
