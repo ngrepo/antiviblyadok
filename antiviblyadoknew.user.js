@@ -2,7 +2,7 @@
 // @name        AntiviblyadokNew
 // @description Script - Antiviblyadok
 // @author      AntiviblyadokNew
-// @version     0.5.9
+// @version     0.6.0
 // @updateURL   https://raw.githubusercontent.com/ngrepo/antiviblyadok/main/antiviblyadoknew.meta.js
 // @downloadURL https://raw.githubusercontent.com/ngrepo/antiviblyadok/main/antiviblyadoknew.user.js
 // @namespace   https://livacha.com/
@@ -242,7 +242,7 @@ const countries_map = new Map([
                                  ['','Stepnyak','неприятный очкир'],
                                  ['','zlobik','хохлопидор с куива'],
                                  ['','valdemar_ogly','русофобский пидор старый'],
-                                 ['','shursheshon','шиза инетная'],
+//                                 ['','shursheshon','шиза инетная'],
                                  ['','zeeko','хуйло с еблом навального'],
                                  ['','cj_manylighter','уг'],
                                  ['','bumer','уг'],
@@ -254,15 +254,15 @@ const countries_map = new Map([
                                  ['','filanda','инвалид'],
                                  ['','Filanday','инвалид'],
                                  ['','PIZDANCE','шлак'],
-                                 ['','Budkin','пиндос'],
+                                 ['','Budkin','пиндосское чмо, унтерменш'],
                                  ['','stepdaddy','унылое'],
                                  ['','agrippa_perturbaciya','шиз какой то'],
-                                 ['','kris_top','интернет проститутка, банит'],
+//                                 ['Кристина','kris_top','интернет проститутка, банит'],
                                  ['','Clay','пездна банит неоднократно'],
                                  ['','Karina-kim20','проститутка с бонги банит'],
                                  ['','mudila88855','инвал из кунсткамеры'],
-                                 ['Рома','Mavkaa','кахтавая мгазь кидает в чс'],
-                                 ['Шеф','Dillinger','чмо уфимское, банит как крыса в других трансляциях'],
+                                 ['Рома','Mavkaa','кахтавая мгазь кидает в чс, из-за этой мрази забанили по айпи'],
+//                                 ['Шеф','Dillinger','чмо уфимское, банит как крыса в других трансляциях'],
                                  ['*(Real) Ya- Bog (999)*','vladimir_gennad','урка, либераст'],
                                  ['','nadin27nadin','держит ублюдков модерастов и сама банит'],
                                  ['Лакомый агнетц','karps','шлак'],
@@ -290,13 +290,14 @@ const countries_map = new Map([
                                  ['Нана','Nana1610','свинья с самомнением'],
 //                                 ['Луна 2010','luna_2010','два акка забанила сучара'],
                                  ['Мультик©™','Daryna','остоебавший хихикающий уебан'],
-                                 ['Алинка Сергеевна','Alinka_Sergeevna','забанила низачто ёбнутая, при чём ни раз.'],
+//                                 ['Алинка Сергеевна','Alinka_Sergeevna','забанила низачто ёбнутая, при чём ни раз.'],
 //                                 ['Милка Попова','milka_popova1','забанила из-за минетки'],
                                  ['Вероника Сергеевна','sdfdghj','у ёбнутой чат всегда для друзей'],
                                  ['ღ_Лялька_ღ✔','Lyalka','уёбищный транс, у которого для друзей'],
                                  ['vI.NADIN21','vl_nadin21','мразота с банщями модерастами'],
                                  ['Реалка','yuliya1237','свидомое отродье с днепропетровска банит'],
                                  ['ponterka..','ponterka1986','животное банит часто, лживая пизда'],
+                                 ['BEZDNA','BEZDNA','из-за этого животного забанили по айпи, нажаловалась видимо мразь, постоянно банит животное'],
                                 ];
         var whitelist_stream = [
                                 ['Дѻктѻр','flus'],
@@ -1307,6 +1308,7 @@ window.addEventListener('beforeunload', function(event) {
                     s = s.replace(/чгео/gi,'чего');
                     s = s.replace(/всегад/gi,'всегда');
                     s = s.replace(/тогад/gi,'тогда');
+                    s = s.replace(/сукурво/gi,'секуров');
                 }
 
                 var arrayOfStrings = s.split(/(#[^#:]+:|:[^:]+:|\. |\!|\?|\)|\()/); // Делим на предложения, ники, смайлы
