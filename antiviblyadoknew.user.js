@@ -2,7 +2,7 @@
 // @name        AntiviblyadokNew
 // @description Script - Antiviblyadok
 // @author      AntiviblyadokNew
-// @version     0.6.3
+// @version     0.6.4
 // @updateURL   https://raw.githubusercontent.com/ngrepo/antiviblyadok/main/antiviblyadoknew.meta.js
 // @downloadURL https://raw.githubusercontent.com/ngrepo/antiviblyadok/main/antiviblyadoknew.user.js
 // @namespace   https://livacha.com/
@@ -261,7 +261,7 @@ const countries_map = new Map([
 /*не разбанивать ёбнутое чмо*/   ['','Clay','пездна банит неоднократно'],
                                  ['','Karina-kim20','проститутка с бонги банит'],
                                  ['','mudila88855','инвал из кунсткамеры'],
-//                                 ['Рома','Mavkaa','кахтавая мгазь кидает в чс, из-за этой мрази забанили по айпи'],
+/*не разбанивать картавую мразь*/['Рома','Mavkaa','из-за этой мрази забанили по айпи, в очередной раз внесла в чёрный список чмо, многократно'],
 //                                 ['Шеф','Dillinger','чмо уфимское, банит как крыса в других трансляциях'],
                                  ['*(Real) Ya- Bog (999)*','vladimir_gennad','урка, либераст'],
                                  ['','nadin27nadin','держит ублюдков модерастов и сама банит'],
@@ -291,7 +291,7 @@ const countries_map = new Map([
                                  ['Нана','Nana1610','свинья с самомнением'],
 //                                 ['Луна 2010','luna_2010','два акка забанила сучара'],
                                  ['Мультик©™','Daryna','остоебавший хихикающий уебан'],
-//                                 ['Алинка Сергеевна','Alinka_Sergeevna','забанила низачто ёбнутая, при чём ни раз.'],
+/*не разбанивать унылую*/        ['Алинка Сергеевна','Alinka_Sergeevna','забанила низачто ёбнутая, при чём ни раз.'],
 //                                 ['Милка Попова','milka_popova1','забанила из-за минетки'],
                                  ['Вероника Сергеевна','sdfdghj','у ёбнутой чат всегда для друзей'],
                                  ['ღ_Лялька_ღ✔','Lyalka','уёбищный транс, у которого для друзей'],
@@ -299,9 +299,13 @@ const countries_map = new Map([
                                  ['Реалка','yuliya1237','свидомое отродье с днепропетровска банит'],
 /*не разбанивать ёбнутое чмо*/   ['ponterka..','ponterka1986','животное банит часто, лживая пизда'],
 /*не разбанивать ёбнутое чмо*/   ['BEZDNA','BEZDNA','из-за этого животного забанили по айпи, нажаловалась видимо мразь, постоянно банит животное'],
-                                 ['Arbuz24','arbuz','либераст, нетвойнист, унылый'],
+//                                 ['Arbuz24','arbuz','либераст, нетвойнист, унылый'],
 /*не разбанивать грушеёблое чмо*/['RadioXoi','radioxoi','прихуевший выблядок олигофрен банит'],
-                                 ['Да, я тАкАя -))','/user/kjuzkjz','не разбанивать минетку ебучую нацистску'],
+                                 ['Да, я тАкАя -))','kjuzkjz','не разбанивать минетку ебучую нацистску'],
+                                 ['yaroslav','yaroslav','педояр надоел мелькать в трансляциях'],
+                                 ['-= ЮлА =-','dno','дура не отвечает в чатах, в игнор'],
+                                 ['Виктор72rus','vviktor','лохотай не интересный мелькает в трансляциях'],
+/*не разбанивать ёбнутое чмо*/   ['Древнее Зло','drevneezlo','чмо банило у кахтавой мхази'],
                                 ];
         var whitelist_stream = [
                                 ['Дѻктѻр','flus'],
@@ -1141,8 +1145,8 @@ function updateUserList (message) {
 
 function chatMessage(message) {
     msglist.set(message.response.mid,message.response);
-    //console.log(message);
 /*
+                    console.log(message);
                     console.log('nickname:' + message.response.owner.info.nickname);
                     console.log('profile:' + message.response.owner.info.profile);
                     console.log('text:' + message.response.text);
@@ -2169,7 +2173,8 @@ window.addEventListener('beforeunload', function(event) {
                                 //} else {
                                 //    nick_to_subjects += ((nick_to_subjects.length > 0) ? "|" + message_to[c][1] + ignorelist_match : message_to[c][1] + ignorelist_match);
                                 //}
-
+//console.log('nickname_self:' + nickname_self);
+//console.log('data.self:' + data.self);
                                 if ( message_to[c][1] == nickname_self && message_to[c][0] == key &&
                                     (data.self !== true ? false : true)) {
                                     for_me = true;
