@@ -290,8 +290,8 @@ const countries_map = new Map([
                                  ['Вася  Градус','Amadei666','пиндос'],
                                  ['Нана','Nana1610','свинья с самомнением'],
 ///*не разбанивать тп суку*/       ['Луна 2010','luna_2010','много акков забанила сучара'],
-//                                 ['Мультик©™','Daryna','остоебавший хихикающий уебан'],
-/*не разбанивать унылую*/        ['Алинка Сергеевна','Alinka_Sergeevna','забанила низачто ёбнутая, при чём ни раз.'],
+/*шизофреник рахит*/             ['Мультик©™','Daryna','остоебавший хихикающий уебан'],
+///*не разбанивать унылую*/        ['Алинка Сергеевна','Alinka_Sergeevna','забанила низачто ёбнутая, при чём ни раз.'],
                                  ['Милка Попова','milka_popova1','забанила из-за минетки'],
                                  ['Вероника Сергеевна','sdfdghj','у ёбнутой чат всегда для друзей'],
                                  ['ღ_Лялька_ღ✔','Lyalka','уёбищный транс, у которого для друзей'],
@@ -309,9 +309,11 @@ const countries_map = new Map([
                                  ['LaS-WeGas','LaS-WeGas','русофобское чмо из грузии'],
                                  ['НИЧЕГО НЕ ПОНИМАЮ','orakul','ебаная рожа, прохвост'],
                                  ['Фаллоимитатор','aleksej_vagner','ёбнутый выблядок старый какой то'],
-                       // забанила за то что мужи пришёл поговорить          ['Милка Попова','mila_popova'],
+///*овцу не разбанивать*/          ['Милка Попова','mila_popova','забанила за то что мужик пришёл поговорить'],
                                  ['Marlon Brando','MarlonBrando','хохлопидор мурлон, друг падлы минетки банил'],
                                  ['Юсичка','usichka','хохлопидоргша свидомитовая'],
+                                 ['дашка','ddashkakashkaa','банит за каждый чих тупоголовая свинья'],
+                                 ['fun','fun777','шиз какой то'],
                                 ];
         var whitelist_stream = [
                                 ['Дѻктѻр','flus'],
@@ -1875,11 +1877,10 @@ window.addEventListener('beforeunload', function(event) {
             const hide_all_not_ru_country = false; // доделать !?
 
             const restrictedCountries = Array ( // boolean true - скрывать так же у зарегеных
-            ['UA',false],['NL',false],['VN',false],['GB',false],['EE',false],['FR',false],['PL',false],
-                //['US',false],
-            ['MD',false],['DE',false],['GE',true],['AT',false],['BA',false],['NO',false],['CL',true],
-            ['AT',false],
-            //,['ES',true],['HU',true],['DZ',false],['DK',false]
+            ['UA',false],['NL',true],['VN',true],['GB',false],['EE',false],['FR',true],['PL',false],
+            ['US',false],
+            ['MD',false],['DE',false],['GE',true],['AT',true],['BA',false],['NO',false],['CL',false],
+            ['SE',false],['ES',false],['HU',false],['DZ',false],['DK',false],
             );
 
             const autoban = true;
