@@ -2,7 +2,7 @@
 // @name        AntiviblyadokNew
 // @description Script - Antiviblyadok
 // @author      AntiviblyadokNew
-// @version     0.6.6
+// @version     0.6.8
 // @updateURL   https://raw.githubusercontent.com/ngrepo/antiviblyadok/main/antiviblyadoknew.meta.js
 // @downloadURL https://raw.githubusercontent.com/ngrepo/antiviblyadok/main/antiviblyadoknew.user.js
 // @namespace   https://livacha.com/
@@ -222,7 +222,7 @@ const countries_map = new Map([
 
         var ignorelist_stream = [
                                  ['Психея','m94794','наставила выблядков в модерасты'],
-/*не разбанивать ёбнутое чмо*/   ['KISS ME','KatyaLeto','чмо, кидает в чс'],
+/*не разбанивать щучье ебло*/   ['KISS ME','KatyaLeto','чмо, кидает в чс'],
                                  ['TiVi','tivi','шлак'],
                                  ['✅ᗫoᏰᏒo','Nevskiy','шлак'],
                                  ['ВероНика','rfgecnf','шлак'],
@@ -232,8 +232,8 @@ const countries_map = new Map([
                                  ['БИЗНЕСВУМЕН','buzzazals','чушь'],
                                  ['Зачот','svet260492','какой то ебанат унылый'],
                                  ['','filippk2555','пиндосский старый жид'],
-/*не разбанивать ёбнутое чмо*/   ['','yourdirty_desire','свинья канадская банит'],
-/*не разбанивать ёбнутое чмо*/   ['sumkina','sumkina','сукина'],
+/*не разбанивать канадское чмо*/   ['','yourdirty_desire','свинья канадская банит'],
+/*не разбанивать щучье чмо*/   ['sumkina','sumkina','сукина'],
                                  ['','vdamkah','жаба'],
                                  ['','vasily_alibabaich','изврот'],
                                  ['','julia-S','инвалид'],
@@ -258,11 +258,11 @@ const countries_map = new Map([
                                  ['','stepdaddy','унылое'],
                                  ['','agrippa_perturbaciya','шиз какой то'],
 //                                 ['Кристина','kris_top','интернет проститутка, банит'],
-/*не разбанивать ёбнутое чмо*/   ['','Clay','пездна банит неоднократно'],
+/*не разбанивать беззубое чмо*/   ['','Clay','пездна банит неоднократно'],
                                  ['','Karina-kim20','проститутка с бонги банит'],
                                  ['','mudila88855','инвал из кунсткамеры'],
 /*не разбанивать картавую мразь*/['Рома','Mavkaa','из-за этой мрази забанили по айпи, в очередной раз внесла в чёрный список чмо, многократно'],
-//                                 ['Шеф','Dillinger','чмо уфимское, банит как крыса в других трансляциях'],
+/*не разбанивать маргариновое чмо*/   ['Шеф','Dillinger','чмо уфимское, банит как крыса в других трансляциях'],
                                  ['*(Real) Ya- Bog (999)*','vladimir_gennad','урка, либераст'],
                                  ['','nadin27nadin','держит ублюдков модерастов и сама банит'],
                                  ['Лакомый агнетц','karps','шлак'],
@@ -298,22 +298,30 @@ const countries_map = new Map([
                                  ['vI.NADIN21','vl_nadin21','мразота с банщями модерастами'],
                                  ['Реалка','yuliya1237','свидомое отродье с днепропетровска банит'],
 /*не разбанивать ёбнутое чмо*/   ['ponterka..','ponterka1986','животное банит часто, лживая пизда'],
+/*не разбанивать ёбнутое чмо*/   ['Кристина кос86','ponterka','животное банит часто, лживая пизда'],
 /*не разбанивать ёбнутое чмо*/   ['BEZDNA','BEZDNA','из-за этого животного забанили по айпи, нажаловалась видимо мразь, постоянно банит животное'],
                                  ['Arbuz24','arbuz','либераст, нетвойнист, унылый'],
 ///*не разбанивать грушеёблое чмо*/['RadioXoi','radioxoi','прихуевший выблядок олигофрен банит'],
                                  ['Да, я тАкАя -))','kjuzkjz','не разбанивать минетку ебучую нацистску'],
                                  ['yaroslav','yaroslav','педояр надоел мелькать в трансляциях'],
                                  ['-= ЮлА =-','dno','дура не отвечает в чатах, в игнор'],
-//                                 ['Виктор72rus','vviktor','лохотай не интересный мелькает в трансляциях'],
-/*не разбанивать ёбнутое чмо*/   ['Древнее Зло','drevneezlo','чмо банило у кахтавой мхази'],
+                                 ['Виктор72rus','vviktor','лохотай не интересный мелькает в трансляциях'],
+/*не разбанивать древнее чмо*/   ['Древнее Зло','drevneezlo','чмо банило у кахтавой мхази'],
                                  ['LaS-WeGas','LaS-WeGas','русофобское чмо из грузии'],
                                  ['НИЧЕГО НЕ ПОНИМАЮ','orakul','ебаная рожа, прохвост'],
                                  ['Фаллоимитатор','aleksej_vagner','ёбнутый выблядок старый какой то'],
 ///*овцу не разбанивать*/          ['Милка Попова','mila_popova','забанила за то что мужик пришёл поговорить'],
                                  ['Marlon Brando','MarlonBrando','хохлопидор мурлон, друг падлы минетки банил'],
                                  ['Юсичка','usichka','хохлопидоргша свидомитовая'],
-                                 ['дашка','ddashkakashkaa','банит за каждый чих тупоголовая свинья'],
+/*не разбанивать ёбнутое чмо*/   ['дашка','ddashkakashkaa','банит за каждый чих тупоголовая свинья'],
                                  ['fun','fun777','шиз какой то'],
+                                 ['❣ Zlobnyi element ❣☕','kargoval','хохлочёрт с куива'],
+                                 ['ЛунаПолина','lunapolina','щелезубая шаболда забанила за то что не хочу деньги давать левой бабе - ей'],
+                                 ['Nadina21','nadina21','интернет проститутка ебучая'],
+                                 ['Да... я такая','Allamonetka','каловая падла минетка'],
+                                 ['❃ •°˜”* Хи Ща *”˜°• ❃','Nadiya','бандеровская мразь забанила за свою падлу подругу'],
+                                 ['РеАльНаЯ ЖиЗнь','malinka7','бандеровская мразь идейная, банила у мудяна всех русских мразь'],
+                                 ['МаленькиеЯйца','alex6231','тупой блюдок извращенец охранник'],
                                 ];
         var whitelist_stream = [
                                 ['Дѻктѻр','flus'],
@@ -1223,7 +1231,7 @@ function filterStreams() {
                 whitelisted += ':(' + nickname + ',' + profile + (rating != undefined ? ',' + rating.innerHTML : '') + ')';
             }
         } else {
-            userItem.innerHTML = '';
+            userItem.innerHTML = ''; // убирает трансу - блок с рекламой
         }
 
         });
@@ -1877,7 +1885,7 @@ window.addEventListener('beforeunload', function(event) {
             const hide_all_not_ru_country = false; // доделать !?
 
             const restrictedCountries = Array ( // boolean true - скрывать так же у зарегеных
-            ['UA',false],['NL',true],['VN',true],['GB',false],['EE',false],['FR',true],['PL',false],
+            ['UA',false],['NL',false],['VN',true],['GB',false],['EE',false],['FR',false],['PL',false],
             ['US',false],
             ['MD',false],['DE',false],['GE',true],['AT',true],['BA',false],['NO',false],['CL',false],
             ['SE',false],['ES',false],['HU',false],['DZ',false],['DK',false],
@@ -1932,7 +1940,7 @@ window.addEventListener('beforeunload', function(event) {
 
                     if (antiSpamResult[0] > 0) { is_spam = true }
 
-                    SpamResult = antiShit(text,false,false);
+                    SpamResult = antiShit(text,true,false);
 
                     text = SpamResult[0];
                     element.querySelector('span.text').innerHTML = text;
